@@ -21,6 +21,7 @@ const boundariesConfig = {
       { type: "features", pattern: "features/**/*", mode: "full" },
       { type: "components", pattern: "components/**/*", mode: "full" },
       { type: "lib-db", pattern: "lib/db/**/*", mode: "full" },
+      { type: "lib-kit", pattern: "lib/business-app-kit/**/*", mode: "full" },
       {
         type: "lib-server",
         pattern:
@@ -132,6 +133,10 @@ const boundariesConfig = {
             allow: { to: { type: ["lib-shared", "types", "i18n"] } },
           },
           {
+            from: { type: "lib-kit" },
+            allow: { to: { type: ["lib-kit", "lib-server", "lib-shared", "types"] } },
+          },
+          {
             from: { type: "lib-db" },
             allow: { to: { type: ["lib-db", "lib-shared", "db", "types"] } },
           },
@@ -168,6 +173,7 @@ const boundariesConfig = {
                   "lib-server",
                   "lib-shared",
                   "lib-db",
+                  "lib-kit",
                   "server-services",
                   "server-repositories",
                   "server-policies",

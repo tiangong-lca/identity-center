@@ -7,6 +7,7 @@
 import 'dotenv/config'
 import { createDbClient } from '@/lib/db/client'
 import { seedAdminRbac } from './seed/admin-rbac'
+import { seedBusinessApps } from './seed/business-apps'
 import { seedAdminConfigFromEnv, seedKeycloakAdmin } from './seed/keycloak-admin'
 
 async function main() {
@@ -18,6 +19,8 @@ async function main() {
     console.log('内置角色/权限/映射就绪')
     const { keycloakSub } = await seedKeycloakAdmin(client.db, seedAdminConfigFromEnv())
     console.log(`种子管理员就绪(keycloak_sub=${keycloakSub})`)
+    await seedBusinessApps(client.db)
+    console.log('业务应用目录就绪(Supabase)')
   } finally {
     await client.close()
   }

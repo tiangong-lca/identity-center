@@ -104,6 +104,29 @@ async function main() {
     },
   })
 
+  // 首个业务应用:Supabase(接入示例;redirect 为占位,接入方按实际域名更新)
+  const supabaseOrigin = process.env.SUPABASE_APP_ORIGIN ?? 'http://localhost:3100'
+  const supabaseClient = await ensureClient(kc, {
+    clientId: 'supabase-business-app',
+    name: 'Supabase Business App',
+    description: '首个接入的业务应用(Supabase)',
+    publicClient: false,
+    standardFlowEnabled: true,
+    implicitFlowEnabled: false,
+    directAccessGrantsEnabled: false,
+    serviceAccountsEnabled: false,
+    redirectUris: [`${supabaseOrigin}/*`],
+    webOrigins: [supabaseOrigin],
+    attributes: { 'pkce.code.challenge.method': 'S256' },
+  })
+  // 准入投影角色 supabase_app_access
+  const existingRole = await kc.clients
+    .findRole({ id: supabaseClient.id, roleName: 'supabase_app_access' })
+    .catch(() => null)
+  if (!existingRole) {
+    await kc.clients.createRole({ id: supabaseClient.id, name: 'supabase_app_access' })
+  }
+
   const adminApiClient = await ensureClient(kc, {
     clientId: 'user-portal-admin-api',
     name: 'User Portal Admin API',
