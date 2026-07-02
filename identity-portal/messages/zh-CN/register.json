@@ -1,0 +1,30 @@
+{
+  "auth": {
+    "noAccount": "没有账号?",
+    "goRegister": "提交注册申请"
+  },
+  "register": {
+    "subtitle": "提交注册申请,审批通过后开通账号",
+    "email": "邮箱",
+    "emailPlaceholder": "you@example.com",
+    "displayName": "姓名",
+    "displayNamePlaceholder": "您的姓名",
+    "reason": "申请理由",
+    "reasonPlaceholder": "简述申请用途(最多 500 字)",
+    "optional": "(选填)",
+    "submit": "提交申请",
+    "submitting": "提交中…",
+    "haveAccount": "已有账号?",
+    "validation": {
+      "emailInvalid": "请输入合法的邮箱地址"
+    },
+    "errors": {
+      "rateLimited": "提交过于频繁,请稍后再试",
+      "generic": "提交失败,请稍后重试"
+    },
+    "success": {
+      "title": "申请已提交",
+      "description": "管理员审批通过后,您将收到邮件通知并可登录平台"
+    }
+  }
+}

@@ -46,7 +46,8 @@ async function main() {
     realm: REALM,
     enabled: true,
     displayName: 'Identity Platform',
-    registrationAllowed: true,
+    // 设计原则:注册默认需管理员审批 —— 关闭 KC 自助注册,统一走门户 /register 申请 → 审批 → 开通
+    registrationAllowed: false,
     registrationEmailAsUsername: true,
     verifyEmail: true,
     resetPasswordAllowed: true,

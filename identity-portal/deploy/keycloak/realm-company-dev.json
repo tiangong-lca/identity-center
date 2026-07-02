@@ -28,7 +28,7 @@
   "oauth2DevicePollingInterval": 5,
   "enabled": true,
   "sslRequired": "external",
-  "registrationAllowed": true,
+  "registrationAllowed": false,
   "registrationEmailAsUsername": true,
   "rememberMe": false,
   "verifyEmail": true,
@@ -329,6 +329,16 @@
           "attributes": {}
         }
       ],
+      "supabase-business-app": [
+        {
+          "id": "fd1c94a3-5570-4ff2-8621-efb2c9447a32",
+          "name": "supabase_app_access",
+          "composite": false,
+          "clientRole": true,
+          "containerId": "45d8a67a-bc42-4377-b4a0-784162dd8550",
+          "attributes": {}
+        }
+      ],
       "security-admin-console": [],
       "admin-cli": [],
       "account-console": [],
@@ -343,7 +353,296 @@
           "attributes": {}
         }
       ],
-      "user-portal": [],
+      "user-portal": [
+        {
+          "id": "890c3e91-227c-4826-9329-66c23b5aa9e6",
+          "name": "contract_app_7422e3d3_access",
+          "composite": false,
+          "clientRole": true,
+          "containerId": "c9ccf31c-038a-4a03-a418-e1d9715607eb",
+          "attributes": {}
+        },
+        {
+          "id": "b2ec6cb5-9d57-49de-8cea-01388ec3bbfc",
+          "name": "contract_app_1a1bcfd5_access",
+          "composite": false,
+          "clientRole": true,
+          "containerId": "c9ccf31c-038a-4a03-a418-e1d9715607eb",
+          "attributes": {}
+        },
+        {
+          "id": "e33f2320-27b4-4bae-8c2e-2889bc0018f9",
+          "name": "it_app_16348afe_access",
+          "composite": false,
+          "clientRole": true,
+          "containerId": "c9ccf31c-038a-4a03-a418-e1d9715607eb",
+          "attributes": {}
+        },
+        {
+          "id": "d02376f5-517b-4bdf-a73a-ea639d398610",
+          "name": "it_app_31e200cc_access",
+          "composite": false,
+          "clientRole": true,
+          "containerId": "c9ccf31c-038a-4a03-a418-e1d9715607eb",
+          "attributes": {}
+        },
+        {
+          "id": "9634e6ca-d868-4b6d-8771-e26d1ff0c8e9",
+          "name": "it_app_b359861d_access",
+          "composite": false,
+          "clientRole": true,
+          "containerId": "c9ccf31c-038a-4a03-a418-e1d9715607eb",
+          "attributes": {}
+        },
+        {
+          "id": "b53ea6a3-a1ca-46ce-994b-9faebacdad7f",
+          "name": "role_app_0444869e_access",
+          "composite": false,
+          "clientRole": true,
+          "containerId": "c9ccf31c-038a-4a03-a418-e1d9715607eb",
+          "attributes": {}
+        },
+        {
+          "id": "0db391e0-cfc5-46db-965b-08ba0b96970f",
+          "name": "it_app_64e5dfe6_access",
+          "composite": false,
+          "clientRole": true,
+          "containerId": "c9ccf31c-038a-4a03-a418-e1d9715607eb",
+          "attributes": {}
+        },
+        {
+          "id": "023a2ff8-5eec-4ea1-96fd-cccc1f82a73c",
+          "name": "pipe_app_a9980b7a_access",
+          "composite": false,
+          "clientRole": true,
+          "containerId": "c9ccf31c-038a-4a03-a418-e1d9715607eb",
+          "attributes": {}
+        },
+        {
+          "id": "39b3a09d-6e58-427a-a7f9-ff682db67f60",
+          "name": "it_app_b86c8fee_access",
+          "composite": false,
+          "clientRole": true,
+          "containerId": "c9ccf31c-038a-4a03-a418-e1d9715607eb",
+          "attributes": {}
+        },
+        {
+          "id": "649a1a61-033c-4aaa-9e50-e8c42f94ee31",
+          "name": "role_app_cad5ea68_access",
+          "composite": false,
+          "clientRole": true,
+          "containerId": "c9ccf31c-038a-4a03-a418-e1d9715607eb",
+          "attributes": {}
+        },
+        {
+          "id": "8787f279-420c-41b6-af74-43574665bddd",
+          "name": "e2e_app_1782981082843_access",
+          "composite": false,
+          "clientRole": true,
+          "containerId": "c9ccf31c-038a-4a03-a418-e1d9715607eb",
+          "attributes": {}
+        },
+        {
+          "id": "1a1ed5a9-42c5-4d83-91c7-6fd4ba30c069",
+          "name": "contract_app_1440b708_access",
+          "composite": false,
+          "clientRole": true,
+          "containerId": "c9ccf31c-038a-4a03-a418-e1d9715607eb",
+          "attributes": {}
+        },
+        {
+          "id": "76aa3a75-91bd-4dfc-9967-f20e4b71d667",
+          "name": "contract_app_61050351_access",
+          "composite": false,
+          "clientRole": true,
+          "containerId": "c9ccf31c-038a-4a03-a418-e1d9715607eb",
+          "attributes": {}
+        },
+        {
+          "id": "c7ca4bba-5c02-4f24-afc0-1394df3a2912",
+          "name": "contract_app_7cb41525_access",
+          "composite": false,
+          "clientRole": true,
+          "containerId": "c9ccf31c-038a-4a03-a418-e1d9715607eb",
+          "attributes": {}
+        },
+        {
+          "id": "f0239a54-b81f-4394-9ad1-b7ddfb446c4b",
+          "name": "pipe_app_495d2480_access",
+          "composite": false,
+          "clientRole": true,
+          "containerId": "c9ccf31c-038a-4a03-a418-e1d9715607eb",
+          "attributes": {}
+        },
+        {
+          "id": "536216ac-3685-45d5-8c63-f32dbad75989",
+          "name": "contract_app_fc5d4905_access",
+          "composite": false,
+          "clientRole": true,
+          "containerId": "c9ccf31c-038a-4a03-a418-e1d9715607eb",
+          "attributes": {}
+        },
+        {
+          "id": "2da38832-3bcb-4167-9716-294490d99c81",
+          "name": "pipe_app_64d0fbc5_access",
+          "composite": false,
+          "clientRole": true,
+          "containerId": "c9ccf31c-038a-4a03-a418-e1d9715607eb",
+          "attributes": {}
+        },
+        {
+          "id": "892ed742-752a-441e-8a57-532fd7f8f389",
+          "name": "pipe_app_83680c4f_access",
+          "composite": false,
+          "clientRole": true,
+          "containerId": "c9ccf31c-038a-4a03-a418-e1d9715607eb",
+          "attributes": {}
+        },
+        {
+          "id": "feb17d0a-9e5c-4cb3-86c4-e86cccaf3a51",
+          "name": "e2e_app_1782980221522_access",
+          "composite": false,
+          "clientRole": true,
+          "containerId": "c9ccf31c-038a-4a03-a418-e1d9715607eb",
+          "attributes": {}
+        },
+        {
+          "id": "daf235e2-c296-4e33-bbd0-91e8a11fdd31",
+          "name": "e2e_app_1782981358478_access",
+          "composite": false,
+          "clientRole": true,
+          "containerId": "c9ccf31c-038a-4a03-a418-e1d9715607eb",
+          "attributes": {}
+        },
+        {
+          "id": "f6d4d48e-48f5-4415-a6e2-5f64022b714b",
+          "name": "it_app_e25ee03a_access",
+          "composite": false,
+          "clientRole": true,
+          "containerId": "c9ccf31c-038a-4a03-a418-e1d9715607eb",
+          "attributes": {}
+        },
+        {
+          "id": "46e14416-06f1-4f14-81e5-fea669733bdb",
+          "name": "pipe_app_70a81b26_access",
+          "composite": false,
+          "clientRole": true,
+          "containerId": "c9ccf31c-038a-4a03-a418-e1d9715607eb",
+          "attributes": {}
+        },
+        {
+          "id": "0f8e2ec0-3488-48e5-9a91-d018c0856594",
+          "name": "role_app_d18c02cc_access",
+          "composite": false,
+          "clientRole": true,
+          "containerId": "c9ccf31c-038a-4a03-a418-e1d9715607eb",
+          "attributes": {}
+        },
+        {
+          "id": "3f4f73b7-3fcb-4f99-aa5f-b76a7ae65f40",
+          "name": "pipe_app_4f6a5403_access",
+          "composite": false,
+          "clientRole": true,
+          "containerId": "c9ccf31c-038a-4a03-a418-e1d9715607eb",
+          "attributes": {}
+        },
+        {
+          "id": "3e93bf66-16aa-425b-8383-48b809fd0d4c",
+          "name": "e2e_app_1782979461431_access",
+          "composite": false,
+          "clientRole": true,
+          "containerId": "c9ccf31c-038a-4a03-a418-e1d9715607eb",
+          "attributes": {}
+        },
+        {
+          "id": "c1692102-ca79-4112-9b0c-b34a39e7044a",
+          "name": "pipe_app_c6498afc_access",
+          "composite": false,
+          "clientRole": true,
+          "containerId": "c9ccf31c-038a-4a03-a418-e1d9715607eb",
+          "attributes": {}
+        },
+        {
+          "id": "18a10004-e05c-418c-8ee9-d5a6d4bd5135",
+          "name": "contract_app_cbca95d6_access",
+          "composite": false,
+          "clientRole": true,
+          "containerId": "c9ccf31c-038a-4a03-a418-e1d9715607eb",
+          "attributes": {}
+        },
+        {
+          "id": "6e1ccbaf-0d33-4556-b49d-f686c52b71eb",
+          "name": "role_app_7a3021c2_access",
+          "composite": false,
+          "clientRole": true,
+          "containerId": "c9ccf31c-038a-4a03-a418-e1d9715607eb",
+          "attributes": {}
+        },
+        {
+          "id": "29ccbad4-78e5-4240-9e14-3e836361ba11",
+          "name": "role_app_294e48d9_access",
+          "composite": false,
+          "clientRole": true,
+          "containerId": "c9ccf31c-038a-4a03-a418-e1d9715607eb",
+          "attributes": {}
+        },
+        {
+          "id": "9f608664-c704-412c-9c84-730d5848eb5e",
+          "name": "it_test_access",
+          "composite": false,
+          "clientRole": true,
+          "containerId": "c9ccf31c-038a-4a03-a418-e1d9715607eb",
+          "attributes": {}
+        },
+        {
+          "id": "cf335fad-6802-4c5b-8d3b-00970c329491",
+          "name": "contract_app_3dfd2e51_access",
+          "composite": false,
+          "clientRole": true,
+          "containerId": "c9ccf31c-038a-4a03-a418-e1d9715607eb",
+          "attributes": {}
+        },
+        {
+          "id": "43d98c82-271a-4c00-8d89-9864f0e0499b",
+          "name": "role_app_5d3fae3c_access",
+          "composite": false,
+          "clientRole": true,
+          "containerId": "c9ccf31c-038a-4a03-a418-e1d9715607eb",
+          "attributes": {}
+        },
+        {
+          "id": "b9230e18-276c-439f-b9a5-e1b8755f903d",
+          "name": "role_app_755f741a_access",
+          "composite": false,
+          "clientRole": true,
+          "containerId": "c9ccf31c-038a-4a03-a418-e1d9715607eb",
+          "attributes": {}
+        },
+        {
+          "id": "ccbcaad2-d31f-410a-934e-af156eeb8ff8",
+          "name": "it_app_9d0fdc7c_access",
+          "composite": false,
+          "clientRole": true,
+          "containerId": "c9ccf31c-038a-4a03-a418-e1d9715607eb",
+          "attributes": {}
+        },
+        {
+          "id": "e9ea0ce9-3e89-4f99-8795-46a47d7305ad",
+          "name": "it_app_ccb0773f_access",
+          "composite": false,
+          "clientRole": true,
+          "containerId": "c9ccf31c-038a-4a03-a418-e1d9715607eb",
+          "attributes": {}
+        },
+        {
+          "id": "4c401cab-82b8-4d70-8b96-0a2551b0e27f",
+          "name": "it_app_bf48d3e4_access",
+          "composite": false,
+          "clientRole": true,
+          "containerId": "c9ccf31c-038a-4a03-a418-e1d9715607eb",
+          "attributes": {}
+        }
+      ],
       "account": [
         {
           "id": "8d7361ca-f818-4292-909b-85739eab2695",
@@ -580,8 +879,8 @@
       "optionalClientScopes": [
         "address",
         "phone",
-        "organization",
         "offline_access",
+        "organization",
         "microprofile-jwt"
       ]
     },
@@ -638,8 +937,8 @@
       "optionalClientScopes": [
         "address",
         "phone",
-        "organization",
         "offline_access",
+        "organization",
         "microprofile-jwt"
       ]
     },
@@ -681,8 +980,8 @@
       "optionalClientScopes": [
         "address",
         "phone",
-        "organization",
         "offline_access",
+        "organization",
         "microprofile-jwt"
       ]
     },
@@ -723,8 +1022,8 @@
       "optionalClientScopes": [
         "address",
         "phone",
-        "organization",
         "offline_access",
+        "organization",
         "microprofile-jwt"
       ]
     },
@@ -834,8 +1133,58 @@
       "optionalClientScopes": [
         "address",
         "phone",
-        "organization",
         "offline_access",
+        "organization",
+        "microprofile-jwt"
+      ]
+    },
+    {
+      "id": "45d8a67a-bc42-4377-b4a0-784162dd8550",
+      "clientId": "supabase-business-app",
+      "name": "Supabase Business App",
+      "description": "首个接入的业务应用(Supabase)",
+      "surrogateAuthRequired": false,
+      "enabled": true,
+      "alwaysDisplayInConsole": false,
+      "clientAuthenticatorType": "client-secret",
+      "secret": "**********",
+      "redirectUris": [
+        "http://localhost:3100/*"
+      ],
+      "webOrigins": [
+        "http://localhost:3100"
+      ],
+      "notBefore": 0,
+      "bearerOnly": false,
+      "consentRequired": false,
+      "standardFlowEnabled": true,
+      "implicitFlowEnabled": false,
+      "directAccessGrantsEnabled": false,
+      "serviceAccountsEnabled": false,
+      "publicClient": false,
+      "frontchannelLogout": false,
+      "protocol": "openid-connect",
+      "attributes": {
+        "realm_client": "false",
+        "client.secret.creation.time": "1782979909",
+        "pkce.code.challenge.method": "S256"
+      },
+      "authenticationFlowBindingOverrides": {},
+      "fullScopeAllowed": true,
+      "nodeReRegistrationTimeout": -1,
+      "defaultClientScopes": [
+        "web-origins",
+        "acr",
+        "roles",
+        "profile",
+        "basic",
+        "email"
+      ],
+      "optionalClientScopes": [
+        "address",
+        "phone",
+        "offline_access",
+        "organization",
         "microprofile-jwt"
       ]
     },
@@ -885,8 +1234,8 @@
       "optionalClientScopes": [
         "address",
         "phone",
-        "organization",
         "offline_access",
+        "organization",
         "microprofile-jwt"
       ]
     },
@@ -931,8 +1280,8 @@
       "optionalClientScopes": [
         "address",
         "phone",
-        "organization",
         "offline_access",
+        "organization",
         "microprofile-jwt"
       ]
     }
@@ -1444,8 +1793,8 @@
           "consentRequired": false,
           "config": {
             "id.token.claim": "true",
-            "access.token.claim": "true",
-            "introspection.token.claim": "true"
+            "introspection.token.claim": "true",
+            "access.token.claim": "true"
           }
         }
       ]
@@ -1468,8 +1817,8 @@
           "protocolMapper": "oidc-allowed-origins-mapper",
           "consentRequired": false,
           "config": {
-            "access.token.claim": "true",
-            "introspection.token.claim": "true"
+            "introspection.token.claim": "true",
+            "access.token.claim": "true"
           }
         }
       ]
@@ -1649,6 +1998,7 @@
     "fromDisplayName": "Identity Platform",
     "port": "1025"
   },
+  "loginTheme": "identity",
   "eventsEnabled": false,
   "eventsListeners": [
     "jboss-logging"

@@ -1,0 +1,30 @@
+{
+  "auth": {
+    "noAccount": "No account?",
+    "goRegister": "Request registration"
+  },
+  "register": {
+    "subtitle": "Submit a registration request; your account is activated after approval",
+    "email": "Email",
+    "emailPlaceholder": "you@example.com",
+    "displayName": "Name",
+    "displayNamePlaceholder": "Your name",
+    "reason": "Reason",
+    "reasonPlaceholder": "Briefly describe your purpose (max 500 chars)",
+    "optional": "(optional)",
+    "submit": "Submit request",
+    "submitting": "Submitting…",
+    "haveAccount": "Already have an account?",
+    "validation": {
+      "emailInvalid": "Please enter a valid email address"
+    },
+    "errors": {
+      "rateLimited": "Too many attempts, please try again later",
+      "generic": "Submission failed, please try again later"
+    },
+    "success": {
+      "title": "Request submitted",
+      "description": "Once approved by an administrator, you will be notified by email and can sign in"
+    }
+  }
+}
