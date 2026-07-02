@@ -77,7 +77,7 @@ export function createRegistrationService(ctx: ServiceContext) {
         throw new ApiError('CONFLICT', `申请状态为 ${request.status},仅 pending 可审批`)
       }
 
-      let kcUser = await ctx.keycloak.findUserByEmail(request.email)
+      const kcUser = await ctx.keycloak.findUserByEmail(request.email)
       let keycloakUserId = kcUser?.id
       if (!keycloakUserId) {
         keycloakUserId = await ctx.keycloak.createUser({

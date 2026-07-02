@@ -103,7 +103,7 @@ const boundariesConfig = {
           {
             from: { type: "server-policies" },
             allow: {
-              to: { type: ["server-policies", "lib-server", "lib-shared", "types"] },
+              to: { type: ["server-policies", "lib-server", "lib-shared", "lib-db", "db", "types"] },
             },
           },
           {
@@ -124,7 +124,7 @@ const boundariesConfig = {
           },
           {
             from: { type: "lib-server" },
-            allow: { to: { type: ["lib-server", "lib-shared", "lib-db", "types"] } },
+            allow: { to: { type: ["lib-server", "lib-shared", "lib-db", "db", "types"] } },
           },
           {
             from: { type: "lib-shared" },

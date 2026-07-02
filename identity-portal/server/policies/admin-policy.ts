@@ -1,10 +1,12 @@
 import { eq, inArray } from 'drizzle-orm'
 import * as schema from '@/db/schema'
 import { getAuditContext } from '@/lib/audit/context'
+import type { DrizzleDb } from '@/lib/db/client'
 import { ApiError } from '@/lib/http/api-error'
 import { canWithReason } from '@/lib/permissions/evaluate'
 import type { AdminGrant, PermissionScope } from '@/lib/permissions/types'
-import type { ServiceDb } from '@/server/services/context'
+
+type ServiceDb = DrizzleDb
 
 /** 加载管理员全部授权(admin_user_roles → 角色 → 权限码) */
 export async function loadGrants(db: ServiceDb, keycloakSub: string): Promise<AdminGrant[]> {
