@@ -1,0 +1,220 @@
+{
+  "apps": {
+    "title": "Applications",
+    "subtitle": "Register business applications, manage access assignments and app roles",
+    "register": "Register application",
+    "table": {
+      "app": "Application",
+      "clientId": "Keycloak Client",
+      "status": "Status",
+      "createdAt": "Created at",
+      "actions": "Actions",
+      "detail": "Details",
+      "empty": "No applications yet; register one from the top right",
+      "loadFailed": "Failed to load the list",
+      "retry": "Retry"
+    },
+    "status": {
+      "active": "Active",
+      "disabled": "Disabled"
+    },
+    "pagination": {
+      "total": "{total} in total",
+      "pageInfo": "Page {page} / {totalPages}",
+      "prev": "Previous",
+      "next": "Next"
+    },
+    "form": {
+      "createTitle": "Register application",
+      "createDescription": "Register a business application in the platform catalog; the Keycloak client must already exist",
+      "editTitle": "Edit basic info",
+      "editDescription": "Application code and the Keycloak client cannot be changed after registration",
+      "code": "Application code",
+      "codePlaceholder": "e.g. supabase",
+      "codeHint": "Lowercase letters, digits and hyphens (2-50 chars); immutable after registration",
+      "codeInvalid": "Code allows only 2-50 lowercase letters, digits and hyphens",
+      "name": "Application name",
+      "namePlaceholder": "e.g. Supabase Data Platform",
+      "keycloakClientId": "Keycloak Client ID",
+      "keycloakClientIdPlaceholder": "e.g. supabase-app",
+      "keycloakClientIdHint": "Must be an existing client in Keycloak; validated at registration",
+      "accessClientRole": "Access client role",
+      "accessClientRolePlaceholder": "Optional; auto-generated as code_access when blank",
+      "accessClientRoleHint": "The client role used for the access projection on the identity provider",
+      "status": "Status",
+      "loginUrl": "Login URL",
+      "adminUrl": "Admin URL",
+      "webhookUrl": "Webhook URL",
+      "webhookUrlHint": "Callback endpoint that receives access and role change events",
+      "webhookSecretRef": "Webhook secret reference",
+      "webhookSecretRefHint": "The env key name of the deployment (e.g. APP_SUPABASE_WEBHOOK_SECRET); the platform stores the key reference only, never the plaintext secret",
+      "optional": "Optional",
+      "requiredMissing": "Please fill in all required fields",
+      "create": "Register",
+      "save": "Save",
+      "cancel": "Cancel"
+    },
+    "toast": {
+      "created": "Application {name} registered",
+      "updated": "Basic info saved",
+      "grantProjected": "Access granted and synced to the identity provider",
+      "grantPending": "Access granted; identity provider projection is syncing",
+      "revoked": "Access revoked",
+      "revokeRetry": "Revoked; identity provider projection is retrying",
+      "roleCreated": "Role {code} created",
+      "roleUpdated": "Role updated",
+      "roleAssigned": "Role assigned",
+      "roleRevoked": "Role assignment revoked",
+      "failed": "Operation failed: {message}"
+    },
+    "detail": {
+      "back": "Back to applications",
+      "edit": "Edit",
+      "loadFailed": "Failed to load the application",
+      "notFound": "Application does not exist or has been removed",
+      "retry": "Retry",
+      "none": "—",
+      "tabs": {
+        "basic": "Basic info",
+        "keycloak": "Keycloak",
+        "assignments": "Access users",
+        "roles": "Role catalog",
+        "roleAssignments": "Role assignments",
+        "sync": "Sync status"
+      },
+      "basic": {
+        "code": "Application code",
+        "name": "Application name",
+        "status": "Status",
+        "loginUrl": "Login URL",
+        "adminUrl": "Admin URL",
+        "webhookUrl": "Webhook URL",
+        "webhookSecretRef": "Webhook secret reference",
+        "createdAt": "Created at",
+        "updatedAt": "Updated at",
+        "clearHint": "Filled URL fields cannot be cleared from the UI yet; they can only be overwritten"
+      },
+      "keycloak": {
+        "title": "Keycloak binding",
+        "description": "The platform ensures the client and access role exist at registration; this page is read-only",
+        "clientId": "Client ID",
+        "accessClientRole": "Access client role",
+        "hint": "Granting access projects this client role onto the user; to change the client itself, use the Keycloak console"
+      },
+      "assignments": {
+        "grant": "Grant access",
+        "keycloakSub": "Keycloak Sub",
+        "status": "Status",
+        "kcProjection": "IdP projection",
+        "bizProjection": "Business projection",
+        "createdAt": "Granted at",
+        "actions": "Actions",
+        "revoke": "Revoke",
+        "empty": "No access users yet",
+        "statusValue": {
+          "active": "Active",
+          "revoked": "Revoked",
+          "expired": "Expired"
+        },
+        "projection": {
+          "projected": "Synced",
+          "pending": "Syncing",
+          "failed": "Failed",
+          "not_required": "Not required"
+        },
+        "revokeConfirmTitle": "Revoke access",
+        "revokeConfirmDescription": "This removes the user access to this application and the client role on the identity provider. This action cannot be undone.",
+        "revokeConfirm": "Confirm revoke",
+        "cancel": "Cancel",
+        "grantTitle": "Grant access",
+        "grantDescription": "Pick a platform user to grant access to this application",
+        "user": "User",
+        "submit": "Grant",
+        "userRequired": "Please select a user first"
+      },
+      "userPicker": {
+        "keywordPlaceholder": "Search email or name",
+        "empty": "No matching active users",
+        "loading": "Searching",
+        "selected": "Selected"
+      },
+      "roles": {
+        "create": "New role",
+        "edit": "Edit",
+        "code": "Role code",
+        "name": "Name",
+        "description": "Description",
+        "status": "Status",
+        "actions": "Actions",
+        "empty": "No roles yet; register roles in the catalog first",
+        "loadFailed": "Failed to load roles",
+        "createTitle": "New application role",
+        "createDescription": "Register an assignable role; the semantics of the role are defined by the business application",
+        "editTitle": "Edit application role",
+        "editDescription": "Role code cannot be changed after creation",
+        "codePlaceholder": "e.g. admin",
+        "codeHint": "Lowercase letters, digits and underscores",
+        "codeInvalid": "Code allows only lowercase letters, digits and underscores",
+        "requiredMissing": "Please fill in all required fields",
+        "statusValue": {
+          "active": "Active",
+          "disabled": "Disabled"
+        },
+        "submitCreate": "Create",
+        "submitSave": "Save",
+        "cancel": "Cancel"
+      },
+      "roleAssignments": {
+        "assign": "Assign role",
+        "role": "Role",
+        "user": "User",
+        "scope": "Scope",
+        "status": "Status",
+        "projection": "Projection",
+        "createdAt": "Assigned at",
+        "actions": "Actions",
+        "revoke": "Revoke",
+        "empty": "No role assignments yet",
+        "loadFailed": "Failed to load role assignments",
+        "assignTitle": "Assign application role",
+        "assignDescription": "Assign an in-app role to a user who already has access",
+        "selectRolePlaceholder": "Select an application role",
+        "scopeType": "Scope type",
+        "scopeId": "Scope ID",
+        "scopeIdPlaceholder": "e.g. org-123",
+        "scopeIdHint": "Not needed for the global scope",
+        "scopeTypeValue": {
+          "global": "Global",
+          "tenant": "Tenant",
+          "org": "Organization",
+          "team": "Team",
+          "project": "Project"
+        },
+        "statusValue": {
+          "active": "Active",
+          "revoked": "Revoked",
+          "expired": "Expired"
+        },
+        "revokeConfirmTitle": "Revoke role assignment",
+        "revokeConfirmDescription": "The business application will receive a role change event via webhook. This action cannot be undone.",
+        "revokeConfirm": "Confirm revoke",
+        "cancel": "Cancel",
+        "submit": "Assign",
+        "requiredMissing": "Please select a role and a user",
+        "unknownRole": "Unknown role"
+      },
+      "sync": {
+        "title": "Projection sync status",
+        "description": "Distribution of projection status across access records (latest {sampled} of {total})",
+        "kcTitle": "Identity provider projection (Keycloak client role)",
+        "bizTitle": "Business projection (Webhook)",
+        "projected": "Synced",
+        "pending": "Syncing",
+        "failed": "Failed",
+        "notRequired": "Not required",
+        "reconcileHint": "Failed projections are retried automatically by background jobs; an hourly reconcile job compares identity provider state with platform facts and repairs drift.",
+        "empty": "No access records yet; projection status will appear here after access is granted"
+      }
+    }
+  }
+}

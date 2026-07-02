@@ -1,0 +1,11 @@
+{
+  "portal": {
+    "myApps": "My applications",
+    "myAppsHint": "Click a card to open the app in a new window",
+    "empty": "No accessible applications yet. Contact an administrator to request access.",
+    "loadFailed": "Failed to load applications",
+    "noLoginUrl": "No login URL configured for this app",
+    "adminConsole": "Open admin console",
+    "accountCenter": "Account center"
+  }
+}

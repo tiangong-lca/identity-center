@@ -1,0 +1,160 @@
+{
+  "users": {
+    "common": {
+      "requestFailed": "Request failed, please try again later",
+      "noName": "Not set"
+    },
+    "status": {
+      "active": "Active",
+      "disabled": "Disabled",
+      "pending_deprovision": "Deprovisioning",
+      "deleted": "Deleted"
+    },
+    "syncStatus": {
+      "in_sync": "In sync",
+      "pending": "Syncing",
+      "failed": "Sync failed"
+    },
+    "list": {
+      "title": "Users",
+      "createUser": "Create user",
+      "searchPlaceholder": "Search email or name",
+      "searchLabel": "Search",
+      "statusFilterLabel": "Status filter",
+      "statusAll": "All statuses",
+      "columns": {
+        "email": "Email",
+        "displayName": "Name",
+        "status": "Status",
+        "syncStatus": "Sync status",
+        "createdAt": "Created at",
+        "actions": "Actions"
+      },
+      "empty": "No users yet",
+      "loadFailed": "Failed to load users",
+      "retry": "Retry",
+      "total": "{total} in total",
+      "pageInfo": "Page {page} / {totalPages}",
+      "prevPage": "Previous page",
+      "nextPage": "Next page",
+      "rowActions": {
+        "menuLabel": "Open actions menu",
+        "view": "View",
+        "disable": "Disable",
+        "enable": "Enable"
+      }
+    },
+    "create": {
+      "title": "Create user",
+      "formTitle": "Account information",
+      "description": "The user signs in with the temporary password and must change it on first login",
+      "email": "Email",
+      "emailPlaceholder": "user@example.com",
+      "displayName": "Name",
+      "displayNameOptional": "(optional)",
+      "displayNamePlaceholder": "Display name",
+      "temporaryPassword": "Temporary password",
+      "temporaryPasswordHint": "At least {min} characters, must be changed on first login",
+      "submit": "Create",
+      "submitting": "Creating…",
+      "cancel": "Cancel",
+      "success": "User created",
+      "validation": {
+        "emailInvalid": "Please enter a valid email address",
+        "passwordMin": "Temporary password must be at least {min} characters"
+      }
+    },
+    "detail": {
+      "back": "Back to users",
+      "retry": "Retry",
+      "notFound": "User does not exist or has been deleted",
+      "overviewTitle": "Basic information",
+      "tabs": {
+        "overview": "Overview",
+        "apps": "App access",
+        "audit": "Audit logs"
+      },
+      "fields": {
+        "email": "Email",
+        "displayName": "Name",
+        "status": "Status",
+        "syncStatus": "Sync status",
+        "id": "User ID",
+        "keycloakSub": "Keycloak sub",
+        "createdAt": "Created at",
+        "updatedAt": "Updated at"
+      }
+    },
+    "assign": {
+      "title": "App access",
+      "hint": "Access details are available on each application page; assign new app access for this user here.",
+      "disabledUserHint": "App access cannot be assigned while the user is not active",
+      "assignApp": "Assign application",
+      "dialogTitle": "Assign application",
+      "dialogDescription": "Grant {email} access to the selected application",
+      "selectApp": "Application",
+      "selectPlaceholder": "Select an application",
+      "loadingApps": "Loading applications…",
+      "loadAppsFailed": "Failed to load applications",
+      "noApps": "No applications available",
+      "cancel": "Cancel",
+      "confirm": "Assign",
+      "assigning": "Assigning…",
+      "successProjected": "App access assigned",
+      "successPending": "Assignment submitted, sync in progress"
+    },
+    "audit": {
+      "hint": "Latest 20 operations related to this user",
+      "columns": {
+        "createdAt": "Time",
+        "action": "Action",
+        "actor": "Actor",
+        "result": "Result"
+      },
+      "result": {
+        "success": "Success",
+        "failure": "Failure"
+      },
+      "empty": "No audit records yet",
+      "loadFailed": "Failed to load audit records",
+      "retry": "Retry"
+    },
+    "danger": {
+      "title": "Danger zone",
+      "description": "These actions directly affect sign-in and access. Proceed with caution.",
+      "cancel": "Cancel",
+      "processing": "Processing…",
+      "disable": {
+        "action": "Disable user",
+        "hint": "The user will no longer be able to sign in to any application",
+        "confirmTitle": "Disable this user?",
+        "confirmDescription": "{email} will be blocked from signing in immediately and existing sessions will be signed out.",
+        "success": "User disabled"
+      },
+      "enable": {
+        "action": "Enable user",
+        "hint": "Restore sign-in and access for this user",
+        "confirmTitle": "Enable this user?",
+        "confirmDescription": "{email} will be able to sign in again.",
+        "success": "User enabled"
+      },
+      "resetPassword": {
+        "action": "Reset password",
+        "hint": "Set a temporary password that must be changed on next login",
+        "dialogTitle": "Reset password",
+        "dialogDescription": "Set a temporary password for {email}. It must be changed on next login.",
+        "passwordLabel": "Temporary password",
+        "passwordHint": "At least {min} characters",
+        "confirm": "Reset password",
+        "success": "Password reset"
+      },
+      "resetMfa": {
+        "action": "Reset MFA",
+        "hint": "Remove all configured multi-factor authenticators",
+        "confirmTitle": "Reset MFA?",
+        "confirmDescription": "Configured multi-factor authenticators for {email} will be removed and must be set up again on next login.",
+        "success": "MFA reset"
+      }
+    }
+  }
+}

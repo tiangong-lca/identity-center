@@ -1,0 +1,75 @@
+{
+  "orgs": {
+    "title": "Organizations",
+    "subtitle": "Maintain the organization directory, members and business app organization mappings",
+    "create": "Create organization",
+    "manage": "Manage members",
+    "empty": "No organizations yet. Use \"Create organization\" to add one.",
+    "loadFailed": "Failed to load",
+    "errorPrefix": "Operation failed",
+    "table": {
+      "code": "Code",
+      "name": "Name",
+      "type": "Type",
+      "status": "Status",
+      "actions": "Actions"
+    },
+    "type": {
+      "company": "Company",
+      "department": "Department",
+      "business_unit": "Business unit",
+      "team": "Team"
+    },
+    "status": {
+      "active": "Active",
+      "disabled": "Disabled"
+    },
+    "pagination": {
+      "total": "{total} in total",
+      "page": "Page {page} of {pages}",
+      "prev": "Previous",
+      "next": "Next"
+    },
+    "createDialog": {
+      "title": "Create organization",
+      "description": "The organization code cannot be changed after creation",
+      "code": "Code",
+      "codePlaceholder": "Lowercase letters, digits and hyphens, e.g. rd-center",
+      "name": "Name",
+      "namePlaceholder": "Enter the organization name",
+      "type": "Type",
+      "parent": "Parent organization",
+      "parentNone": "None (top-level organization)",
+      "submit": "Create",
+      "cancel": "Cancel",
+      "required": "Code and name are required"
+    },
+    "manageDialog": {
+      "title": "Manage organization: {name}",
+      "membersTab": "Members",
+      "mappingsTab": "App mappings",
+      "memberEmpty": "No members yet",
+      "memberTypes": {
+        "member": "Member",
+        "manager": "Manager",
+        "owner": "Owner"
+      },
+      "addMember": "Add member",
+      "addMemberSubmit": "Add",
+      "removeMember": "Remove",
+      "removeConfirmTitle": "Remove member",
+      "removeConfirmDesc": "Remove this user from \"{name}\"? You can add them back later.",
+      "removeConfirm": "Remove",
+      "removeCancel": "Cancel",
+      "userPickerPlaceholder": "Search users by email or name",
+      "userPickerEmpty": "No matching users",
+      "userPickerSearching": "Searching…",
+      "mappingEmpty": "No app mappings yet",
+      "setMapping": "Set mapping",
+      "mappingAppPlaceholder": "Select an application",
+      "mappingOrgIdPlaceholder": "Organization ID inside the business app",
+      "mappingSubmit": "Save mapping",
+      "mappingRequired": "Select an application and enter the business org ID"
+    }
+  }
+}

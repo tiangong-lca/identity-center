@@ -1,0 +1,220 @@
+{
+  "apps": {
+    "title": "应用管理",
+    "subtitle": "登记业务应用,管理准入用户与应用角色分配",
+    "register": "登记应用",
+    "table": {
+      "app": "应用",
+      "clientId": "Keycloak Client",
+      "status": "状态",
+      "createdAt": "创建时间",
+      "actions": "操作",
+      "detail": "详情",
+      "empty": "暂无应用,点击右上角登记应用",
+      "loadFailed": "列表加载失败",
+      "retry": "重试"
+    },
+    "status": {
+      "active": "启用",
+      "disabled": "停用"
+    },
+    "pagination": {
+      "total": "共 {total} 条",
+      "pageInfo": "第 {page} / {totalPages} 页",
+      "prev": "上一页",
+      "next": "下一页"
+    },
+    "form": {
+      "createTitle": "登记应用",
+      "createDescription": "在平台目录登记业务应用,对应 Keycloak client 须已存在",
+      "editTitle": "编辑基础信息",
+      "editDescription": "应用 Code 与 Keycloak client 登记后不可修改",
+      "code": "应用 Code",
+      "codePlaceholder": "如 supabase",
+      "codeHint": "小写字母、数字与连字符(2-50 位),登记后不可修改",
+      "codeInvalid": "Code 仅允许 2-50 位小写字母、数字和连字符",
+      "name": "应用名称",
+      "namePlaceholder": "如 Supabase 数据平台",
+      "keycloakClientId": "Keycloak Client ID",
+      "keycloakClientIdPlaceholder": "如 supabase-app",
+      "keycloakClientIdHint": "须为 Keycloak 中已存在的 client,登记时校验",
+      "accessClientRole": "准入 Client Role",
+      "accessClientRolePlaceholder": "选填,留空自动生成 code_access 形式",
+      "accessClientRoleHint": "认证侧准入投影使用的 Client Role 名称",
+      "status": "状态",
+      "loginUrl": "登录地址",
+      "adminUrl": "管理后台地址",
+      "webhookUrl": "Webhook 地址",
+      "webhookUrlHint": "接收准入与角色变更事件的回调地址",
+      "webhookSecretRef": "Webhook Secret 引用",
+      "webhookSecretRefHint": "填写部署环境变量的键名(如 APP_SUPABASE_WEBHOOK_SECRET),平台只存键名引用,不保存明文密钥",
+      "optional": "选填",
+      "requiredMissing": "请填写完整必填项",
+      "create": "登记",
+      "save": "保存",
+      "cancel": "取消"
+    },
+    "toast": {
+      "created": "应用 {name} 已登记",
+      "updated": "基础信息已保存",
+      "grantProjected": "准入已分配,认证侧已同步",
+      "grantPending": "准入已分配,认证侧投影同步中",
+      "revoked": "准入已撤销",
+      "revokeRetry": "已撤销,认证侧投影重试中",
+      "roleCreated": "角色 {code} 已创建",
+      "roleUpdated": "角色已更新",
+      "roleAssigned": "角色已分配",
+      "roleRevoked": "角色分配已撤销",
+      "failed": "操作失败:{message}"
+    },
+    "detail": {
+      "back": "返回应用列表",
+      "edit": "编辑",
+      "loadFailed": "应用信息加载失败",
+      "notFound": "应用不存在或已被删除",
+      "retry": "重试",
+      "none": "—",
+      "tabs": {
+        "basic": "基础信息",
+        "keycloak": "Keycloak",
+        "assignments": "准入用户",
+        "roles": "角色目录",
+        "roleAssignments": "角色分配",
+        "sync": "同步状态"
+      },
+      "basic": {
+        "code": "应用 Code",
+        "name": "应用名称",
+        "status": "状态",
+        "loginUrl": "登录地址",
+        "adminUrl": "管理后台地址",
+        "webhookUrl": "Webhook 地址",
+        "webhookSecretRef": "Webhook Secret 引用",
+        "createdAt": "创建时间",
+        "updatedAt": "更新时间",
+        "clearHint": "已填写的地址字段暂不支持在界面清空,仅可覆盖更新"
+      },
+      "keycloak": {
+        "title": "Keycloak 关联",
+        "description": "登记时由平台确保 client 与准入角色存在,本页只读",
+        "clientId": "Client ID",
+        "accessClientRole": "准入 Client Role",
+        "hint": "分配准入会将该 Client Role 投影到用户;如需调整 client 本身的配置,请前往 Keycloak 控制台操作"
+      },
+      "assignments": {
+        "grant": "分配准入",
+        "keycloakSub": "Keycloak Sub",
+        "status": "状态",
+        "kcProjection": "认证投影",
+        "bizProjection": "业务投影",
+        "createdAt": "分配时间",
+        "actions": "操作",
+        "revoke": "撤销",
+        "empty": "暂无准入用户",
+        "statusValue": {
+          "active": "生效",
+          "revoked": "已撤销",
+          "expired": "已过期"
+        },
+        "projection": {
+          "projected": "已同步",
+          "pending": "同步中",
+          "failed": "失败",
+          "not_required": "无需"
+        },
+        "revokeConfirmTitle": "撤销准入",
+        "revokeConfirmDescription": "将移除该用户对本应用的访问权限,认证侧 Client Role 同步移除,此操作不可撤回。",
+        "revokeConfirm": "确认撤销",
+        "cancel": "取消",
+        "grantTitle": "分配准入",
+        "grantDescription": "选择平台用户,授予其访问本应用的权限",
+        "user": "用户",
+        "submit": "分配",
+        "userRequired": "请先选择用户"
+      },
+      "userPicker": {
+        "keywordPlaceholder": "搜索邮箱或姓名",
+        "empty": "未找到匹配的启用用户",
+        "loading": "搜索中",
+        "selected": "已选择"
+      },
+      "roles": {
+        "create": "新建角色",
+        "edit": "编辑",
+        "code": "角色 Code",
+        "name": "名称",
+        "description": "描述",
+        "status": "状态",
+        "actions": "操作",
+        "empty": "暂无角色,先在目录登记角色",
+        "loadFailed": "角色列表加载失败",
+        "createTitle": "新建应用角色",
+        "createDescription": "登记应用可分配的角色,角色的权限含义由业务应用定义",
+        "editTitle": "编辑应用角色",
+        "editDescription": "角色 Code 创建后不可修改",
+        "codePlaceholder": "如 admin",
+        "codeHint": "小写字母、数字与下划线",
+        "codeInvalid": "Code 仅允许小写字母、数字和下划线",
+        "requiredMissing": "请填写完整必填项",
+        "statusValue": {
+          "active": "启用",
+          "disabled": "停用"
+        },
+        "submitCreate": "创建",
+        "submitSave": "保存",
+        "cancel": "取消"
+      },
+      "roleAssignments": {
+        "assign": "分配角色",
+        "role": "角色",
+        "user": "用户",
+        "scope": "作用域",
+        "status": "状态",
+        "projection": "投影",
+        "createdAt": "分配时间",
+        "actions": "操作",
+        "revoke": "撤销",
+        "empty": "暂无角色分配",
+        "loadFailed": "角色分配加载失败",
+        "assignTitle": "分配应用角色",
+        "assignDescription": "为已具备准入的用户分配应用内角色",
+        "selectRolePlaceholder": "选择应用角色",
+        "scopeType": "作用域类型",
+        "scopeId": "作用域 ID",
+        "scopeIdPlaceholder": "如 org-123",
+        "scopeIdHint": "全局作用域无需填写",
+        "scopeTypeValue": {
+          "global": "全局",
+          "tenant": "租户",
+          "org": "组织",
+          "team": "团队",
+          "project": "项目"
+        },
+        "statusValue": {
+          "active": "生效",
+          "revoked": "已撤销",
+          "expired": "已过期"
+        },
+        "revokeConfirmTitle": "撤销角色分配",
+        "revokeConfirmDescription": "撤销后业务应用将通过 Webhook 收到角色变更事件,此操作不可撤回。",
+        "revokeConfirm": "确认撤销",
+        "cancel": "取消",
+        "submit": "分配",
+        "requiredMissing": "请选择角色与用户",
+        "unknownRole": "未知角色"
+      },
+      "sync": {
+        "title": "投影同步状态",
+        "description": "统计准入记录的投影状态分布(取最近 {sampled} 条,共 {total} 条)",
+        "kcTitle": "认证侧投影(Keycloak Client Role)",
+        "bizTitle": "业务侧投影(Webhook)",
+        "projected": "已同步",
+        "pending": "同步中",
+        "failed": "失败",
+        "notRequired": "无需投影",
+        "reconcileHint": "失败的投影由后台任务自动重投,对账任务每小时兜底比对认证侧与平台事实并修复差异。",
+        "empty": "暂无准入记录,分配准入后此处展示投影同步情况"
+      }
+    }
+  }
+}

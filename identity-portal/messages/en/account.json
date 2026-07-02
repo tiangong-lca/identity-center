@@ -1,0 +1,39 @@
+{
+  "account": {
+    "nav": {
+      "profile": "Profile",
+      "security": "Security",
+      "sessions": "Sessions",
+      "backToPortal": "Back to portal"
+    },
+    "profile": {
+      "title": "Profile",
+      "email": "Email",
+      "displayName": "Display name",
+      "status": "Account status",
+      "statusActive": "Active",
+      "statusDisabled": "Disabled",
+      "createdAt": "Created at",
+      "notSynced": "Not set",
+      "loadFailed": "Failed to load profile"
+    },
+    "security": {
+      "title": "Security",
+      "managedByKeycloak": "Password and multi-factor authentication are managed in the Keycloak account console",
+      "passwordTitle": "Password",
+      "passwordDesc": "Change your password in the Keycloak account console; the platform never stores passwords",
+      "mfaTitle": "Multi-factor authentication (MFA)",
+      "mfaDesc": "Enable or reset OTP and other MFA methods in the Keycloak account console",
+      "openKeycloak": "Open Keycloak account console"
+    },
+    "sessions": {
+      "title": "Sessions",
+      "ip": "IP address",
+      "start": "Started",
+      "lastAccess": "Last active",
+      "clients": "Clients",
+      "empty": "No active sessions",
+      "loadFailed": "Failed to load sessions"
+    }
+  }
+}

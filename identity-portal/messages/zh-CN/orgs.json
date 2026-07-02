@@ -1,0 +1,75 @@
+{
+  "orgs": {
+    "title": "组织管理",
+    "subtitle": "维护平台组织目录、组织成员与业务应用组织映射",
+    "create": "创建组织",
+    "manage": "成员管理",
+    "empty": "暂无组织,点击右上角「创建组织」",
+    "loadFailed": "加载失败",
+    "errorPrefix": "操作失败",
+    "table": {
+      "code": "组织代码",
+      "name": "名称",
+      "type": "类型",
+      "status": "状态",
+      "actions": "操作"
+    },
+    "type": {
+      "company": "公司",
+      "department": "部门",
+      "business_unit": "事业部",
+      "team": "团队"
+    },
+    "status": {
+      "active": "启用",
+      "disabled": "停用"
+    },
+    "pagination": {
+      "total": "共 {total} 条",
+      "page": "第 {page} / {pages} 页",
+      "prev": "上一页",
+      "next": "下一页"
+    },
+    "createDialog": {
+      "title": "创建组织",
+      "description": "组织代码创建后不可修改,请谨慎填写",
+      "code": "组织代码",
+      "codePlaceholder": "小写字母、数字与连字符,如 rd-center",
+      "name": "组织名称",
+      "namePlaceholder": "请输入组织名称",
+      "type": "组织类型",
+      "parent": "父组织",
+      "parentNone": "无(作为顶级组织)",
+      "submit": "创建",
+      "cancel": "取消",
+      "required": "请填写组织代码与组织名称"
+    },
+    "manageDialog": {
+      "title": "管理组织:{name}",
+      "membersTab": "成员",
+      "mappingsTab": "应用映射",
+      "memberEmpty": "暂无成员",
+      "memberTypes": {
+        "member": "成员",
+        "manager": "主管",
+        "owner": "负责人"
+      },
+      "addMember": "添加成员",
+      "addMemberSubmit": "添加",
+      "removeMember": "移除",
+      "removeConfirmTitle": "移除成员",
+      "removeConfirmDesc": "确认将该用户移出组织「{name}」?移除后可重新添加。",
+      "removeConfirm": "确认移除",
+      "removeCancel": "取消",
+      "userPickerPlaceholder": "输入邮箱或姓名搜索用户",
+      "userPickerEmpty": "未找到匹配用户",
+      "userPickerSearching": "搜索中…",
+      "mappingEmpty": "暂无应用映射",
+      "setMapping": "设置映射",
+      "mappingAppPlaceholder": "选择应用",
+      "mappingOrgIdPlaceholder": "业务应用内的组织标识",
+      "mappingSubmit": "保存映射",
+      "mappingRequired": "请选择应用并填写业务组织 ID"
+    }
+  }
+}

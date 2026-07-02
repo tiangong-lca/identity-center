@@ -1,0 +1,112 @@
+{
+  "registrations": {
+    "title": "注册审批",
+    "subtitle": "审批用户注册申请,通过后自动开通统一身份账号",
+    "configLink": "注册策略说明",
+    "tabs": {
+      "pending": "待审批",
+      "approved": "已通过",
+      "rejected": "已拒绝",
+      "all": "全部"
+    },
+    "table": {
+      "email": "邮箱",
+      "displayName": "姓名",
+      "reason": "申请理由",
+      "status": "状态",
+      "createdAt": "提交时间",
+      "reviewedBy": "审批人",
+      "actions": "操作",
+      "empty": "暂无注册申请",
+      "loadFailed": "列表加载失败",
+      "retry": "重试"
+    },
+    "status": {
+      "pending": "待审批",
+      "approved": "已通过",
+      "rejected": "已拒绝",
+      "cancelled": "已取消"
+    },
+    "actions": {
+      "review": "审批",
+      "view": "查看"
+    },
+    "pagination": {
+      "total": "共 {total} 条",
+      "pageInfo": "第 {page} / {totalPages} 页",
+      "prev": "上一页",
+      "next": "下一页"
+    },
+    "dialog": {
+      "reviewTitle": "审批注册申请",
+      "reviewDescription": "核对申请信息后选择通过或拒绝",
+      "viewTitle": "申请详情",
+      "viewDescription": "该申请已完成审批,以下为归档信息",
+      "email": "邮箱",
+      "displayName": "姓名",
+      "reason": "申请理由",
+      "createdAt": "提交时间",
+      "approvalRequired": "需要审批",
+      "yes": "是",
+      "no": "否",
+      "statusLabel": "状态",
+      "reviewedBy": "审批人",
+      "reviewedAt": "审批时间",
+      "reviewCommentArchived": "审批意见",
+      "reviewComment": "审批意见",
+      "reviewCommentPlaceholder": "选填,记录审批依据(最多 500 字)",
+      "temporaryPassword": "临时密码",
+      "temporaryPasswordPlaceholder": "选填,至少 10 位,留空由系统生成",
+      "temporaryPasswordHint": "仅在认证侧尚无该账号时用于初始化,用户首次登录需修改",
+      "temporaryPasswordTooShort": "临时密码至少需要 10 位",
+      "approve": "通过",
+      "reject": "拒绝",
+      "close": "关闭",
+      "none": "—"
+    },
+    "toast": {
+      "approved": "已通过 {email} 的注册申请",
+      "rejected": "已拒绝 {email} 的注册申请",
+      "failed": "操作失败:{message}"
+    },
+    "config": {
+      "title": "注册管理",
+      "subtitle": "注册策略由部署配置决定,本页为只读说明,界面不可修改",
+      "backToList": "返回注册审批",
+      "readOnly": "只读",
+      "policy": {
+        "title": "当前策略",
+        "description": "注册默认需管理员审批",
+        "selfRegister": "自主注册",
+        "selfRegisterValue": "开启,注册入口由 Keycloak 登录页提供",
+        "approval": "管理员审批",
+        "approvalValue": "默认必需,新申请以待审批状态进入本模块",
+        "onApprove": "通过后动作",
+        "onApproveValue": "创建或复用 Keycloak 账号,并镜像到平台用户表",
+        "onReject": "拒绝后动作",
+        "onRejectValue": "仅记录审批结论,不创建任何账号"
+      },
+      "autoApprove": {
+        "title": "免审批模式",
+        "description": "免审批为部署级配置项,不提供界面开关",
+        "envKey": "配置项(env 键名)",
+        "current": "当前取值",
+        "currentValue": "关闭,所有注册申请均需人工审批",
+        "change": "变更方式",
+        "changeValue": "由运维调整部署环境变量并重新发布,本页面不可编辑"
+      },
+      "modeA": {
+        "title": "Keycloak 托管注册(模式 A)",
+        "description": "注册表单与邮箱验证由 Keycloak 托管,平台负责审批与开通",
+        "entry": "注册入口",
+        "entryValue": "Keycloak 登录页注册链接(realm 配置 registrationAllowed)",
+        "duty": "平台职责",
+        "dutyValue": "记录注册申请、执行审批并开通账号,申请数据保存在平台数据库",
+        "verify": "邮箱验证",
+        "verifyValue": "由 Keycloak 发送验证邮件并完成校验",
+        "reconcile": "一致性兜底",
+        "reconcileValue": "对账任务每小时比对 Keycloak 与平台事实并自动修复差异"
+      }
+    }
+  }
+}

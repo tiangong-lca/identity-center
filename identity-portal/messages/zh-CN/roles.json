@@ -1,0 +1,68 @@
+{
+  "roles": {
+    "title": "角色权限",
+    "subtitle": "管理后台角色、权限矩阵与管理员绑定",
+    "rolesList": "管理角色",
+    "builtIn": "内置",
+    "createRole": "创建角色",
+    "deleteRole": "删除",
+    "deleteConfirmTitle": "删除管理角色",
+    "deleteConfirmDesc": "确认删除角色「{name}」?内置角色或仍被管理员绑定的角色无法删除。",
+    "deleteConfirm": "确认删除",
+    "cancel": "取消",
+    "listEmpty": "暂无管理角色",
+    "loadFailed": "加载失败",
+    "errorPrefix": "操作失败",
+    "permissionsTitle": "权限矩阵",
+    "permissionsHint": "勾选即授予权限,取消勾选即回收",
+    "allPermissions": "全部权限",
+    "allPermissionsDesc": "platform_admin 拥有全部管理权限,矩阵为只读展示。",
+    "selectRoleHint": "请选择左侧角色查看权限矩阵",
+    "groups": {
+      "user": "用户",
+      "app": "应用",
+      "role": "应用角色",
+      "org": "组织",
+      "registration": "注册",
+      "audit": "审计",
+      "admin-role": "管理角色",
+      "settings": "系统设置",
+      "other": "其他"
+    },
+    "createDialog": {
+      "title": "创建管理角色",
+      "description": "自建角色可随时删除,内置角色由系统预置",
+      "code": "角色代码",
+      "codePlaceholder": "小写字母、数字与下划线,如 ops_admin",
+      "name": "角色名称",
+      "namePlaceholder": "请输入角色名称",
+      "descriptionLabel": "描述",
+      "descriptionPlaceholder": "可选,说明角色用途",
+      "submit": "创建",
+      "required": "请填写角色代码与角色名称"
+    },
+    "bind": {
+      "title": "绑定管理员",
+      "hint": "将管理角色授予平台用户,可限定组织或应用范围",
+      "user": "用户",
+      "role": "角色",
+      "rolePlaceholder": "选择管理角色",
+      "scopeType": "范围类型",
+      "scope": {
+        "global": "全局",
+        "org": "组织",
+        "app": "应用"
+      },
+      "scopeId": "范围 ID",
+      "scopeIdPlaceholder": "组织或应用的 ID",
+      "submit": "绑定",
+      "required": "请选择用户与角色",
+      "scopeIdRequired": "非全局范围需填写范围 ID",
+      "success": "绑定成功:",
+      "unbind": "解绑",
+      "userPickerPlaceholder": "输入邮箱或姓名搜索用户",
+      "userPickerEmpty": "未找到匹配用户",
+      "userPickerSearching": "搜索中…"
+    }
+  }
+}

@@ -1,0 +1,11 @@
+{
+  "portal": {
+    "myApps": "我的应用",
+    "myAppsHint": "点击卡片在新窗口打开应用",
+    "empty": "暂无可访问的应用,请联系管理员申请准入",
+    "loadFailed": "应用列表加载失败",
+    "noLoginUrl": "该应用未配置登录地址",
+    "adminConsole": "进入管理后台",
+    "accountCenter": "账号中心"
+  }
+}

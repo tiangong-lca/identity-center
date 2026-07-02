@@ -1,0 +1,68 @@
+{
+  "roles": {
+    "title": "Roles & Permissions",
+    "subtitle": "Manage admin roles, the permission matrix and administrator bindings",
+    "rolesList": "Admin roles",
+    "builtIn": "Built-in",
+    "createRole": "Create role",
+    "deleteRole": "Delete",
+    "deleteConfirmTitle": "Delete admin role",
+    "deleteConfirmDesc": "Delete role \"{name}\"? Built-in roles or roles still bound to administrators cannot be deleted.",
+    "deleteConfirm": "Delete",
+    "cancel": "Cancel",
+    "listEmpty": "No admin roles yet",
+    "loadFailed": "Failed to load",
+    "errorPrefix": "Operation failed",
+    "permissionsTitle": "Permission matrix",
+    "permissionsHint": "Check to grant a permission, uncheck to revoke it",
+    "allPermissions": "All permissions",
+    "allPermissionsDesc": "platform_admin holds every admin permission; the matrix is read-only.",
+    "selectRoleHint": "Select a role on the left to view its permissions",
+    "groups": {
+      "user": "Users",
+      "app": "Applications",
+      "role": "App roles",
+      "org": "Organizations",
+      "registration": "Registration",
+      "audit": "Audit",
+      "admin-role": "Admin roles",
+      "settings": "Settings",
+      "other": "Other"
+    },
+    "createDialog": {
+      "title": "Create admin role",
+      "description": "Custom roles can be deleted anytime; built-in roles are seeded by the system",
+      "code": "Code",
+      "codePlaceholder": "Lowercase letters, digits and underscores, e.g. ops_admin",
+      "name": "Name",
+      "namePlaceholder": "Enter the role name",
+      "descriptionLabel": "Description",
+      "descriptionPlaceholder": "Optional, describe the purpose of this role",
+      "submit": "Create",
+      "required": "Code and name are required"
+    },
+    "bind": {
+      "title": "Bind administrator",
+      "hint": "Grant an admin role to a platform user, optionally scoped to an organization or application",
+      "user": "User",
+      "role": "Role",
+      "rolePlaceholder": "Select an admin role",
+      "scopeType": "Scope type",
+      "scope": {
+        "global": "Global",
+        "org": "Organization",
+        "app": "Application"
+      },
+      "scopeId": "Scope ID",
+      "scopeIdPlaceholder": "Organization or application ID",
+      "submit": "Bind",
+      "required": "Select a user and a role",
+      "scopeIdRequired": "Scope ID is required for non-global scopes",
+      "success": "Bound successfully:",
+      "unbind": "Unbind",
+      "userPickerPlaceholder": "Search users by email or name",
+      "userPickerEmpty": "No matching users",
+      "userPickerSearching": "Searching…"
+    }
+  }
+}

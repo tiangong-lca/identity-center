@@ -1,0 +1,28 @@
+{
+  "settings": {
+    "title": "Settings",
+    "readOnlyHint": "Read-only system information; runtime configuration is managed by the deployment environment",
+    "version": {
+      "title": "Platform version",
+      "desc": "Current release of the identity platform"
+    },
+    "realm": {
+      "title": "Keycloak Realm",
+      "desc": "The realm is a deployment setting; this is a static note for the current environment, no runtime variable is read"
+    },
+    "reconciliation": {
+      "title": "Reconciliation policy",
+      "desc": "Consistency checks between platform facts and the Keycloak projection",
+      "highRisk": "High-risk reconciliation: hourly (security-related facts such as assignments and disablement)",
+      "profile": "Profile reconciliation: daily (profile fields such as email and display name)",
+      "full": "Full reconciliation: weekly (full data snapshot comparison)"
+    },
+    "baseline": {
+      "title": "Security baseline",
+      "desc": "The security baseline checklist is maintained alongside the security design document in the repository, covering authentication, sessions, audit and key management",
+      "item1": "Three-layer checks on admin endpoints (sign-in, console role, fine-grained permission) plus the audit hash chain",
+      "item2": "Same-origin CSRF checks and Idempotency-Key replay protection for write operations",
+      "item3": "Credentials and secrets live only in server-side environment variables, never in frontend bundles"
+    }
+  }
+}

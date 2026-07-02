@@ -1,0 +1,39 @@
+{
+  "account": {
+    "nav": {
+      "profile": "资料",
+      "security": "安全",
+      "sessions": "会话",
+      "backToPortal": "返回门户"
+    },
+    "profile": {
+      "title": "个人资料",
+      "email": "邮箱",
+      "displayName": "显示名称",
+      "status": "账号状态",
+      "statusActive": "正常",
+      "statusDisabled": "已禁用",
+      "createdAt": "创建时间",
+      "notSynced": "未设置",
+      "loadFailed": "资料加载失败"
+    },
+    "security": {
+      "title": "安全设置",
+      "managedByKeycloak": "登录密码与多因素认证由 Keycloak 账户中心统一管理",
+      "passwordTitle": "登录密码",
+      "passwordDesc": "在 Keycloak 账户中心修改登录密码,平台不保存任何密码",
+      "mfaTitle": "多因素认证(MFA)",
+      "mfaDesc": "在 Keycloak 账户中心启用或重置 OTP 等多因素认证方式",
+      "openKeycloak": "打开 Keycloak 账户中心"
+    },
+    "sessions": {
+      "title": "登录会话",
+      "ip": "IP 地址",
+      "start": "开始时间",
+      "lastAccess": "最后活跃",
+      "clients": "客户端",
+      "empty": "暂无活跃会话",
+      "loadFailed": "会话加载失败"
+    }
+  }
+}

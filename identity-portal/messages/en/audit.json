@@ -1,0 +1,47 @@
+{
+  "audit": {
+    "title": "Audit Logs",
+    "subtitle": "Full trail of admin operations, filterable by action and target type",
+    "empty": "No audit logs yet",
+    "loadFailed": "Failed to load",
+    "filters": {
+      "action": "Action code",
+      "actionPlaceholder": "Action code, e.g. user.disable",
+      "targetType": "Target type",
+      "targetTypePlaceholder": "Target type, e.g. organization",
+      "apply": "Search",
+      "reset": "Reset"
+    },
+    "table": {
+      "time": "Time",
+      "action": "Action",
+      "actor": "Actor",
+      "target": "Target",
+      "result": "Result",
+      "requestId": "Request ID"
+    },
+    "result": {
+      "success": "Success",
+      "failure": "Failure"
+    },
+    "pagination": {
+      "total": "{total} in total",
+      "page": "Page {page} of {pages}",
+      "prev": "Previous",
+      "next": "Next"
+    },
+    "detail": {
+      "title": "Audit detail",
+      "action": "Action",
+      "actor": "Actor",
+      "target": "Target",
+      "result": "Result",
+      "failureReason": "Failure reason",
+      "requestId": "Request ID",
+      "time": "Time",
+      "beforeData": "Data before change",
+      "afterData": "Data after change",
+      "none": "None"
+    }
+  }
+}

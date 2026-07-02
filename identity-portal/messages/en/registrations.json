@@ -1,0 +1,112 @@
+{
+  "registrations": {
+    "title": "Registration Approval",
+    "subtitle": "Review registration requests; approval provisions a unified identity account",
+    "configLink": "Registration policy",
+    "tabs": {
+      "pending": "Pending",
+      "approved": "Approved",
+      "rejected": "Rejected",
+      "all": "All"
+    },
+    "table": {
+      "email": "Email",
+      "displayName": "Name",
+      "reason": "Reason",
+      "status": "Status",
+      "createdAt": "Submitted at",
+      "reviewedBy": "Reviewer",
+      "actions": "Actions",
+      "empty": "No registration requests",
+      "loadFailed": "Failed to load the list",
+      "retry": "Retry"
+    },
+    "status": {
+      "pending": "Pending",
+      "approved": "Approved",
+      "rejected": "Rejected",
+      "cancelled": "Cancelled"
+    },
+    "actions": {
+      "review": "Review",
+      "view": "View"
+    },
+    "pagination": {
+      "total": "{total} in total",
+      "pageInfo": "Page {page} / {totalPages}",
+      "prev": "Previous",
+      "next": "Next"
+    },
+    "dialog": {
+      "reviewTitle": "Review registration request",
+      "reviewDescription": "Verify the request details, then approve or reject",
+      "viewTitle": "Request details",
+      "viewDescription": "This request has been reviewed; details are archived below",
+      "email": "Email",
+      "displayName": "Name",
+      "reason": "Reason",
+      "createdAt": "Submitted at",
+      "approvalRequired": "Approval required",
+      "yes": "Yes",
+      "no": "No",
+      "statusLabel": "Status",
+      "reviewedBy": "Reviewer",
+      "reviewedAt": "Reviewed at",
+      "reviewCommentArchived": "Review comment",
+      "reviewComment": "Review comment",
+      "reviewCommentPlaceholder": "Optional, record the review rationale (max 500 characters)",
+      "temporaryPassword": "Temporary password",
+      "temporaryPasswordPlaceholder": "Optional, at least 10 characters; leave blank to auto-generate",
+      "temporaryPasswordHint": "Used only when no account exists on the identity provider yet; the user must change it at first sign-in",
+      "temporaryPasswordTooShort": "Temporary password must be at least 10 characters",
+      "approve": "Approve",
+      "reject": "Reject",
+      "close": "Close",
+      "none": "—"
+    },
+    "toast": {
+      "approved": "Approved the registration request of {email}",
+      "rejected": "Rejected the registration request of {email}",
+      "failed": "Operation failed: {message}"
+    },
+    "config": {
+      "title": "Registration Settings",
+      "subtitle": "Registration policy is defined by deployment configuration; this page is a read-only summary",
+      "backToList": "Back to registration approval",
+      "readOnly": "Read-only",
+      "policy": {
+        "title": "Current policy",
+        "description": "Registration requires admin approval by default",
+        "selfRegister": "Self registration",
+        "selfRegisterValue": "Enabled; the entry point is provided by the Keycloak login page",
+        "approval": "Admin approval",
+        "approvalValue": "Required by default; new requests arrive in this module as pending",
+        "onApprove": "On approval",
+        "onApproveValue": "Create or reuse the Keycloak account and mirror it into the platform user table",
+        "onReject": "On rejection",
+        "onRejectValue": "Only the review decision is recorded; no account is created"
+      },
+      "autoApprove": {
+        "title": "Auto-approval mode",
+        "description": "Auto-approval is a deployment-level setting without a UI switch",
+        "envKey": "Setting (env key)",
+        "current": "Current value",
+        "currentValue": "Off; every registration request requires manual review",
+        "change": "How to change",
+        "changeValue": "Operations adjusts the deployment environment variable and redeploys; this page is not editable"
+      },
+      "modeA": {
+        "title": "Keycloak-hosted registration (Mode A)",
+        "description": "The registration form and email verification are hosted by Keycloak; the platform handles approval and provisioning",
+        "entry": "Registration entry",
+        "entryValue": "Registration link on the Keycloak login page (realm setting registrationAllowed)",
+        "duty": "Platform duty",
+        "dutyValue": "Record requests, run the approval flow and provision accounts; request data lives in the platform database",
+        "verify": "Email verification",
+        "verifyValue": "Keycloak sends and validates the verification email",
+        "reconcile": "Consistency safety net",
+        "reconcileValue": "An hourly reconcile job compares Keycloak with platform facts and repairs drift automatically"
+      }
+    }
+  }
+}
