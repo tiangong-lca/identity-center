@@ -1,26 +1,34 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
+/* 设计库 token(vendored 自 .design_library/identity-platform/,勿手改;
+   同步方式:重新复制源文件并 diff review) */
+@import "./design-tokens/ui-base-tokens.css";
+@import "./design-tokens/ui-base-themes.css";
 
+/* 暗色变体跟随设计库的 data-theme 属性(next-themes attribute="data-theme") */
+@custom-variant dark ([data-theme="dark"] &);
+
+/* 将设计库语义 token 暴露为 Tailwind 工具类(bg-background、text-foreground 等) */
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+  --color-background: var(--color-bg-page);
+  --color-card: var(--color-bg-card);
+  --color-foreground: var(--color-text-primary);
+  --color-secondary-foreground: var(--color-text-secondary);
+  --color-muted-foreground: var(--color-text-tertiary);
+  --color-primary: var(--color-primary);
+  --color-primary-hover: var(--color-primary-hover);
+  --color-danger: var(--color-danger);
+  --color-success: var(--color-success);
+  --color-warning: var(--color-warning);
+  --color-border: var(--color-border);
+  --color-border-light: var(--color-border-light);
+  --font-sans: var(--font-geist-sans), "PingFang SC", "Microsoft YaHei",
+    "Helvetica Neue", sans-serif;
+  --font-mono: var(--font-geist-mono), monospace;
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background: var(--color-bg-page);
+  color: var(--color-text-primary);
+  font-family: var(--font-sans);
 }
