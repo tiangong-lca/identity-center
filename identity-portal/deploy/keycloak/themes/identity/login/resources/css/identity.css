@@ -1,0 +1,93 @@
+/*
+ * Identity Platform 登录主题(对齐 login.html 原型与设计库 token):
+ * 主色 #1664FF(hover #0055FF)、文字 #0C0D0E/#1D2129/#86909C、
+ * 边框 #DDE2E9、危险 #D7312A、卡片圆角 12px、控件圆角 4px。
+ */
+:root {
+  --identity-primary: #1664ff;
+  --identity-primary-hover: #0055ff;
+  --identity-text: #0c0d0e;
+  --identity-text-secondary: #1d2129;
+  --identity-text-tertiary: #86909c;
+  --identity-border: #dde2e9;
+  --identity-danger: #d7312a;
+  --identity-bg: #f1f4f8;
+}
+
+body.login-pf,
+.login-pf body {
+  background: linear-gradient(160deg, #f1f4f8 0%, #e8efff 100%);
+}
+
+/* 登录卡片 */
+.card-pf,
+.pf-v5-c-login__main {
+  border-radius: 12px;
+  border: 1px solid var(--identity-border);
+  box-shadow: 0 4px 12px rgba(12, 13, 14, 0.06);
+}
+
+/* 标题与品牌 */
+#kc-header-wrapper,
+.pf-v5-c-login__header {
+  color: var(--identity-text);
+  font-weight: 600;
+}
+
+h1#kc-page-title {
+  color: var(--identity-text);
+  font-size: 20px;
+  font-weight: 600;
+}
+
+/* 输入控件 */
+.pf-v5-c-form-control,
+input[type="text"],
+input[type="password"],
+input[type="email"] {
+  border-radius: 4px;
+  border-color: var(--identity-border);
+}
+
+.pf-v5-c-form-control:focus-within,
+input:focus {
+  --pf-v5-c-form-control--m-focus--BorderBottomColor: var(--identity-primary);
+  border-color: var(--identity-primary);
+  outline-color: var(--identity-primary);
+}
+
+/* 主按钮 */
+.pf-v5-c-button.pf-m-primary,
+input.pf-v5-c-button.pf-m-primary,
+#kc-login {
+  background-color: var(--identity-primary);
+  border-radius: 4px;
+  height: 36px;
+  font-weight: 500;
+}
+
+.pf-v5-c-button.pf-m-primary:hover,
+#kc-login:hover {
+  background-color: var(--identity-primary-hover);
+}
+
+/* 链接 */
+a,
+.pf-v5-c-login__main-footer-band a {
+  color: var(--identity-primary);
+}
+
+a:hover {
+  color: var(--identity-primary-hover);
+}
+
+/* 错误提示 */
+.pf-v5-c-alert.pf-m-danger {
+  border-top-color: var(--identity-danger);
+}
+
+/* 辅助文字 */
+.pf-v5-c-login__main-footer-band,
+.instruction {
+  color: var(--identity-text-tertiary);
+}

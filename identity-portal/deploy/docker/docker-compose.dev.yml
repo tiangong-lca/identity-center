@@ -33,6 +33,8 @@ services:
     ports:
       - "8080:8080"
       - "9000:9000"
+    volumes:
+      - ../keycloak/themes:/opt/keycloak/themes:ro
     depends_on:
       postgres:
         condition: service_healthy

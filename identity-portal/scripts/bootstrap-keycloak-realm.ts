@@ -59,6 +59,7 @@ async function main() {
     internationalizationEnabled: true,
     supportedLocales: ['zh-CN', 'en'],
     defaultLocale: 'zh-CN',
+    loginTheme: 'identity',
     smtpServer: {
       host: process.env.SMTP_HOST ?? 'localhost',
       port: process.env.SMTP_PORT ?? '1025',
