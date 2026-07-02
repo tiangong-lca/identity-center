@@ -1,0 +1,143 @@
+openapi: 3.0.3
+info:
+  title: 统一身份平台管理接口
+  version: 1.0.0
+  description: >
+    Next.js 门户服务端 API。统一响应信封:成功 {data, requestId},失败 {error:{code,message,details?}, requestId}。
+    认证:门户会话 Cookie(Auth.js);管理端点要求 Keycloak realm role admin_console_access + Platform Admin RBAC 权限码。
+    写操作支持 Idempotency-Key 头(重复 → 409)。列表统一 page/pageSize/keyword/status 查询参数。
+
+tags:
+  - { name: users, description: 用户管理(权限 user:*) }
+  - { name: registration, description: 注册申请与审批(registration:*) }
+  - { name: applications, description: 应用目录/准入/角色(app:*、role:*) }
+  - { name: organizations, description: 平台组织(org:*) }
+  - { name: admin-rbac, description: 管理后台角色权限(admin-role:*) }
+  - { name: audit, description: 审计日志(audit:read) }
+  - { name: account, description: 账号中心(登录即可) }
+  - { name: public, description: 公共入口(无认证,IP 限流) }
+
+paths:
+  /api/health:
+    get: { summary: 健康检查, responses: { "200": { $ref: "#/components/responses/Ok" }, "503": { $ref: "#/components/responses/Error" } } }
+
+  /api/admin/users:
+    get: { tags: [users], summary: 用户列表(user:read), parameters: [{ $ref: "#/components/parameters/Page" }, { $ref: "#/components/parameters/PageSize" }, { $ref: "#/components/parameters/Keyword" }, { name: status, in: query, schema: { enum: [active, disabled, pending_deprovision, deleted] } }], responses: { "200": { $ref: "#/components/responses/Ok" } } }
+    post:
+      tags: [users]
+      summary: 创建用户(user:create;KC 先行,DB 失败补偿删除)
+      requestBody: { content: { application/json: { schema: { type: object, required: [email, temporaryPassword], properties: { email: { type: string, format: email }, displayName: { type: string }, temporaryPassword: { type: string, minLength: 10, description: 临时密码,首登强制改密 } } } } } }
+      responses: { "201": { $ref: "#/components/responses/Ok" }, "400": { $ref: "#/components/responses/Error" }, "409": { $ref: "#/components/responses/Error" } }
+  /api/admin/users/{id}:
+    get: { tags: [users], summary: 用户详情(user:read), parameters: [{ $ref: "#/components/parameters/Id" }], responses: { "200": { $ref: "#/components/responses/Ok" }, "404": { $ref: "#/components/responses/Error" } } }
+    patch: { tags: [users], summary: 更新资料(user:update), parameters: [{ $ref: "#/components/parameters/Id" }], requestBody: { content: { application/json: { schema: { type: object, properties: { displayName: { type: string } } } } } }, responses: { "200": { $ref: "#/components/responses/Ok" } } }
+  /api/admin/users/{id}/disable:
+    post: { tags: [users], summary: 禁用(user:disable;Keycloak disable 成功=完成点,联动会话登出), parameters: [{ $ref: "#/components/parameters/Id" }], responses: { "200": { $ref: "#/components/responses/Ok" }, "409": { $ref: "#/components/responses/Error" }, "502": { $ref: "#/components/responses/Error" } } }
+  /api/admin/users/{id}/enable:
+    post: { tags: [users], summary: 启用(user:enable), parameters: [{ $ref: "#/components/parameters/Id" }], responses: { "200": { $ref: "#/components/responses/Ok" } } }
+  /api/admin/users/{id}/reset-password:
+    post: { tags: [users], summary: 重置密码(user:reset-password,发临时密码), parameters: [{ $ref: "#/components/parameters/Id" }], requestBody: { content: { application/json: { schema: { type: object, required: [temporaryPassword], properties: { temporaryPassword: { type: string, minLength: 10 } } } } } }, responses: { "200": { $ref: "#/components/responses/Ok" } } }
+  /api/admin/users/{id}/reset-mfa:
+    post: { tags: [users], summary: 重置 MFA(user:reset-mfa,删除 OTP 凭据), parameters: [{ $ref: "#/components/parameters/Id" }], responses: { "200": { $ref: "#/components/responses/Ok" } } }
+
+  /api/public/registration-requests:
+    post: { tags: [public], summary: 提交注册申请(IP 限流 10/h;防枚举固定响应), requestBody: { content: { application/json: { schema: { type: object, required: [email], properties: { email: { type: string, format: email }, displayName: { type: string }, requestedOrganizationId: { type: string, format: uuid }, requestedReason: { type: string } } } } } }, responses: { "202": { $ref: "#/components/responses/Ok" }, "429": { $ref: "#/components/responses/Error" } } }
+  /api/admin/registration-requests:
+    get: { tags: [registration], summary: 申请列表(registration:read), responses: { "200": { $ref: "#/components/responses/Ok" } } }
+  /api/admin/registration-requests/{id}:
+    get: { tags: [registration], summary: 申请详情, parameters: [{ $ref: "#/components/parameters/Id" }], responses: { "200": { $ref: "#/components/responses/Ok" } } }
+  /api/admin/registration-requests/{id}/approve:
+    post: { tags: [registration], summary: 审批通过(registration:review;KC 确保用户+镜像;非 pending → 409), parameters: [{ $ref: "#/components/parameters/Id" }], responses: { "200": { $ref: "#/components/responses/Ok" }, "409": { $ref: "#/components/responses/Error" } } }
+  /api/admin/registration-requests/{id}/reject:
+    post: { tags: [registration], summary: 拒绝(registration:review), parameters: [{ $ref: "#/components/parameters/Id" }], responses: { "200": { $ref: "#/components/responses/Ok" }, "409": { $ref: "#/components/responses/Error" } } }
+
+  /api/admin/applications:
+    get: { tags: [applications], summary: 应用列表(app:read), responses: { "200": { $ref: "#/components/responses/Ok" } } }
+    post: { tags: [applications], summary: 登记应用(app:create;确保 KC client 存在并建准入 Client Role), requestBody: { content: { application/json: { schema: { type: object, required: [code, name, keycloakClientId], properties: { code: { type: string }, name: { type: string }, keycloakClientId: { type: string }, accessClientRole: { type: string }, loginUrl: { type: string }, adminUrl: { type: string }, webhookUrl: { type: string }, webhookSecretRef: { type: string, description: secret 的密钥引用(env 键名),不传明文 } } } } } }, responses: { "201": { $ref: "#/components/responses/Ok" } } }
+  /api/admin/applications/{id}:
+    get: { tags: [applications], summary: 应用详情(app:read,支持 app 范围权限), parameters: [{ $ref: "#/components/parameters/Id" }], responses: { "200": { $ref: "#/components/responses/Ok" } } }
+    patch: { tags: [applications], summary: 更新应用(app:update), parameters: [{ $ref: "#/components/parameters/Id" }], responses: { "200": { $ref: "#/components/responses/Ok" } } }
+  /api/admin/applications/{id}/assignments:
+    get: { tags: [applications], summary: 准入列表(app:read), parameters: [{ $ref: "#/components/parameters/Id" }], responses: { "200": { $ref: "#/components/responses/Ok" } } }
+    post: { tags: [applications], summary: 授予准入(app:assign;最终一致), description: "201=已同步投影到 Keycloak;202=事实已生效、投影异步补偿(SYNC_PENDING 语义)", parameters: [{ $ref: "#/components/parameters/Id" }], requestBody: { content: { application/json: { schema: { type: object, required: [portalUserId], properties: { portalUserId: { type: string, format: uuid } } } } } }, responses: { "201": { $ref: "#/components/responses/Ok" }, "202": { $ref: "#/components/responses/Ok" }, "409": { $ref: "#/components/responses/Error" } } }
+  /api/admin/applications/{id}/assignments/{assignmentId}:
+    delete: { tags: [applications], summary: 撤销准入(app:revoke;撤权语义), description: "200=Keycloak Client Role 移除成功(关键完成点);502=事实已 revoked 但认证侧投影失败(自动重试);409=无生效准入", parameters: [{ $ref: "#/components/parameters/Id" }, { name: assignmentId, in: path, required: true, schema: { type: string } }], responses: { "200": { $ref: "#/components/responses/Ok" }, "409": { $ref: "#/components/responses/Error" }, "502": { $ref: "#/components/responses/Error" } } }
+  /api/admin/applications/{id}/roles:
+    get: { tags: [applications], summary: 角色目录(role:read), parameters: [{ $ref: "#/components/parameters/Id" }], responses: { "200": { $ref: "#/components/responses/Ok" } } }
+    post: { tags: [applications], summary: 创建角色(role:manage), parameters: [{ $ref: "#/components/parameters/Id" }], responses: { "201": { $ref: "#/components/responses/Ok" }, "409": { $ref: "#/components/responses/Error" } } }
+  /api/admin/applications/{id}/roles/{roleId}:
+    patch: { tags: [applications], summary: 更新角色(role:manage), parameters: [{ $ref: "#/components/parameters/Id" }, { name: roleId, in: path, required: true, schema: { type: string } }], responses: { "200": { $ref: "#/components/responses/Ok" } } }
+  /api/admin/applications/{id}/role-assignments:
+    get: { tags: [applications], summary: 角色分配列表(role:read), parameters: [{ $ref: "#/components/parameters/Id" }], responses: { "200": { $ref: "#/components/responses/Ok" } } }
+    post: { tags: [applications], summary: 分配角色(app:assign;需先有准入;业务侧投影走 Webhook), parameters: [{ $ref: "#/components/parameters/Id" }], requestBody: { content: { application/json: { schema: { type: object, required: [applicationRoleId, portalUserId], properties: { applicationRoleId: { type: string }, portalUserId: { type: string }, scopeType: { enum: [global, tenant, org, team, project] }, scopeId: { type: string } } } } } }, responses: { "201": { $ref: "#/components/responses/Ok" }, "409": { $ref: "#/components/responses/Error" } } }
+  /api/admin/applications/{id}/role-assignments/{assignmentId}:
+    delete: { tags: [applications], summary: 撤销角色(app:revoke), parameters: [{ $ref: "#/components/parameters/Id" }, { name: assignmentId, in: path, required: true, schema: { type: string } }], responses: { "200": { $ref: "#/components/responses/Ok" } } }
+
+  /api/admin/platform-organizations:
+    get: { tags: [organizations], summary: 组织列表(org:read), responses: { "200": { $ref: "#/components/responses/Ok" } } }
+    post: { tags: [organizations], summary: 创建组织(org:manage), responses: { "201": { $ref: "#/components/responses/Ok" } } }
+  /api/admin/platform-organizations/{id}:
+    get: { tags: [organizations], summary: 组织详情, parameters: [{ $ref: "#/components/parameters/Id" }], responses: { "200": { $ref: "#/components/responses/Ok" } } }
+    patch: { tags: [organizations], summary: 更新组织(org:manage), parameters: [{ $ref: "#/components/parameters/Id" }], responses: { "200": { $ref: "#/components/responses/Ok" } } }
+  /api/admin/platform-organizations/{id}/members:
+    get: { tags: [organizations], summary: 成员列表, parameters: [{ $ref: "#/components/parameters/Id" }], responses: { "200": { $ref: "#/components/responses/Ok" } } }
+    post: { tags: [organizations], summary: 添加成员(org:manage), parameters: [{ $ref: "#/components/parameters/Id" }], responses: { "201": { $ref: "#/components/responses/Ok" }, "409": { $ref: "#/components/responses/Error" } } }
+  /api/admin/platform-organizations/{id}/members/{userId}:
+    delete: { tags: [organizations], summary: 移除成员(org:manage), parameters: [{ $ref: "#/components/parameters/Id" }, { name: userId, in: path, required: true, schema: { type: string } }], responses: { "200": { $ref: "#/components/responses/Ok" } } }
+  /api/admin/platform-organizations/{id}/application-mappings:
+    get: { tags: [organizations], summary: 应用映射列表, parameters: [{ $ref: "#/components/parameters/Id" }], responses: { "200": { $ref: "#/components/responses/Ok" } } }
+    post: { tags: [organizations], summary: 设置映射(org:manage,upsert), parameters: [{ $ref: "#/components/parameters/Id" }], responses: { "201": { $ref: "#/components/responses/Ok" } } }
+
+  /api/admin/admin-roles:
+    get: { tags: [admin-rbac], summary: 管理角色列表(admin-role:read), responses: { "200": { $ref: "#/components/responses/Ok" } } }
+    post: { tags: [admin-rbac], summary: 创建管理角色(admin-role:manage), responses: { "201": { $ref: "#/components/responses/Ok" } } }
+  /api/admin/admin-roles/{id}:
+    delete: { tags: [admin-rbac], summary: 删除管理角色(内置角色/仍被绑定 → 409), parameters: [{ $ref: "#/components/parameters/Id" }], responses: { "200": { $ref: "#/components/responses/Ok" }, "409": { $ref: "#/components/responses/Error" } } }
+  /api/admin/admin-roles/{id}/permissions:
+    get: { tags: [admin-rbac], summary: 角色权限列表, parameters: [{ $ref: "#/components/parameters/Id" }], responses: { "200": { $ref: "#/components/responses/Ok" } } }
+    post: { tags: [admin-rbac], summary: 赋予权限(admin-role:manage), parameters: [{ $ref: "#/components/parameters/Id" }], responses: { "201": { $ref: "#/components/responses/Ok" } } }
+  /api/admin/admin-roles/{id}/permissions/{permissionId}:
+    delete: { tags: [admin-rbac], summary: 移除权限, parameters: [{ $ref: "#/components/parameters/Id" }, { name: permissionId, in: path, required: true, schema: { type: string } }], responses: { "200": { $ref: "#/components/responses/Ok" } } }
+  /api/admin/admin-permissions:
+    get: { tags: [admin-rbac], summary: 权限清单(admin-role:read), responses: { "200": { $ref: "#/components/responses/Ok" } } }
+  /api/admin/admin-user-roles:
+    post: { tags: [admin-rbac], summary: 绑定管理员角色(admin-role:manage,支持 global/org/app 范围), responses: { "201": { $ref: "#/components/responses/Ok" }, "409": { $ref: "#/components/responses/Error" } } }
+  /api/admin/admin-user-roles/{bindingId}:
+    delete: { tags: [admin-rbac], summary: 解绑, parameters: [{ name: bindingId, in: path, required: true, schema: { type: string } }], responses: { "200": { $ref: "#/components/responses/Ok" } } }
+
+  /api/admin/audit-logs:
+    get: { tags: [audit], summary: 审计日志查询(audit:read;只读 append-only), parameters: [{ $ref: "#/components/parameters/Page" }, { $ref: "#/components/parameters/PageSize" }, { name: action, in: query, schema: { type: string } }, { name: actor, in: query, schema: { type: string } }, { name: targetType, in: query, schema: { type: string } }, { name: targetId, in: query, schema: { type: string } }], responses: { "200": { $ref: "#/components/responses/Ok" } } }
+
+  /api/account/profile:
+    get: { tags: [account], summary: 当前用户资料, responses: { "200": { $ref: "#/components/responses/Ok" }, "401": { $ref: "#/components/responses/Error" } } }
+  /api/account/apps:
+    get: { tags: [account], summary: 当前用户可访问应用, responses: { "200": { $ref: "#/components/responses/Ok" } } }
+  /api/account/sessions:
+    get: { tags: [account], summary: 当前用户 Keycloak 会话, responses: { "200": { $ref: "#/components/responses/Ok" } } }
+
+components:
+  parameters:
+    Id: { name: id, in: path, required: true, schema: { type: string, format: uuid } }
+    Page: { name: page, in: query, schema: { type: integer, minimum: 1, default: 1 } }
+    PageSize: { name: pageSize, in: query, schema: { type: integer, minimum: 1, maximum: 100, default: 20 } }
+    Keyword: { name: keyword, in: query, schema: { type: string } }
+  responses:
+    Ok:
+      description: 成功信封
+      content: { application/json: { schema: { type: object, required: [data, requestId], properties: { data: {}, requestId: { type: string } } } } }
+    Error:
+      description: 失败信封
+      content:
+        application/json:
+          schema:
+            type: object
+            required: [error, requestId]
+            properties:
+              requestId: { type: string }
+              error:
+                type: object
+                required: [code, message]
+                properties:
+                  code: { type: string, enum: [UNAUTHENTICATED, FORBIDDEN, APP_ACCESS_DENIED, CSRF_REJECTED, USER_NOT_FOUND, APPLICATION_NOT_FOUND, NOT_FOUND, VALIDATION_ERROR, CONFLICT, KEYCLOAK_ERROR, DEPENDENCY_FAILED, SYNC_PENDING, RATE_LIMITED, INTERNAL_ERROR] }
+                  message: { type: string }
+                  details: { type: object }

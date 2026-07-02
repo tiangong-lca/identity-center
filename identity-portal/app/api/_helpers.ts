@@ -40,7 +40,9 @@ type AdminRouteOptions = {
 function checkCsrf(request: NextRequest) {
   if (!MUTATING.has(request.method)) return
   const contentType = request.headers.get('content-type') ?? ''
-  if (request.method !== 'DELETE' && !contentType.includes('application/json')) {
+  const contentLength = request.headers.get('content-length')
+  const hasBody = contentLength !== null && contentLength !== '0'
+  if (hasBody && !contentType.includes('application/json')) {
     throw new ApiError('CSRF_REJECTED', '仅接受 application/json 请求体')
   }
   const origin = request.headers.get('origin')
