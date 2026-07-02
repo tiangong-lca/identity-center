@@ -1,0 +1,38 @@
+{
+  "project": {
+    "name": "Identity Platform 管理后台",
+    "path": "/Users/biao/Code/Biaoo-projects/identity-platform/identity-platform-admin",
+    "operation": "create",
+    "deviceType": "desktop",
+    "language": "zh-CN",
+    "dashboardMode": false,
+    "designRead": "admin-console / B2B enterprise admins / professional-corporate / high-information-density / generic-bland",
+    "designDials": { "layoutVariance": 2, "motionIntensity": 1, "visualDensity": 4 },
+    "sharedProjectShellContract": {
+      "navigationShell": "48px TopNav (Logo + hamburger + search + links + icons + avatar) + 200px Sidebar (business icon + title 58px + grouped menu items 36px + collapse button) + flex Content area",
+      "primaryColorSystem": "#1664FF primary blue from Identity Platform design system",
+      "typographySystem": "PingFang SC / Microsoft YaHei / Helvetica Neue, 12-24px scale, 400/500/600 weights",
+      "radiusScale": "sm:4px md:8px lg:12px xl:16px full:9999px",
+      "surfaceDepthModel": "border-led static surfaces (1px EAEDF1), shadow only for floating layers (dropdown/modal/drawer)",
+      "ctaStyle": "primary:#1664FF bg white text 32px 4px radius; secondary:white bg #DDE2E9 border",
+      "alignmentRules": "4px base grid, 32px content side padding, 40px module spacing, left-aligned content"
+    }
+  },
+  "designSource": {
+    "libraryIdentity": { "name": "Volcengine Copy", "id": "Y2JIZFT9CG4WDK", "version": "1", "scope": "workspace", "path": "/Users/biao/.trae-cn/design_libraries/Y2JIZFT9CG4WDK", "versionSource": "metadata.json" },
+    "brandPrefix": "identity",
+    "brandCssPath": "/Users/biao/Code/Biaoo-projects/identity-platform/.design_library/identity-platform/colors_and_type.css",
+    "iconAssets": { "source": "assets/icons", "projectIconDir": "assets/icons/Y2JIZFT9CG4WDK", "libraryKey": "Y2JIZFT9CG4WDK", "renderMethod": "css-mask", "pathTemplate": "../assets/icons/Y2JIZFT9CG4WDK/{name}.svg", "totalCount": 650 }
+  },
+  "pages": [
+    { "nodeId": "page-admin-dashboard", "htmlSrc": "pages/admin-dashboard.html", "title": "概览", "pageIndex": 1, "pageType": "information-dense", "businessScenario": "admin overview dashboard with KPI metrics and charts" },
+    { "nodeId": "page-admin-users", "htmlSrc": "pages/admin-users.html", "title": "用户列表", "pageIndex": 2, "pageType": "information-dense", "businessScenario": "user management list with search, filter, batch operations, and data table" },
+    { "nodeId": "page-admin-user-detail", "htmlSrc": "pages/admin-user-detail.html", "title": "用户详情", "pageIndex": 3, "pageType": "information-dense", "businessScenario": "user detail with tabs (overview/security/org/apps/roles/sessions/audit) and danger zone" },
+    { "nodeId": "page-admin-apps", "htmlSrc": "pages/admin-apps.html", "title": "应用列表", "pageIndex": 4, "pageType": "information-dense", "businessScenario": "application management list with sync status and access control" },
+    { "nodeId": "page-admin-app-detail", "htmlSrc": "pages/admin-app-detail.html", "title": "应用详情", "pageIndex": 5, "pageType": "information-dense", "businessScenario": "application detail with Keycloak Client info, redirect URIs, and authorized users" },
+    { "nodeId": "page-admin-roles", "htmlSrc": "pages/admin-roles.html", "title": "角色权限", "pageIndex": 6, "pageType": "information-dense", "businessScenario": "role and permission management with permission matrix view" },
+    { "nodeId": "page-admin-audit", "htmlSrc": "pages/admin-audit.html", "title": "审计日志", "pageIndex": 7, "pageType": "information-dense", "businessScenario": "audit log list with time filter, full-text search, and actor/target columns" },
+    { "nodeId": "page-account-profile", "htmlSrc": "pages/account-profile.html", "title": "我的资料", "pageIndex": 8, "pageType": "task-driven", "businessScenario": "user profile view with avatar, name, email, org, and security settings entry" },
+    { "nodeId": "page-login", "htmlSrc": "pages/login.html", "title": "登录", "pageIndex": 9, "pageType": "task-driven", "businessScenario": "unified login page with email/password, SSO options, and branding" }
+  ]
+}

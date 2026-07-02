@@ -1,0 +1,238 @@
+{
+  "data": [
+    {
+      "id": "page-admin-dashboard",
+      "type": "page",
+      "title": "概览",
+      "version": 1,
+      "createdAt": 1782564100000,
+      "canvasData": {
+        "x": 0,
+        "y": 0,
+        "group": 0
+      },
+      "devMetadata": {
+        "htmlSrc": "pages/admin-dashboard.html"
+      }
+    },
+    {
+      "id": "page-admin-users",
+      "type": "page",
+      "title": "用户列表",
+      "version": 1,
+      "createdAt": 1782564200000,
+      "canvasData": {
+        "x": 620,
+        "y": 0,
+        "group": 0
+      },
+      "devMetadata": {
+        "htmlSrc": "pages/admin-users.html"
+      }
+    },
+    {
+      "id": "page-admin-user-detail",
+      "type": "page",
+      "title": "用户详情",
+      "version": 1,
+      "createdAt": 1782564300000,
+      "canvasData": {
+        "x": 1308,
+        "y": -24,
+        "group": 0
+      },
+      "devMetadata": {
+        "htmlSrc": "pages/admin-user-detail.html"
+      }
+    },
+    {
+      "id": "page-admin-apps",
+      "type": "page",
+      "title": "应用列表",
+      "version": 1,
+      "createdAt": 1782564400000,
+      "canvasData": {
+        "x": 1860,
+        "y": 0,
+        "group": 0
+      },
+      "devMetadata": {
+        "htmlSrc": "pages/admin-apps.html"
+      }
+    },
+    {
+      "id": "page-admin-app-detail",
+      "type": "page",
+      "title": "应用详情",
+      "version": 1,
+      "createdAt": 1782564500000,
+      "canvasData": {
+        "x": 2480,
+        "y": 0,
+        "group": 0
+      },
+      "devMetadata": {
+        "htmlSrc": "pages/admin-app-detail.html"
+      }
+    },
+    {
+      "id": "page-admin-roles",
+      "type": "page",
+      "title": "角色权限",
+      "version": 1,
+      "createdAt": 1782564600000,
+      "canvasData": {
+        "x": 3100,
+        "y": 0,
+        "group": 0
+      },
+      "devMetadata": {
+        "htmlSrc": "pages/admin-roles.html"
+      }
+    },
+    {
+      "id": "page-admin-audit",
+      "type": "page",
+      "title": "审计日志",
+      "version": 1,
+      "createdAt": 1782564700000,
+      "canvasData": {
+        "x": 3720,
+        "y": 0,
+        "group": 0
+      },
+      "devMetadata": {
+        "htmlSrc": "pages/admin-audit.html"
+      }
+    },
+    {
+      "id": "page-account-profile",
+      "type": "page",
+      "title": "我的资料",
+      "version": 1,
+      "createdAt": 1782564800000,
+      "canvasData": {
+        "x": 0,
+        "y": 633,
+        "group": 1
+      },
+      "devMetadata": {
+        "htmlSrc": "pages/account-profile.html"
+      }
+    },
+    {
+      "id": "page-login",
+      "type": "page",
+      "title": "登录",
+      "version": 1,
+      "createdAt": 1782564900000,
+      "canvasData": {
+        "x": 620,
+        "y": 633,
+        "group": 1
+      },
+      "devMetadata": {
+        "htmlSrc": "pages/login.html"
+      }
+    },
+    {
+      "id": "page-account-security",
+      "type": "page",
+      "title": "安全设置",
+      "version": 1,
+      "createdAt": 1782565000000,
+      "canvasData": {
+        "x": 1240,
+        "y": 633,
+        "group": 1
+      },
+      "devMetadata": {
+        "htmlSrc": "pages/account-security.html"
+      }
+    },
+    {
+      "id": "page-register",
+      "type": "page",
+      "title": "注册",
+      "version": 1,
+      "createdAt": 1782565100000,
+      "canvasData": {
+        "x": 1860,
+        "y": 633,
+        "group": 1
+      },
+      "devMetadata": {
+        "htmlSrc": "pages/register.html"
+      }
+    },
+    {
+      "id": "page-admin-registration-config",
+      "type": "page",
+      "title": "注册管理",
+      "version": 1,
+      "createdAt": 1782565200000,
+      "canvasData": {
+        "x": 4340,
+        "y": 0,
+        "group": 0
+      },
+      "devMetadata": {
+        "htmlSrc": "pages/admin-registration-config.html"
+      }
+    },
+    {
+      "id": "page-admin-registration-approval",
+      "type": "page",
+      "title": "注册审批",
+      "version": 1,
+      "createdAt": 1782565300000,
+      "canvasData": {
+        "x": 4960,
+        "y": 0,
+        "group": 0
+      },
+      "devMetadata": {
+        "htmlSrc": "pages/admin-registration-approval.html"
+      }
+    },
+    {
+      "id": "page-user-home",
+      "type": "page",
+      "title": "用户首页",
+      "version": 1,
+      "createdAt": 1782565400000,
+      "canvasData": {
+        "x": 2480,
+        "y": 633,
+        "group": 1
+      },
+      "devMetadata": {
+        "htmlSrc": "pages/user-home.html"
+      }
+    },
+    {
+      "id": "page-user-apps",
+      "type": "page",
+      "title": "已授权应用",
+      "version": 1,
+      "createdAt": 1782565500000,
+      "canvasData": {
+        "x": 3100,
+        "y": 633,
+        "group": 1
+      },
+      "devMetadata": {
+        "htmlSrc": "pages/user-apps.html"
+      }
+    }
+  ],
+  "config": {
+    "autoLayout": false,
+    "deviceType": "desktop",
+    "showEdge": false,
+    "windowSize": {
+      "width": 800,
+      "height": 600
+    }
+  }
+}

@@ -1,0 +1,1119 @@
+<!DOCTYPE html>
+<html lang="zh-CN" class="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>已授权应用 - Identity Platform</title>
+    <style id="theme-vars">
+:root {
+  /* === Colors === */
+  --primary-identityBlue-1: #f3f7ff;
+  --primary-identityBlue-2: #ebf1ff;
+  --primary-identityBlue-3: #a0c0ff;
+  --primary-identityBlue-4: #ccddff;
+  --primary-identityBlue-5: #387bff;
+  --primary-identityBlue-6: #1664ff;
+  --primary-identityBlue-7: #0055ff;
+  --primary-foreground: #ffffff;
+  --primary-accent-foreground: #ffffff;
+  --primary: #1664ff;
+  --primary-accent: #1664ff;
+  --primary-accent-hover: #0055ff;
+  --primary-link: #1664ff;
+  --primary-ring: #1664ff;
+  --text-identityNeutral-1: #ffffff;
+  --text-identityNeutral-2: #fcfdfe;
+  --text-identityNeutral-3: #eceded;
+  --text-identityNeutral-4: #dde2e9;
+  --text-identityNeutral-5: #c9cdd4;
+  --text-identityNeutral-6: #86909c;
+  --text-identityNeutral-7: #4e5969;
+  --text-identityNeutral-8: #333333;
+  --text-identityNeutral-9: #1d2129;
+  --text-identityNeutral-10: #0c0d0e;
+  --text-identityNeutral-11: #000b1a;
+  --text-fg: #0c0d0e;
+  --text-foreground: #0c0d0e;
+  --text-secondary: #eceded;
+  --text-secondary-foreground: #1d2129;
+  --text-muted: #86909c;
+  --text-muted-foreground: #86909c;
+  --text-color-text-strong: #0c0d0e;
+  --text-color-text-regular: #1d2129;
+  --text-color-text-subtle: #86909c;
+  --text-color-text-disabled: #c9cdd4;
+  --foundation-surface-container: #f7f9fb;
+  --foundation-surface-container-high: #f1f4f8;
+  --foundation-bg: #ffffff;
+  --foundation-background: #ffffff;
+  --foundation-surface-bright: #ffffff;
+  --foundation-surface: #ffffff;
+  --foundation-surface-dim: #fcfdfe;
+  --foundation-surface-container-lowest: #ffffff;
+  --foundation-surface-container-low: #fcfdfe;
+  --foundation-surface-container-highest: #eceded;
+  --foundation-inverse-surface: #1d2129;
+  --foundation-inverse-on-surface: #ffffff;
+  --foundation-card: #ffffff;
+  --foundation-card-foreground: #0c0d0e;
+  --foundation-popover: #f1f4f8;
+  --foundation-popover-foreground: #0c0d0e;
+  --foundation-rule: #dde2e9;
+  --foundation-border: #dde2e9;
+  --foundation-input: #eceded;
+  --border-identityBorder-1: #eaedf1;
+  --border-identityBorder-2: #e1e4e8;
+  --border-identityBorder-3: #d1d5da;
+  --border-identityBorder-4: #959da5;
+  --status-identityDanger-2: #feeced;
+  --status-identityDanger-3: #fa9ea3;
+  --status-identityDanger-5: #f65159;
+  --status-identityDanger-6: #d7312a;
+  --status-identityDanger-7: #c43138;
+  --status-identitySuccess-2: #e2f5eb;
+  --status-identitySuccess-3: #8dd8b3;
+  --status-identitySuccess-5: #1ebf6f;
+  --status-identitySuccess-6: #2a814b;
+  --status-identitySuccess-7: #189959;
+  --status-identityWarning-2: #fdf3de;
+  --status-identityWarning-3: #f8d080;
+  --status-identityWarning-5: #f5b433;
+  --status-identityWarning-6: #bd7e00;
+  --status-identityWarning-7: #de9400;
+  --status-on-error: #ffffff;
+  --status-error: #d7312a;
+  --status-error-container: #feeced;
+  --status-on-error-container: #c43138;
+  --status-success: #2a814b;
+  --status-warning: #bd7e00;
+  --state-hover: rgba(22, 100, 255, 0.08);
+  --state-focus: rgba(22, 100, 255, 0.12);
+  --state-press: rgba(22, 100, 255, 0.16);
+  --state-drag: rgba(22, 100, 255, 0.16);
+  --color-on-primary: #ffffff;
+  --color-background: #ffffff;
+  --color-foreground: #0c0d0e;
+  --color-surface: #ffffff;
+  --color-surface-dim: #fcfdfe;
+  --color-surface-variant: #f1f4f8;
+  --color-surface-container: #f7f9fb;
+  --color-surface-container-low: #fcfdfe;
+  --color-surface-container-high: #f1f4f8;
+  --color-surface-container-highest: #eceded;
+  --color-card: #ffffff;
+  --color-sidebar: #fcfdfe;
+  --color-on-surface: #0c0d0e;
+  --color-on-surface-variant: #86909c;
+  --color-muted-foreground: #86909c;
+  --color-primary: #1664ff;
+  --color-primary-hover: #0055ff;
+  --color-primary-container: #f3f7ff;
+  --color-on-primary-container: #0055ff;
+  --color-secondary: #eceded;
+  --color-secondary-container: #fcfdfe;
+  --color-on-secondary-container: #333333;
+  --color-error: #d7312a;
+  --color-error-container: #feeced;
+  --color-on-error: #ffffff;
+  --color-on-error-container: #c43138;
+  --color-outline: #dde2e9;
+  --color-outline-variant: #eceded;
+  --color-border: #dde2e9;
+  --color-success: #2a814b;
+  --color-warning: #bd7e00;
+  --color-danger: #d7312a;
+  --chart-1: #1664ff;
+  --chart-2: #2a814b;
+  --chart-3: #bd7e00;
+  --chart-4: #d7312a;
+  --chart-5: #4e5969;
+
+  /* === Typography === */
+  --font-display: "PingFang SC", "Microsoft YaHei", "Helvetica Neue", Arial, sans-serif;
+  --font-heading: "PingFang SC", "Microsoft YaHei", "Helvetica Neue", Arial, sans-serif;
+  --font-body: "PingFang SC", "Roboto", "Helvetica Neue", Arial, sans-serif;
+  --font-mono: "SFMono-Regular", "SF Mono", "Roboto Mono", "Consolas", "Liberation Mono", monospace;
+  --font-family-base: "PingFang SC", "Roboto", "Helvetica Neue", Arial, sans-serif;
+  --font-size-display: 24px;
+  --font-size-h1: 20px;
+  --font-size-h2: 18px;
+  --font-size-h3: 16px;
+  --font-size-h4: 14px;
+  --font-size-body: 12px;
+  --font-size-lead: 13px;
+  --font-size-caption: 10px;
+  --font-size-eyebrow: 10px;
+  --font-size-mono: 12px;
+  --font-size-price: 20px;
+  --type-display-sm: 24px;
+  --type-heading-sm: 14px;
+  --type-body-md: 12px;
+  --type-body-sm: 10px;
+  --font-weight-regular: 400;
+  --font-weight-medium: 500;
+  --font-weight-semibold: 600;
+  --line-height-display: 32px;
+  --line-height-h1: 28px;
+  --line-height-h2: 26px;
+  --line-height-h3: 24px;
+  --line-height-h4: 22px;
+  --line-height-body: 20px;
+  --line-height-lead: 22px;
+  --line-height-caption: 18px;
+  --line-height-eyebrow: 16px;
+  --line-height-mono: 20px;
+  --line-height-price: 28px;
+
+  /* === Radius === */
+  --identitytest-radius-sm: 4px;
+  --radius-full: 9999px;
+  --radius-sm: 4px;
+  --radius-md: 8px;
+  --radius-lg: 12px;
+  --radius-xl: 16px;
+
+  /* === Spacing === */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 20px;
+  --space-6: 24px;
+  --space-8: 32px;
+  --space-10: 40px;
+  --space-12: 48px;
+  --space-16: 64px;
+
+  /* === Size === */
+  --max-content: 1440px;
+  --max-prose: 72ch;
+  --gutter-desk: 24px;
+  --gutter-mob: 16px;
+  --nav-height: 56px;
+  --sidebar-width: 240px;
+
+  /* === Shadow === */
+  --shadow-1: 0px 1px 2px 0px rgba(12, 13, 14, 0.05);
+  --shadow-2: 0px 2px 6px 0px rgba(12, 13, 14, 0.08);
+  --shadow-3: 0px 5px 15px 0px rgba(12, 13, 14, 0.08), 0px 2px 4px 0px rgba(12, 13, 14, 0.04);
+  --shadow-4: 0px 15px 35px -2px rgba(12, 13, 14, 0.1), 0px 5px 15px 0px rgba(12, 13, 14, 0.06);
+  --shadow-5: 0px 24px 48px -4px rgba(12, 13, 14, 0.12), 0px 8px 20px 0px rgba(12, 13, 14, 0.08);
+}
+
+.dark {
+  --identityDanger-6: #ff706d;
+  --identitySuccess-6: #7ccd94;
+  --identityWarning-6: #f0a50f;
+  --fg: #ffffff;
+  --foreground: #ffffff;
+  --secondary: #333333;
+  --secondary-foreground: #ffffff;
+  --muted: #86909c;
+  --muted-foreground: #c9cdd4;
+  --bg: #0c0d0e;
+  --background: #0c0d0e;
+  --surface-dim: #000b1a;
+  --surface: #1d2129;
+  --surface-bright: #333333;
+  --surface-container-lowest: #0c0d0e;
+  --surface-container-low: #1d2129;
+  --surface-container: #202833;
+  --surface-container-high: #2a3440;
+  --surface-container-highest: #41464f;
+  --inverse-surface: #ffffff;
+  --inverse-on-surface: #0c0d0e;
+  --card: #1d2129;
+  --card-foreground: #ffffff;
+  --popover: #2a3440;
+  --popover-foreground: #ffffff;
+  --rule: #333333;
+  --border: #333333;
+  --input: #41464f;
+  --error: #ff706d;
+  --error-container: rgba(255, 112, 109, 0.16);
+  --on-error: #1f0a0c;
+  --on-error-container: #ffd9d7;
+  --success: #7ccd94;
+  --warning: #f0a50f;
+  --state-hover: rgba(56, 123, 255, 0.16);
+  --state-focus: rgba(56, 123, 255, 0.24);
+  --state-press: rgba(56, 123, 255, 0.32);
+  --state-drag: rgba(56, 123, 255, 0.32);
+  --color-background: #0c0d0e;
+  --color-foreground: #ffffff;
+  --color-surface: #1d2129;
+  --color-surface-dim: #000b1a;
+  --color-surface-variant: #2a3440;
+  --color-surface-container: #202833;
+  --color-surface-container-low: #1d2129;
+  --color-surface-container-high: #2a3440;
+  --color-surface-container-highest: #41464f;
+  --color-card: #1d2129;
+  --color-sidebar: #1d2129;
+  --color-on-surface: #ffffff;
+  --color-on-surface-variant: #86909c;
+  --color-muted-foreground: #86909c;
+  --color-primary: #1664ff;
+  --color-primary-hover: #0055ff;
+  --color-primary-container: #0055ff;
+  --color-on-primary-container: #ffffff;
+  --color-secondary: #333333;
+  --color-secondary-container: #1d2129;
+  --color-on-secondary-container: #ffffff;
+  --color-error: #ff706d;
+  --color-error-container: rgba(255, 112, 109, 0.16);
+  --color-on-error: #1f0a0c;
+  --color-on-error-container: #ffd9d7;
+  --color-outline: #333333;
+  --color-outline-variant: #333333;
+  --color-border: #333333;
+  --color-success: #7ccd94;
+  --color-warning: #f0a50f;
+  --color-danger: #ff706d;
+  --chart-1: #387bff;
+  --chart-2: #7ccd94;
+  --chart-3: #f0a50f;
+  --chart-4: #ff706d;
+  --chart-5: #86909c;
+  --shadow-1: 0px 1px 2px 0px rgba(0, 0, 0, 0.24);
+  --shadow-2: 0px 2px 6px 0px rgba(0, 0, 0, 0.32);
+  --shadow-3: 0px 5px 15px 0px rgba(0, 0, 0, 0.36), 0px 2px 4px 0px rgba(0, 0, 0, 0.2);
+  --shadow-4: 0px 15px 35px -2px rgba(0, 0, 0, 0.44), 0px 5px 15px 0px rgba(0, 0, 0, 0.28);
+  --shadow-5: 0px 24px 48px -4px rgba(0, 0, 0, 0.5), 0px 8px 20px 0px rgba(0, 0, 0, 0.32);
+}
+
+/* === Typography utility classes === */
+.type-display {
+  font-size: var(--font-size-display);
+  line-height: var(--line-height-display);
+  font-family: var(--font-sans, "PingFang SC", "Microsoft YaHei", "Helvetica Neue", Arial, sans-serif);
+}
+
+.type-h1 {
+  font-size: var(--font-size-h1);
+  line-height: var(--line-height-h1);
+  font-family: var(--font-sans, "PingFang SC", "Microsoft YaHei", "Helvetica Neue", Arial, sans-serif);
+}
+
+.type-h2 {
+  font-size: var(--font-size-h2);
+  line-height: var(--line-height-h2);
+  font-family: var(--font-sans, "PingFang SC", "Microsoft YaHei", "Helvetica Neue", Arial, sans-serif);
+}
+
+.type-h3 {
+  font-size: var(--font-size-h3);
+  line-height: var(--line-height-h3);
+  font-family: var(--font-sans, "PingFang SC", "Microsoft YaHei", "Helvetica Neue", Arial, sans-serif);
+}
+
+.type-h4 {
+  font-size: var(--font-size-h4);
+  line-height: var(--line-height-h4);
+  font-family: var(--font-sans, "PingFang SC", "Microsoft YaHei", "Helvetica Neue", Arial, sans-serif);
+}
+
+.type-body {
+  font-size: var(--font-size-body);
+  line-height: var(--line-height-body);
+  font-family: var(--font-sans, "PingFang SC", "Microsoft YaHei", "Helvetica Neue", Arial, sans-serif);
+}
+
+.type-lead {
+  font-size: var(--font-size-lead);
+  line-height: var(--line-height-lead);
+  font-family: var(--font-sans, "PingFang SC", "Microsoft YaHei", "Helvetica Neue", Arial, sans-serif);
+}
+
+.type-caption {
+  font-size: var(--font-size-caption);
+  line-height: var(--line-height-caption);
+  font-family: var(--font-sans, "PingFang SC", "Microsoft YaHei", "Helvetica Neue", Arial, sans-serif);
+}
+
+.type-eyebrow {
+  font-size: var(--font-size-eyebrow);
+  line-height: var(--line-height-eyebrow);
+  font-family: var(--font-sans, "PingFang SC", "Microsoft YaHei", "Helvetica Neue", Arial, sans-serif);
+}
+
+.type-mono {
+  font-size: var(--font-size-mono);
+  line-height: var(--line-height-mono);
+  font-family: var(--font-sans, "PingFang SC", "Microsoft YaHei", "Helvetica Neue", Arial, sans-serif);
+}
+
+.type-price {
+  font-size: var(--font-size-price);
+  line-height: var(--line-height-price);
+  font-family: var(--font-sans, "PingFang SC", "Microsoft YaHei", "Helvetica Neue", Arial, sans-serif);
+}
+
+.type-type-display-sm {
+  font-size: var(--type-display-sm);
+  font-family: var(--font-sans, "PingFang SC", "Microsoft YaHei", "Helvetica Neue", Arial, sans-serif);
+}
+
+.type-type-heading-sm {
+  font-size: var(--type-heading-sm);
+  font-family: var(--font-sans, "PingFang SC", "Microsoft YaHei", "Helvetica Neue", Arial, sans-serif);
+}
+
+.type-type-body-md {
+  font-size: var(--type-body-md);
+  font-family: var(--font-sans, "PingFang SC", "Microsoft YaHei", "Helvetica Neue", Arial, sans-serif);
+}
+
+.type-type-body-sm {
+  font-size: var(--type-body-sm);
+  font-family: var(--font-sans, "PingFang SC", "Microsoft YaHei", "Helvetica Neue", Arial, sans-serif);
+}
+
+    </style>
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4.3.1/dist/index.global.js"></script>
+    <script src="https://unpkg.com/lucide@1.8.0/dist/umd/lucide.min.js"></script>
+    <style type="text/tailwindcss">
+  @theme inline {
+    --color-background: var(--foundation-background);
+    --color-foreground: var(--text-foreground);
+    --color-card: var(--foundation-card);
+    --color-card-foreground: var(--text-foreground);
+    --color-primary: var(--primary);
+    --color-primary-foreground: var(--primary-foreground);
+    --color-secondary: var(--foundation-surface-dim);
+    --color-secondary-foreground: var(--text-secondary-foreground);
+    --color-muted: var(--foundation-surface-container);
+    --color-muted-foreground: var(--text-muted-foreground);
+    --color-accent: var(--primary-accent);
+    --color-accent-foreground: var(--primary-accent-foreground);
+    --color-destructive: var(--status-danger);
+    --color-destructive-foreground: #ffffff;
+    --color-border: var(--border-default);
+    --color-input: var(--border-default);
+    --color-ring: var(--primary-ring);
+    --color-chart-1: var(--primary);
+    --color-chart-2: var(--status-success);
+    --color-chart-3: var(--status-warning);
+    --color-chart-4: var(--status-danger);
+    --color-chart-5: var(--text-muted-foreground);
+    --color-sidebar: var(--foundation-surface-dim);
+    --color-sidebar-foreground: var(--text-foreground);
+    --color-sidebar-primary: var(--primary);
+    --color-sidebar-primary-foreground: #ffffff;
+    --color-sidebar-accent: var(--foundation-surface-container);
+    --color-sidebar-accent-foreground: var(--text-secondary-foreground);
+    --radius-sm: var(--radius-small);
+    --radius-md: var(--radius-medium);
+    --radius-lg: var(--radius-large);
+    --radius-xl: var(--radius-xlarge);
+  }
+  
+  @layer base {
+    body { background: var(--identity-background); color: var(--identity-foreground); }
+    td, th { @apply break-words; word-break: break-all; word-break: auto-phrase; }
+    th { @apply whitespace-nowrap; }
+  }
+    </style>
+    <style>
+      .no-scrollbar::-webkit-scrollbar { display: none; }
+      .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+      [data-icon] {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        -webkit-mask-size: contain;
+        mask-size: contain;
+        -webkit-mask-repeat: no-repeat;
+        mask-repeat: no-repeat;
+        -webkit-mask-position: center;
+        mask-position: center;
+        color: inherit; background-color: currentColor;
+      }
+    </style>
+</head>
+<body class="min-h-screen font-sans antialiased" style="background-color: var(--color-background); color: var(--color-foreground); font-family: var(--font-family-base);">
+
+    <!-- ===== TOP NAV (same as user-home) ===== -->
+    <header style="height: 48px; background-color: var(--color-background); border-bottom: 1px solid var(--color-border); position: fixed; top: 0; left: 0; right: 0; z-index: 50; display: flex; align-items: center; padding: 0 16px;">
+      <!-- Left: hamburger + logo -->
+      <div style="display: flex; align-items: center; gap: 12px; flex-shrink: 0;">
+        <button data-dom-id="btn-hamburger" onclick="toggleSidebar()" style="width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; border: none; background: none; cursor: pointer; border-radius: var(--radius-md); color: var(--color-on-surface-variant);" aria-label="菜单">
+          <i data-lucide="menu" style="width: 20px; height: 20px;"></i>
+        </button>
+        <span style="font-size: 15px; font-weight: 600; color: var(--color-foreground); white-space: nowrap;">Identity Platform</span>
+      </div>
+
+      <!-- Right: search + icons + avatar -->
+      <div style="margin-left: auto; display: flex; align-items: center; gap: 8px; flex-shrink: 0;">
+        <div style="width: 200px; height: 32px; display: flex; align-items: center; gap: 8px; padding: 0 10px; border: 1px solid var(--color-border); border-radius: var(--radius-md); background-color: var(--color-surface-container-low);">
+          <i data-lucide="search" style="width: 14px; height: 14px; color: var(--color-muted-foreground); flex-shrink: 0;"></i>
+          <input type="text" placeholder="搜索" style="border: none; outline: none; background: none; font-size: 13px; color: var(--color-foreground); width: 100%; font-family: var(--font-family-base);" />
+        </div>
+        <button data-dom-id="btn-notification" style="position: relative; width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; border: none; background: none; cursor: pointer; border-radius: var(--radius-md); color: var(--color-on-surface-variant);" aria-label="通知">
+          <i data-lucide="bell" style="width: 18px; height: 18px;"></i>
+          <span style="position: absolute; top: 6px; right: 6px; width: 7px; height: 7px; background-color: var(--color-danger); border-radius: 50%; border: 1.5px solid var(--color-background);"></span>
+        </button>
+        <button data-dom-id="btn-help" style="width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; border: none; background: none; cursor: pointer; border-radius: var(--radius-md); color: var(--color-on-surface-variant);" aria-label="帮助">
+          <i data-lucide="help-circle" style="width: 18px; height: 18px;"></i>
+        </button>
+        <div data-dom-id="avatar-menu" style="width: 32px; height: 32px; border-radius: var(--radius-full); background-color: var(--color-primary-container); display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 12px; font-weight: 600; color: var(--color-primary);">张</div>
+      </div>
+    </header>
+
+    <!-- ===== SIDEBAR (已授权应用 active) ===== -->
+    <aside id="sidebar" style="position: fixed; top: 48px; left: 0; bottom: 0; width: 200px; background-color: var(--color-sidebar); border-right: 1px solid var(--color-border); overflow-y: auto; overflow-x: hidden; padding: 16px 0 8px 0; z-index: 40; transition: width 200ms cubic-bezier(.2,.8,.2,1);">
+      <nav style="display: flex; flex-direction: column; gap: 2px;">
+        <!-- 首页 -->
+        <a data-nav-key="home" href="#" class="sidebar-nav-item" style="display: flex; align-items: center; gap: 10px; padding: 8px 16px; margin: 0 8px; border-radius: var(--radius-md); color: var(--color-on-surface-variant); text-decoration: none; font-size: 13px; font-weight: 400; white-space: nowrap; overflow: hidden; transition: background-color 120ms cubic-bezier(.2,.8,.2,1);">
+          <span data-icon class="w-4 h-4 shrink-0" style="-webkit-mask-image: url('../assets/icons/Y2JIZFT9CG4WDK/House_Dashboard.svg'); mask-image: url('../assets/icons/Y2JIZFT9CG4WDK/House_Dashboard.svg');"></span>
+          <span class="sidebar-label">首页</span>
+        </a>
+        <!-- 我的资料 -->
+        <a data-nav-key="profile" href="#" class="sidebar-nav-item" style="display: flex; align-items: center; gap: 10px; padding: 8px 16px; margin: 0 8px; border-radius: var(--radius-md); color: var(--color-on-surface-variant); text-decoration: none; font-size: 13px; font-weight: 400; white-space: nowrap; overflow: hidden; transition: background-color 120ms cubic-bezier(.2,.8,.2,1);">
+          <span data-icon class="w-4 h-4 shrink-0" style="-webkit-mask-image: url('../assets/icons/Y2JIZFT9CG4WDK/account.svg'); mask-image: url('../assets/icons/Y2JIZFT9CG4WDK/account.svg');"></span>
+          <span class="sidebar-label">我的资料</span>
+        </a>
+        <!-- 安全设置 -->
+        <a data-nav-key="security" href="#" class="sidebar-nav-item" style="display: flex; align-items: center; gap: 10px; padding: 8px 16px; margin: 0 8px; border-radius: var(--radius-md); color: var(--color-on-surface-variant); text-decoration: none; font-size: 13px; font-weight: 400; white-space: nowrap; overflow: hidden; transition: background-color 120ms cubic-bezier(.2,.8,.2,1);">
+          <span data-icon class="w-4 h-4 shrink-0" style="-webkit-mask-image: url('../assets/icons/Y2JIZFT9CG4WDK/key.svg'); mask-image: url('../assets/icons/Y2JIZFT9CG4WDK/key.svg');"></span>
+          <span class="sidebar-label">安全设置</span>
+        </a>
+        <!-- 登录会话 -->
+        <a data-nav-key="sessions" href="#" class="sidebar-nav-item" style="display: flex; align-items: center; gap: 10px; padding: 8px 16px; margin: 0 8px; border-radius: var(--radius-md); color: var(--color-on-surface-variant); text-decoration: none; font-size: 13px; font-weight: 400; white-space: nowrap; overflow: hidden; transition: background-color 120ms cubic-bezier(.2,.8,.2,1);">
+          <span data-icon class="w-4 h-4 shrink-0" style="-webkit-mask-image: url('../assets/icons/Y2JIZFT9CG4WDK/desktop.svg'); mask-image: url('../assets/icons/Y2JIZFT9CG4WDK/desktop.svg');"></span>
+          <span class="sidebar-label">登录会话</span>
+        </a>
+        <!-- 已授权应用 (active) -->
+        <a data-nav-key="apps" data-active="true" href="#" class="sidebar-nav-item" style="display: flex; align-items: center; gap: 10px; padding: 8px 16px; margin: 0 8px; border-radius: var(--radius-md); background-color: var(--color-primary-container); color: var(--color-primary); font-weight: 500; text-decoration: none; font-size: 13px; white-space: nowrap; overflow: hidden; transition: background-color 120ms cubic-bezier(.2,.8,.2,1);">
+          <span data-icon class="w-4 h-4 shrink-0" style="-webkit-mask-image: url('../assets/icons/Y2JIZFT9CG4WDK/apps.svg'); mask-image: url('../assets/icons/Y2JIZFT9CG4WDK/apps.svg');"></span>
+          <span class="sidebar-label">已授权应用</span>
+        </a>
+        <!-- 通知中心 -->
+        <a data-nav-key="notifications" href="#" class="sidebar-nav-item" style="display: flex; align-items: center; gap: 10px; padding: 8px 16px; margin: 0 8px; border-radius: var(--radius-md); color: var(--color-on-surface-variant); text-decoration: none; font-size: 13px; font-weight: 400; white-space: nowrap; overflow: hidden; transition: background-color 120ms cubic-bezier(.2,.8,.2,1);">
+          <span data-icon class="w-4 h-4 shrink-0" style="-webkit-mask-image: url('../assets/icons/Y2JIZFT9CG4WDK/alarm.svg'); mask-image: url('../assets/icons/Y2JIZFT9CG4WDK/alarm.svg');"></span>
+          <span class="sidebar-label">通知中心</span>
+        </a>
+      </nav>
+      <!-- Collapse toggle -->
+      <div style="padding: 12px 8px 0; margin-top: auto;">
+        <button id="sidebar-toggle" onclick="toggleSidebar()" style="display: flex; align-items: center; gap: 10px; width: 100%; padding: 8px 16px; border: none; background: none; cursor: pointer; border-radius: var(--radius-md); color: var(--color-muted-foreground); font-size: 13px; white-space: nowrap; overflow: hidden; transition: background-color 120ms;" onmouseenter="this.style.backgroundColor='var(--color-primary-container)'" onmouseleave="this.style.backgroundColor='transparent'">
+          <i data-lucide="panel-left-close" class="w-4 h-4 shrink-0"></i>
+          <span class="sidebar-label">收起菜单</span>
+        </button>
+      </div>
+    </aside>
+
+    <!-- ===== MAIN CONTENT ===== -->
+    <main style="margin-top: 48px; margin-left: 200px; padding: 32px; min-height: calc(100vh - 48px); background-color: var(--color-background);">
+
+      <!-- PageHeader: title + right controls -->
+      <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 24px;">
+        <h1 style="font-size: 18px; font-weight: 500; color: var(--color-foreground); line-height: 26px; margin: 0; text-wrap: balance; word-break: keep-all;">已授权应用</h1>
+        <div style="display: flex; align-items: center; gap: 8px;">
+          <!-- View toggle buttons -->
+          <div style="display: flex; align-items: center; gap: 4px;">
+            <button id="view-card-btn" onclick="toggleAppView('card')" data-dom-id="btn-view-card" style="width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; border: none; background-color: var(--color-primary-container); color: var(--color-primary); cursor: pointer; border-radius: var(--radius-sm);" aria-label="卡片视图">
+              <i data-lucide="layout-grid" style="width: 16px; height: 16px;"></i>
+            </button>
+            <button id="view-list-btn" onclick="toggleAppView('list')" data-dom-id="btn-view-list" style="width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; border: 1px solid var(--color-border); background-color: transparent; color: var(--color-muted-foreground); cursor: pointer; border-radius: var(--radius-sm);" aria-label="列表视图">
+              <i data-lucide="list" style="width: 16px; height: 16px;"></i>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- ===== CARD VIEW (default) ===== -->
+      <div id="app-card-view" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 16px;">
+
+        <!-- App 1: 产品碳足迹系统 -->
+        <div class="app-card" style="display: flex; flex-direction: column; background-color: var(--color-card); border: 1px solid var(--color-border); border-radius: var(--radius-md); padding: 16px; position: relative; transition: box-shadow 160ms cubic-bezier(.2,.8,.2,1), border-color 160ms cubic-bezier(.2,.8,.2,1);" onmouseenter="this.style.boxShadow='0 2px 8px rgba(0,0,0,0.08)'; this.style.borderColor='var(--color-outline)'" onmouseleave="this.style.boxShadow='none'; this.style.borderColor='var(--color-border)'">
+          <!-- Enter button top-right -->
+          <button style="position: absolute; top: 22px; right: 12px; width: 28px; height: 28px; display: flex; align-items: center; justify-content: center; border: none; background: var(--color-primary); color: var(--color-on-primary); cursor: pointer; border-radius: var(--radius-md); transition: background-color 120ms cubic-bezier(.2,.8,.2,1);" onmouseenter="this.style.backgroundColor='var(--color-primary-hover)'" onmouseleave="this.style.backgroundColor='var(--color-primary)'">
+            <i data-lucide="arrow-right" style="width: 14px; height: 14px;"></i>
+          </button>
+          <!-- App identity -->
+          <div style="display: flex; align-items: flex-start; gap: 12px;">
+            <div style="width: 40px; height: 40px; border-radius: var(--radius-md); background-color: #16A34A; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+              <i data-lucide="leaf" style="width: 20px; height: 20px; color: #ffffff;"></i>
+            </div>
+            <div style="flex: 1; min-width: 0; padding-right: 40px;">
+              <div style="font-size: 14px; font-weight: 500; color: var(--color-foreground); line-height: 20px; margin-bottom: 2px;">产品碳足迹系统</div>
+              <div style="font-size: 12px; color: var(--color-muted-foreground); line-height: 16px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">产品全生命周期碳足迹核算与管理</div>
+            </div>
+          </div>
+          <!-- Separator -->
+          <div style="margin-top: 12px; margin-bottom: 12px; height: 1px; background-color: var(--color-border);"></div>
+          <!-- Meta info -->
+          <div style="display: flex; flex-direction: column; gap: 6px;">
+            <div style="display: flex; align-items: center; gap: 6px; font-size: 12px; color: var(--color-muted-foreground); line-height: 18px;">
+              <i data-lucide="clock" style="width: 12px; height: 12px; flex-shrink: 0; opacity: 0.7;"></i>
+              <span>最近使用: 今天 09:15</span>
+            </div>
+            <div style="display: flex; align-items: center; gap: 6px; font-size: 12px; color: var(--color-muted-foreground); line-height: 18px;">
+              <i data-lucide="calendar" style="width: 12px; height: 12px; flex-shrink: 0; opacity: 0.7;"></i>
+              <span>授权日期: 2025-11-20</span>
+            </div>
+          </div>
+          <!-- Role tags -->
+          <div style="display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px;">
+            <span style="display: inline-flex; align-items: center; gap: 4px; padding: 2px 8px; border-radius: var(--radius-full); font-size: 11px; font-weight: 500; background-color: var(--color-primary-container); color: var(--color-primary); white-space: nowrap;">
+              <i data-lucide="user-check" style="width: 10px; height: 10px;"></i>
+              数据录入员
+            </span>
+            <span style="display: inline-flex; align-items: center; gap: 4px; padding: 2px 8px; border-radius: var(--radius-full); font-size: 11px; font-weight: 500; background-color: var(--color-primary-container); color: var(--color-primary); white-space: nowrap;">
+              <i data-lucide="user-check" style="width: 10px; height: 10px;"></i>
+              审核员
+            </span>
+          </div>
+        </div>
+
+        <!-- App 2: 直接排放因子系统 -->
+        <div class="app-card" style="display: flex; flex-direction: column; background-color: var(--color-card); border: 1px solid var(--color-border); border-radius: var(--radius-md); padding: 16px; position: relative; transition: box-shadow 160ms cubic-bezier(.2,.8,.2,1), border-color 160ms cubic-bezier(.2,.8,.2,1);" onmouseenter="this.style.boxShadow='0 2px 8px rgba(0,0,0,0.08)'; this.style.borderColor='var(--color-outline)'" onmouseleave="this.style.boxShadow='none'; this.style.borderColor='var(--color-border)'">
+          <!-- Enter button top-right -->
+          <button style="position: absolute; top: 22px; right: 12px; width: 28px; height: 28px; display: flex; align-items: center; justify-content: center; border: none; background: var(--color-primary); color: var(--color-on-primary); cursor: pointer; border-radius: var(--radius-md); transition: background-color 120ms cubic-bezier(.2,.8,.2,1);" onmouseenter="this.style.backgroundColor='var(--color-primary-hover)'" onmouseleave="this.style.backgroundColor='var(--color-primary)'">
+            <i data-lucide="arrow-right" style="width: 14px; height: 14px;"></i>
+          </button>
+          <!-- App identity -->
+          <div style="display: flex; align-items: flex-start; gap: 12px;">
+            <div style="width: 40px; height: 40px; border-radius: var(--radius-md); background-color: #DC2626; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+              <i data-lucide="factory" style="width: 20px; height: 20px; color: #ffffff;"></i>
+            </div>
+            <div style="flex: 1; min-width: 0; padding-right: 40px;">
+              <div style="font-size: 14px; font-weight: 500; color: var(--color-foreground); line-height: 20px; margin-bottom: 2px;">直接排放因子系统</div>
+              <div style="font-size: 12px; color: var(--color-muted-foreground); line-height: 16px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">直接排放因子库管理与维护</div>
+            </div>
+          </div>
+          <!-- Separator -->
+          <div style="margin-top: 12px; margin-bottom: 12px; height: 1px; background-color: var(--color-border);"></div>
+          <!-- Meta info -->
+          <div style="display: flex; flex-direction: column; gap: 6px;">
+            <div style="display: flex; align-items: center; gap: 6px; font-size: 12px; color: var(--color-muted-foreground); line-height: 18px;">
+              <i data-lucide="clock" style="width: 12px; height: 12px; flex-shrink: 0; opacity: 0.7;"></i>
+              <span>最近使用: 昨天 16:30</span>
+            </div>
+            <div style="display: flex; align-items: center; gap: 6px; font-size: 12px; color: var(--color-muted-foreground); line-height: 18px;">
+              <i data-lucide="calendar" style="width: 12px; height: 12px; flex-shrink: 0; opacity: 0.7;"></i>
+              <span>授权日期: 2025-12-05</span>
+            </div>
+          </div>
+          <!-- Role tags -->
+          <div style="display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px;">
+            <span style="display: inline-flex; align-items: center; gap: 4px; padding: 2px 8px; border-radius: var(--radius-full); font-size: 11px; font-weight: 500; background-color: var(--color-primary-container); color: var(--color-primary); white-space: nowrap;">
+              <i data-lucide="user-check" style="width: 10px; height: 10px;"></i>
+              因子管理员
+            </span>
+          </div>
+        </div>
+
+        <!-- App 3: 间接排放因子系统 -->
+        <div class="app-card" style="display: flex; flex-direction: column; background-color: var(--color-card); border: 1px solid var(--color-border); border-radius: var(--radius-md); padding: 16px; position: relative; transition: box-shadow 160ms cubic-bezier(.2,.8,.2,1), border-color 160ms cubic-bezier(.2,.8,.2,1);" onmouseenter="this.style.boxShadow='0 2px 8px rgba(0,0,0,0.08)'; this.style.borderColor='var(--color-outline)'" onmouseleave="this.style.boxShadow='none'; this.style.borderColor='var(--color-border)'">
+          <!-- Enter button top-right -->
+          <button style="position: absolute; top: 22px; right: 12px; width: 28px; height: 28px; display: flex; align-items: center; justify-content: center; border: none; background: var(--color-primary); color: var(--color-on-primary); cursor: pointer; border-radius: var(--radius-md); transition: background-color 120ms cubic-bezier(.2,.8,.2,1);" onmouseenter="this.style.backgroundColor='var(--color-primary-hover)'" onmouseleave="this.style.backgroundColor='var(--color-primary)'">
+            <i data-lucide="arrow-right" style="width: 14px; height: 14px;"></i>
+          </button>
+          <!-- App identity -->
+          <div style="display: flex; align-items: flex-start; gap: 12px;">
+            <div style="width: 40px; height: 40px; border-radius: var(--radius-md); background-color: #2563EB; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+              <i data-lucide="zap" style="width: 20px; height: 20px; color: #ffffff;"></i>
+            </div>
+            <div style="flex: 1; min-width: 0; padding-right: 40px;">
+              <div style="font-size: 14px; font-weight: 500; color: var(--color-foreground); line-height: 20px; margin-bottom: 2px;">间接排放因子系统</div>
+              <div style="font-size: 12px; color: var(--color-muted-foreground); line-height: 16px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">间接排放因子库管理与维护</div>
+            </div>
+          </div>
+          <!-- Separator -->
+          <div style="margin-top: 12px; margin-bottom: 12px; height: 1px; background-color: var(--color-border);"></div>
+          <!-- Meta info -->
+          <div style="display: flex; flex-direction: column; gap: 6px;">
+            <div style="display: flex; align-items: center; gap: 6px; font-size: 12px; color: var(--color-muted-foreground); line-height: 18px;">
+              <i data-lucide="clock" style="width: 12px; height: 12px; flex-shrink: 0; opacity: 0.7;"></i>
+              <span>最近使用: 3天前</span>
+            </div>
+            <div style="display: flex; align-items: center; gap: 6px; font-size: 12px; color: var(--color-muted-foreground); line-height: 18px;">
+              <i data-lucide="calendar" style="width: 12px; height: 12px; flex-shrink: 0; opacity: 0.7;"></i>
+              <span>授权日期: 2026-01-10</span>
+            </div>
+          </div>
+          <!-- Role tags -->
+          <div style="display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px;">
+            <span style="display: inline-flex; align-items: center; gap: 4px; padding: 2px 8px; border-radius: var(--radius-full); font-size: 11px; font-weight: 500; background-color: var(--color-primary-container); color: var(--color-primary); white-space: nowrap;">
+              <i data-lucide="user-check" style="width: 10px; height: 10px;"></i>
+              因子管理员
+            </span>
+            <span style="display: inline-flex; align-items: center; gap: 4px; padding: 2px 8px; border-radius: var(--radius-full); font-size: 11px; font-weight: 500; background-color: var(--color-primary-container); color: var(--color-primary); white-space: nowrap;">
+              <i data-lucide="user-check" style="width: 10px; height: 10px;"></i>
+              数据查看者
+            </span>
+          </div>
+        </div>
+
+        <!-- App 4: 数据审核系统 -->
+        <div class="app-card" style="display: flex; flex-direction: column; background-color: var(--color-card); border: 1px solid var(--color-border); border-radius: var(--radius-md); padding: 16px; position: relative; transition: box-shadow 160ms cubic-bezier(.2,.8,.2,1), border-color 160ms cubic-bezier(.2,.8,.2,1);" onmouseenter="this.style.boxShadow='0 2px 8px rgba(0,0,0,0.08)'; this.style.borderColor='var(--color-outline)'" onmouseleave="this.style.boxShadow='none'; this.style.borderColor='var(--color-border)'">
+          <!-- Enter button top-right -->
+          <button style="position: absolute; top: 22px; right: 12px; width: 28px; height: 28px; display: flex; align-items: center; justify-content: center; border: none; background: var(--color-primary); color: var(--color-on-primary); cursor: pointer; border-radius: var(--radius-md); transition: background-color 120ms cubic-bezier(.2,.8,.2,1);" onmouseenter="this.style.backgroundColor='var(--color-primary-hover)'" onmouseleave="this.style.backgroundColor='var(--color-primary)'">
+            <i data-lucide="arrow-right" style="width: 14px; height: 14px;"></i>
+          </button>
+          <!-- App identity -->
+          <div style="display: flex; align-items: flex-start; gap: 12px;">
+            <div style="width: 40px; height: 40px; border-radius: var(--radius-md); background-color: #7C3AED; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+              <i data-lucide="check-circle" style="width: 20px; height: 20px; color: #ffffff;"></i>
+            </div>
+            <div style="flex: 1; min-width: 0; padding-right: 40px;">
+              <div style="font-size: 14px; font-weight: 500; color: var(--color-foreground); line-height: 20px; margin-bottom: 2px;">数据审核系统</div>
+              <div style="font-size: 12px; color: var(--color-muted-foreground); line-height: 16px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">碳排放数据审核与质量管控</div>
+            </div>
+          </div>
+          <!-- Separator -->
+          <div style="margin-top: 12px; margin-bottom: 12px; height: 1px; background-color: var(--color-border);"></div>
+          <!-- Meta info -->
+          <div style="display: flex; flex-direction: column; gap: 6px;">
+            <div style="display: flex; align-items: center; gap: 6px; font-size: 12px; color: var(--color-muted-foreground); line-height: 18px;">
+              <i data-lucide="clock" style="width: 12px; height: 12px; flex-shrink: 0; opacity: 0.7;"></i>
+              <span>最近使用: 今天 08:00</span>
+            </div>
+            <div style="display: flex; align-items: center; gap: 6px; font-size: 12px; color: var(--color-muted-foreground); line-height: 18px;">
+              <i data-lucide="calendar" style="width: 12px; height: 12px; flex-shrink: 0; opacity: 0.7;"></i>
+              <span>授权日期: 2026-02-15</span>
+            </div>
+          </div>
+          <!-- Role tags -->
+          <div style="display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px;">
+            <span style="display: inline-flex; align-items: center; gap: 4px; padding: 2px 8px; border-radius: var(--radius-full); font-size: 11px; font-weight: 500; background-color: var(--color-primary-container); color: var(--color-primary); white-space: nowrap;">
+              <i data-lucide="user-check" style="width: 10px; height: 10px;"></i>
+              审核员
+            </span>
+            <span style="display: inline-flex; align-items: center; gap: 4px; padding: 2px 8px; border-radius: var(--radius-full); font-size: 11px; font-weight: 500; background-color: var(--color-primary-container); color: var(--color-primary); white-space: nowrap;">
+              <i data-lucide="user-check" style="width: 10px; height: 10px;"></i>
+              审批人
+            </span>
+          </div>
+        </div>
+
+        <!-- App 5: 组织碳核算系统 -->
+        <div class="app-card" style="display: flex; flex-direction: column; background-color: var(--color-card); border: 1px solid var(--color-border); border-radius: var(--radius-md); padding: 16px; position: relative; transition: box-shadow 160ms cubic-bezier(.2,.8,.2,1), border-color 160ms cubic-bezier(.2,.8,.2,1);" onmouseenter="this.style.boxShadow='0 2px 8px rgba(0,0,0,0.08)'; this.style.borderColor='var(--color-outline)'" onmouseleave="this.style.boxShadow='none'; this.style.borderColor='var(--color-border)'">
+          <!-- Enter button top-right -->
+          <button style="position: absolute; top: 22px; right: 12px; width: 28px; height: 28px; display: flex; align-items: center; justify-content: center; border: none; background: var(--color-primary); color: var(--color-on-primary); cursor: pointer; border-radius: var(--radius-md); transition: background-color 120ms cubic-bezier(.2,.8,.2,1);" onmouseenter="this.style.backgroundColor='var(--color-primary-hover)'" onmouseleave="this.style.backgroundColor='var(--color-primary)'">
+            <i data-lucide="arrow-right" style="width: 14px; height: 14px;"></i>
+          </button>
+          <!-- App identity -->
+          <div style="display: flex; align-items: flex-start; gap: 12px;">
+            <div style="width: 40px; height: 40px; border-radius: var(--radius-md); background-color: #0891B2; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+              <i data-lucide="building-2" style="width: 20px; height: 20px; color: #ffffff;"></i>
+            </div>
+            <div style="flex: 1; min-width: 0; padding-right: 40px;">
+              <div style="font-size: 14px; font-weight: 500; color: var(--color-foreground); line-height: 20px; margin-bottom: 2px;">组织碳核算系统</div>
+              <div style="font-size: 12px; color: var(--color-muted-foreground); line-height: 16px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">组织层级碳排放核算与报告</div>
+            </div>
+          </div>
+          <!-- Separator -->
+          <div style="margin-top: 12px; margin-bottom: 12px; height: 1px; background-color: var(--color-border);"></div>
+          <!-- Meta info -->
+          <div style="display: flex; flex-direction: column; gap: 6px;">
+            <div style="display: flex; align-items: center; gap: 6px; font-size: 12px; color: var(--color-muted-foreground); line-height: 18px;">
+              <i data-lucide="clock" style="width: 12px; height: 12px; flex-shrink: 0; opacity: 0.7;"></i>
+              <span>最近使用: 2天前</span>
+            </div>
+            <div style="display: flex; align-items: center; gap: 6px; font-size: 12px; color: var(--color-muted-foreground); line-height: 18px;">
+              <i data-lucide="calendar" style="width: 12px; height: 12px; flex-shrink: 0; opacity: 0.7;"></i>
+              <span>授权日期: 2026-03-20</span>
+            </div>
+          </div>
+          <!-- Role tags -->
+          <div style="display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px;">
+            <span style="display: inline-flex; align-items: center; gap: 4px; padding: 2px 8px; border-radius: var(--radius-full); font-size: 11px; font-weight: 500; background-color: var(--color-primary-container); color: var(--color-primary); white-space: nowrap;">
+              <i data-lucide="user-check" style="width: 10px; height: 10px;"></i>
+              核算专员
+            </span>
+            <span style="display: inline-flex; align-items: center; gap: 4px; padding: 2px 8px; border-radius: var(--radius-full); font-size: 11px; font-weight: 500; background-color: var(--color-primary-container); color: var(--color-primary); white-space: nowrap;">
+              <i data-lucide="user-check" style="width: 10px; height: 10px;"></i>
+              报告查看者
+            </span>
+          </div>
+        </div>
+
+        <!-- App 6: 碳报告管理系统 -->
+        <div class="app-card" style="display: flex; flex-direction: column; background-color: var(--color-card); border: 1px solid var(--color-border); border-radius: var(--radius-md); padding: 16px; position: relative; transition: box-shadow 160ms cubic-bezier(.2,.8,.2,1), border-color 160ms cubic-bezier(.2,.8,.2,1);" onmouseenter="this.style.boxShadow='0 2px 8px rgba(0,0,0,0.08)'; this.style.borderColor='var(--color-outline)'" onmouseleave="this.style.boxShadow='none'; this.style.borderColor='var(--color-border)'">
+          <!-- Enter button top-right -->
+          <button style="position: absolute; top: 22px; right: 12px; width: 28px; height: 28px; display: flex; align-items: center; justify-content: center; border: none; background: var(--color-primary); color: var(--color-on-primary); cursor: pointer; border-radius: var(--radius-md); transition: background-color 120ms cubic-bezier(.2,.8,.2,1);" onmouseenter="this.style.backgroundColor='var(--color-primary-hover)'" onmouseleave="this.style.backgroundColor='var(--color-primary)'">
+            <i data-lucide="arrow-right" style="width: 14px; height: 14px;"></i>
+          </button>
+          <!-- App identity -->
+          <div style="display: flex; align-items: flex-start; gap: 12px;">
+            <div style="width: 40px; height: 40px; border-radius: var(--radius-md); background-color: #CA8A04; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+              <i data-lucide="file-text" style="width: 20px; height: 20px; color: #ffffff;"></i>
+            </div>
+            <div style="flex: 1; min-width: 0; padding-right: 40px;">
+              <div style="font-size: 14px; font-weight: 500; color: var(--color-foreground); line-height: 20px; margin-bottom: 2px;">碳报告管理系统</div>
+              <div style="font-size: 12px; color: var(--color-muted-foreground); line-height: 16px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">碳排放报告生成与发布管理</div>
+            </div>
+          </div>
+          <!-- Separator -->
+          <div style="margin-top: 12px; margin-bottom: 12px; height: 1px; background-color: var(--color-border);"></div>
+          <!-- Meta info -->
+          <div style="display: flex; flex-direction: column; gap: 6px;">
+            <div style="display: flex; align-items: center; gap: 6px; font-size: 12px; color: var(--color-muted-foreground); line-height: 18px;">
+              <i data-lucide="clock" style="width: 12px; height: 12px; flex-shrink: 0; opacity: 0.7;"></i>
+              <span>最近使用: 5天前</span>
+            </div>
+            <div style="display: flex; align-items: center; gap: 6px; font-size: 12px; color: var(--color-muted-foreground); line-height: 18px;">
+              <i data-lucide="calendar" style="width: 12px; height: 12px; flex-shrink: 0; opacity: 0.7;"></i>
+              <span>授权日期: 2026-01-05</span>
+            </div>
+          </div>
+          <!-- Role tags -->
+          <div style="display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px;">
+            <span style="display: inline-flex; align-items: center; gap: 4px; padding: 2px 8px; border-radius: var(--radius-full); font-size: 11px; font-weight: 500; background-color: var(--color-primary-container); color: var(--color-primary); white-space: nowrap;">
+              <i data-lucide="user-check" style="width: 10px; height: 10px;"></i>
+              报告查看者
+            </span>
+          </div>
+        </div>
+
+        <!-- App 7: 减排项目管理 -->
+        <div class="app-card" style="display: flex; flex-direction: column; background-color: var(--color-card); border: 1px solid var(--color-border); border-radius: var(--radius-md); padding: 16px; position: relative; transition: box-shadow 160ms cubic-bezier(.2,.8,.2,1), border-color 160ms cubic-bezier(.2,.8,.2,1);" onmouseenter="this.style.boxShadow='0 2px 8px rgba(0,0,0,0.08)'; this.style.borderColor='var(--color-outline)'" onmouseleave="this.style.boxShadow='none'; this.style.borderColor='var(--color-border)'">
+          <!-- Enter button top-right -->
+          <button style="position: absolute; top: 22px; right: 12px; width: 28px; height: 28px; display: flex; align-items: center; justify-content: center; border: none; background: var(--color-primary); color: var(--color-on-primary); cursor: pointer; border-radius: var(--radius-md); transition: background-color 120ms cubic-bezier(.2,.8,.2,1);" onmouseenter="this.style.backgroundColor='var(--color-primary-hover)'" onmouseleave="this.style.backgroundColor='var(--color-primary)'">
+            <i data-lucide="arrow-right" style="width: 14px; height: 14px;"></i>
+          </button>
+          <!-- App identity -->
+          <div style="display: flex; align-items: flex-start; gap: 12px;">
+            <div style="width: 40px; height: 40px; border-radius: var(--radius-md); background-color: #059669; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+              <i data-lucide="trending-down" style="width: 20px; height: 20px; color: #ffffff;"></i>
+            </div>
+            <div style="flex: 1; min-width: 0; padding-right: 40px;">
+              <div style="font-size: 14px; font-weight: 500; color: var(--color-foreground); line-height: 20px; margin-bottom: 2px;">减排项目管理</div>
+              <div style="font-size: 12px; color: var(--color-muted-foreground); line-height: 16px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">减排项目跟踪与效果评估</div>
+            </div>
+          </div>
+          <!-- Separator -->
+          <div style="margin-top: 12px; margin-bottom: 12px; height: 1px; background-color: var(--color-border);"></div>
+          <!-- Meta info -->
+          <div style="display: flex; flex-direction: column; gap: 6px;">
+            <div style="display: flex; align-items: center; gap: 6px; font-size: 12px; color: var(--color-muted-foreground); line-height: 18px;">
+              <i data-lucide="clock" style="width: 12px; height: 12px; flex-shrink: 0; opacity: 0.7;"></i>
+              <span>最近使用: 1周前</span>
+            </div>
+            <div style="display: flex; align-items: center; gap: 6px; font-size: 12px; color: var(--color-muted-foreground); line-height: 18px;">
+              <i data-lucide="calendar" style="width: 12px; height: 12px; flex-shrink: 0; opacity: 0.7;"></i>
+              <span>授权日期: 2026-04-10</span>
+            </div>
+          </div>
+          <!-- Role tags -->
+          <div style="display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px;">
+            <span style="display: inline-flex; align-items: center; gap: 4px; padding: 2px 8px; border-radius: var(--radius-full); font-size: 11px; font-weight: 500; background-color: var(--color-primary-container); color: var(--color-primary); white-space: nowrap;">
+              <i data-lucide="user-check" style="width: 10px; height: 10px;"></i>
+              项目经理
+            </span>
+            <span style="display: inline-flex; align-items: center; gap: 4px; padding: 2px 8px; border-radius: var(--radius-full); font-size: 11px; font-weight: 500; background-color: var(--color-primary-container); color: var(--color-primary); white-space: nowrap;">
+              <i data-lucide="user-check" style="width: 10px; height: 10px;"></i>
+              数据查看者
+            </span>
+          </div>
+        </div>
+
+        <!-- App 8: 配额管理系统 -->
+        <div class="app-card" style="display: flex; flex-direction: column; background-color: var(--color-card); border: 1px solid var(--color-border); border-radius: var(--radius-md); padding: 16px; position: relative; transition: box-shadow 160ms cubic-bezier(.2,.8,.2,1), border-color 160ms cubic-bezier(.2,.8,.2,1);" onmouseenter="this.style.boxShadow='0 2px 8px rgba(0,0,0,0.08)'; this.style.borderColor='var(--color-outline)'" onmouseleave="this.style.boxShadow='none'; this.style.borderColor='var(--color-border)'">
+          <!-- Enter button top-right -->
+          <button style="position: absolute; top: 22px; right: 12px; width: 28px; height: 28px; display: flex; align-items: center; justify-content: center; border: none; background: var(--color-primary); color: var(--color-on-primary); cursor: pointer; border-radius: var(--radius-md); transition: background-color 120ms cubic-bezier(.2,.8,.2,1);" onmouseenter="this.style.backgroundColor='var(--color-primary-hover)'" onmouseleave="this.style.backgroundColor='var(--color-primary)'">
+            <i data-lucide="arrow-right" style="width: 14px; height: 14px;"></i>
+          </button>
+          <!-- App identity -->
+          <div style="display: flex; align-items: flex-start; gap: 12px;">
+            <div style="width: 40px; height: 40px; border-radius: var(--radius-md); background-color: #EA580C; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+              <i data-lucide="pie-chart" style="width: 20px; height: 20px; color: #ffffff;"></i>
+            </div>
+            <div style="flex: 1; min-width: 0; padding-right: 40px;">
+              <div style="font-size: 14px; font-weight: 500; color: var(--color-foreground); line-height: 20px; margin-bottom: 2px;">配额管理系统</div>
+              <div style="font-size: 12px; color: var(--color-muted-foreground); line-height: 16px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">碳配额分配与履约管理</div>
+            </div>
+          </div>
+          <!-- Separator -->
+          <div style="margin-top: 12px; margin-bottom: 12px; height: 1px; background-color: var(--color-border);"></div>
+          <!-- Meta info -->
+          <div style="display: flex; flex-direction: column; gap: 6px;">
+            <div style="display: flex; align-items: center; gap: 6px; font-size: 12px; color: var(--color-muted-foreground); line-height: 18px;">
+              <i data-lucide="clock" style="width: 12px; height: 12px; flex-shrink: 0; opacity: 0.7;"></i>
+              <span>最近使用: 3天前</span>
+            </div>
+            <div style="display: flex; align-items: center; gap: 6px; font-size: 12px; color: var(--color-muted-foreground); line-height: 18px;">
+              <i data-lucide="calendar" style="width: 12px; height: 12px; flex-shrink: 0; opacity: 0.7;"></i>
+              <span>授权日期: 2025-08-15</span>
+            </div>
+          </div>
+          <!-- Role tags -->
+          <div style="display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px;">
+            <span style="display: inline-flex; align-items: center; gap: 4px; padding: 2px 8px; border-radius: var(--radius-full); font-size: 11px; font-weight: 500; background-color: var(--color-primary-container); color: var(--color-primary); white-space: nowrap;">
+              <i data-lucide="user-check" style="width: 10px; height: 10px;"></i>
+              配额管理员
+            </span>
+            <span style="display: inline-flex; align-items: center; gap: 4px; padding: 2px 8px; border-radius: var(--radius-full); font-size: 11px; font-weight: 500; background-color: var(--color-primary-container); color: var(--color-primary); white-space: nowrap;">
+              <i data-lucide="user-check" style="width: 10px; height: 10px;"></i>
+              履约专员
+            </span>
+          </div>
+        </div>
+      </div>
+      <!-- ===== LIST VIEW (hidden by default) ===== -->
+      <div id="app-list-view" style="display: none;">
+        <div style="background-color: var(--color-card); border: 1px solid var(--color-border); border-radius: var(--radius-lg); overflow: hidden;">
+
+          <!-- List header -->
+          <div style="display: flex; align-items: center; height: 40px; padding: 0 16px; background-color: var(--color-surface-container-low); border-bottom: 1px solid var(--color-border); font-size: 12px; font-weight: 500; color: var(--color-muted-foreground);">
+            <div style="width: 32px; flex-shrink: 0;"></div>
+            <div style="flex: 2; min-width: 0; padding-left: 12px;">应用名称</div>
+            <div style="flex: 2; min-width: 0;">描述</div>
+            <div style="width: 72px; flex-shrink: 0; text-align: center;">状态</div>
+            <div style="width: 120px; flex-shrink: 0;">最近使用</div>
+            <div style="width: 180px; flex-shrink: 0;">业务角色</div>
+            <div style="width: 48px; flex-shrink: 0;"></div>
+          </div>
+
+          <!-- Row 1: 产品碳足迹系统 -->
+          <div style="display: flex; align-items: center; height: 64px; padding: 0 16px; border-bottom: 1px solid var(--color-outline-variant); transition: background-color 120ms cubic-bezier(.2,.8,.2,1);" onmouseenter="this.style.backgroundColor='var(--color-surface-container-low)'" onmouseleave="this.style.backgroundColor='transparent'">
+            <div style="width: 32px; flex-shrink: 0;">
+              <div style="width: 32px; height: 32px; border-radius: var(--radius-md); background-color: #16A34A; display: flex; align-items: center; justify-content: center;">
+                <i data-lucide="leaf" style="width: 16px; height: 16px; color: #ffffff;"></i>
+              </div>
+            </div>
+            <div style="flex: 2; min-width: 0; padding-left: 12px; font-size: 13px; font-weight: 500; color: var(--color-foreground);">产品碳足迹系统</div>
+            <div style="flex: 2; min-width: 0; font-size: 12px; color: var(--color-muted-foreground);">产品全生命周期碳足迹核算与管理</div>
+            <div style="width: 72px; flex-shrink: 0; text-align: center;">
+              <span style="display: inline-flex; align-items: center; padding: 2px 8px; border-radius: var(--radius-full); font-size: 12px; font-weight: 500; background-color: var(--status-identitySuccess-2); color: var(--color-success);">运行中</span>
+            </div>
+            <div style="width: 120px; flex-shrink: 0; font-size: 12px; color: var(--color-muted-foreground);">今天 09:15</div>
+            <div style="width: 180px; flex-shrink: 0; display: flex; flex-wrap: wrap; gap: 4px;">
+              <span style="display: inline-flex; align-items: center; gap: 3px; padding: 1px 6px; border-radius: var(--radius-full); font-size: 11px; background-color: var(--color-primary-container); color: var(--color-primary); white-space: nowrap;">数据录入员</span>
+              <span style="display: inline-flex; align-items: center; gap: 3px; padding: 1px 6px; border-radius: var(--radius-full); font-size: 11px; background-color: var(--color-primary-container); color: var(--color-primary); white-space: nowrap;">审核员</span>
+            </div>
+            <div style="width: 48px; flex-shrink: 0; display: flex; justify-content: flex-end;">
+              <button data-dom-id="btn-enter-crm-list" style="width: 28px; height: 28px; display: flex; align-items: center; justify-content: center; border: none; background: none; cursor: pointer; border-radius: var(--radius-md); color: var(--color-primary);" aria-label="进入产品碳足迹系统">
+                <i data-lucide="arrow-right" style="width: 16px; height: 16px;"></i>
+              </button>
+            </div>
+          </div>
+
+          <!-- Row 2: 直接排放因子系统 -->
+          <div style="display: flex; align-items: center; height: 64px; padding: 0 16px; border-bottom: 1px solid var(--color-outline-variant); transition: background-color 120ms cubic-bezier(.2,.8,.2,1);" onmouseenter="this.style.backgroundColor='var(--color-surface-container-low)'" onmouseleave="this.style.backgroundColor='transparent'">
+            <div style="width: 32px; flex-shrink: 0;">
+              <div style="width: 32px; height: 32px; border-radius: var(--radius-md); background-color: #DC2626; display: flex; align-items: center; justify-content: center;">
+                <i data-lucide="factory" style="width: 16px; height: 16px; color: #ffffff;"></i>
+              </div>
+            </div>
+            <div style="flex: 2; min-width: 0; padding-left: 12px; font-size: 13px; font-weight: 500; color: var(--color-foreground);">直接排放因子系统</div>
+            <div style="flex: 2; min-width: 0; font-size: 12px; color: var(--color-muted-foreground);">直接排放因子库管理与维护</div>
+            <div style="width: 72px; flex-shrink: 0; text-align: center;">
+              <span style="display: inline-flex; align-items: center; padding: 2px 8px; border-radius: var(--radius-full); font-size: 12px; font-weight: 500; background-color: var(--status-identitySuccess-2); color: var(--color-success);">运行中</span>
+            </div>
+            <div style="width: 120px; flex-shrink: 0; font-size: 12px; color: var(--color-muted-foreground);">昨天 16:30</div>
+            <div style="width: 180px; flex-shrink: 0; display: flex; flex-wrap: wrap; gap: 4px;">
+              <span style="display: inline-flex; align-items: center; gap: 3px; padding: 1px 6px; border-radius: var(--radius-full); font-size: 11px; background-color: var(--color-primary-container); color: var(--color-primary); white-space: nowrap;">因子管理员</span>
+            </div>
+            <div style="width: 48px; flex-shrink: 0; display: flex; justify-content: flex-end;">
+              <button data-dom-id="btn-enter-billing-list" style="width: 28px; height: 28px; display: flex; align-items: center; justify-content: center; border: none; background: none; cursor: pointer; border-radius: var(--radius-md); color: var(--color-primary);" aria-label="进入直接排放因子系统">
+                <i data-lucide="arrow-right" style="width: 16px; height: 16px;"></i>
+              </button>
+            </div>
+          </div>
+
+          <!-- Row 3: 间接排放因子系统 -->
+          <div style="display: flex; align-items: center; height: 64px; padding: 0 16px; border-bottom: 1px solid var(--color-outline-variant); transition: background-color 120ms cubic-bezier(.2,.8,.2,1);" onmouseenter="this.style.backgroundColor='var(--color-surface-container-low)'" onmouseleave="this.style.backgroundColor='transparent'">
+            <div style="width: 32px; flex-shrink: 0;">
+              <div style="width: 32px; height: 32px; border-radius: var(--radius-md); background-color: #2563EB; display: flex; align-items: center; justify-content: center;">
+                <i data-lucide="zap" style="width: 16px; height: 16px; color: #ffffff;"></i>
+              </div>
+            </div>
+            <div style="flex: 2; min-width: 0; padding-left: 12px; font-size: 13px; font-weight: 500; color: var(--color-foreground);">间接排放因子系统</div>
+            <div style="flex: 2; min-width: 0; font-size: 12px; color: var(--color-muted-foreground);">间接排放因子库管理与维护</div>
+            <div style="width: 72px; flex-shrink: 0; text-align: center;">
+              <span style="display: inline-flex; align-items: center; padding: 2px 8px; border-radius: var(--radius-full); font-size: 12px; font-weight: 500; background-color: var(--status-identitySuccess-2); color: var(--color-success);">运行中</span>
+            </div>
+            <div style="width: 120px; flex-shrink: 0; font-size: 12px; color: var(--color-muted-foreground);">3天前</div>
+            <div style="width: 180px; flex-shrink: 0; display: flex; flex-wrap: wrap; gap: 4px;">
+              <span style="display: inline-flex; align-items: center; gap: 3px; padding: 1px 6px; border-radius: var(--radius-full); font-size: 11px; background-color: var(--color-primary-container); color: var(--color-primary); white-space: nowrap;">因子管理员</span>
+              <span style="display: inline-flex; align-items: center; gap: 3px; padding: 1px 6px; border-radius: var(--radius-full); font-size: 11px; background-color: var(--color-primary-container); color: var(--color-primary); white-space: nowrap;">数据查看者</span>
+            </div>
+            <div style="width: 48px; flex-shrink: 0; display: flex; justify-content: flex-end;">
+              <button data-dom-id="btn-enter-data-list" style="width: 28px; height: 28px; display: flex; align-items: center; justify-content: center; border: none; background: none; cursor: pointer; border-radius: var(--radius-md); color: var(--color-primary);" aria-label="进入间接排放因子系统">
+                <i data-lucide="arrow-right" style="width: 16px; height: 16px;"></i>
+              </button>
+            </div>
+          </div>
+
+          <!-- Row 4: 数据审核系统 -->
+          <div style="display: flex; align-items: center; height: 64px; padding: 0 16px; border-bottom: 1px solid var(--color-outline-variant); transition: background-color 120ms cubic-bezier(.2,.8,.2,1);" onmouseenter="this.style.backgroundColor='var(--color-surface-container-low)'" onmouseleave="this.style.backgroundColor='transparent'">
+            <div style="width: 32px; flex-shrink: 0;">
+              <div style="width: 32px; height: 32px; border-radius: var(--radius-md); background-color: #7C3AED; display: flex; align-items: center; justify-content: center;">
+                <i data-lucide="check-circle" style="width: 16px; height: 16px; color: #ffffff;"></i>
+              </div>
+            </div>
+            <div style="flex: 2; min-width: 0; padding-left: 12px; font-size: 13px; font-weight: 500; color: var(--color-foreground);">数据审核系统</div>
+            <div style="flex: 2; min-width: 0; font-size: 12px; color: var(--color-muted-foreground);">碳排放数据审核与质量管控</div>
+            <div style="width: 72px; flex-shrink: 0; text-align: center;">
+              <span style="display: inline-flex; align-items: center; padding: 2px 8px; border-radius: var(--radius-full); font-size: 12px; font-weight: 500; background-color: var(--status-identitySuccess-2); color: var(--color-success);">运行中</span>
+            </div>
+            <div style="width: 120px; flex-shrink: 0; font-size: 12px; color: var(--color-muted-foreground);">今天 08:00</div>
+            <div style="width: 180px; flex-shrink: 0; display: flex; flex-wrap: wrap; gap: 4px;">
+              <span style="display: inline-flex; align-items: center; gap: 3px; padding: 1px 6px; border-radius: var(--radius-full); font-size: 11px; background-color: var(--color-primary-container); color: var(--color-primary); white-space: nowrap;">审核员</span>
+              <span style="display: inline-flex; align-items: center; gap: 3px; padding: 1px 6px; border-radius: var(--radius-full); font-size: 11px; background-color: var(--color-primary-container); color: var(--color-primary); white-space: nowrap;">审批人</span>
+            </div>
+            <div style="width: 48px; flex-shrink: 0; display: flex; justify-content: flex-end;">
+              <button data-dom-id="btn-enter-supabase-list" style="width: 28px; height: 28px; display: flex; align-items: center; justify-content: center; border: none; background: none; cursor: pointer; border-radius: var(--radius-md); color: var(--color-primary);" aria-label="进入数据审核系统">
+                <i data-lucide="arrow-right" style="width: 16px; height: 16px;"></i>
+              </button>
+            </div>
+          </div>
+
+          <!-- Row 5: 组织碳核算系统 -->
+          <div style="display: flex; align-items: center; height: 64px; padding: 0 16px; border-bottom: 1px solid var(--color-outline-variant); transition: background-color 120ms cubic-bezier(.2,.8,.2,1);" onmouseenter="this.style.backgroundColor='var(--color-surface-container-low)'" onmouseleave="this.style.backgroundColor='transparent'">
+            <div style="width: 32px; flex-shrink: 0;">
+              <div style="width: 32px; height: 32px; border-radius: var(--radius-md); background-color: #0891B2; display: flex; align-items: center; justify-content: center;">
+                <i data-lucide="building-2" style="width: 16px; height: 16px; color: #ffffff;"></i>
+              </div>
+            </div>
+            <div style="flex: 2; min-width: 0; padding-left: 12px; font-size: 13px; font-weight: 500; color: var(--color-foreground);">组织碳核算系统</div>
+            <div style="flex: 2; min-width: 0; font-size: 12px; color: var(--color-muted-foreground);">组织层级碳排放核算与报告</div>
+            <div style="width: 72px; flex-shrink: 0; text-align: center;">
+              <span style="display: inline-flex; align-items: center; padding: 2px 8px; border-radius: var(--radius-full); font-size: 12px; font-weight: 500; background-color: var(--status-identitySuccess-2); color: var(--color-success);">运行中</span>
+            </div>
+            <div style="width: 120px; flex-shrink: 0; font-size: 12px; color: var(--color-muted-foreground);">2天前</div>
+            <div style="width: 180px; flex-shrink: 0; display: flex; flex-wrap: wrap; gap: 4px;">
+              <span style="display: inline-flex; align-items: center; gap: 3px; padding: 1px 6px; border-radius: var(--radius-full); font-size: 11px; background-color: var(--color-primary-container); color: var(--color-primary); white-space: nowrap;">核算专员</span>
+              <span style="display: inline-flex; align-items: center; gap: 3px; padding: 1px 6px; border-radius: var(--radius-full); font-size: 11px; background-color: var(--color-primary-container); color: var(--color-primary); white-space: nowrap;">报告查看者</span>
+            </div>
+            <div style="width: 48px; flex-shrink: 0; display: flex; justify-content: flex-end;">
+              <button data-dom-id="btn-enter-mobile-list" style="width: 28px; height: 28px; display: flex; align-items: center; justify-content: center; border: none; background: none; cursor: pointer; border-radius: var(--radius-md); color: var(--color-primary);" aria-label="进入组织碳核算系统">
+                <i data-lucide="arrow-right" style="width: 16px; height: 16px;"></i>
+              </button>
+            </div>
+          </div>
+
+          <!-- Row 6: 碳报告管理系统 -->
+          <div style="display: flex; align-items: center; height: 64px; padding: 0 16px; border-bottom: 1px solid var(--color-outline-variant); transition: background-color 120ms cubic-bezier(.2,.8,.2,1);" onmouseenter="this.style.backgroundColor='var(--color-surface-container-low)'" onmouseleave="this.style.backgroundColor='transparent'">
+            <div style="width: 32px; flex-shrink: 0;">
+              <div style="width: 32px; height: 32px; border-radius: var(--radius-md); background-color: #CA8A04; display: flex; align-items: center; justify-content: center;">
+                <i data-lucide="file-text" style="width: 16px; height: 16px; color: #ffffff;"></i>
+              </div>
+            </div>
+            <div style="flex: 2; min-width: 0; padding-left: 12px; font-size: 13px; font-weight: 500; color: var(--color-foreground);">碳报告管理系统</div>
+            <div style="flex: 2; min-width: 0; font-size: 12px; color: var(--color-muted-foreground);">碳排放报告生成与发布管理</div>
+            <div style="width: 72px; flex-shrink: 0; text-align: center;">
+              <span style="display: inline-flex; align-items: center; padding: 2px 8px; border-radius: var(--radius-full); font-size: 12px; font-weight: 500; background-color: var(--status-identityWarning-2); color: var(--color-warning);">维护中</span>
+            </div>
+            <div style="width: 120px; flex-shrink: 0; font-size: 12px; color: var(--color-muted-foreground);">5天前</div>
+            <div style="width: 180px; flex-shrink: 0; display: flex; flex-wrap: wrap; gap: 4px;">
+              <span style="display: inline-flex; align-items: center; gap: 3px; padding: 1px 6px; border-radius: var(--radius-full); font-size: 11px; background-color: var(--color-primary-container); color: var(--color-primary); white-space: nowrap;">报告查看者</span>
+            </div>
+            <div style="width: 48px; flex-shrink: 0; display: flex; justify-content: flex-end;">
+              <button data-dom-id="btn-enter-portal-list" style="width: 28px; height: 28px; display: flex; align-items: center; justify-content: center; border: none; background: none; cursor: pointer; border-radius: var(--radius-md); color: var(--color-primary);" aria-label="进入碳报告管理系统">
+                <i data-lucide="arrow-right" style="width: 16px; height: 16px;"></i>
+              </button>
+            </div>
+          </div>
+
+          <!-- Row 7: 减排项目管理 -->
+          <div style="display: flex; align-items: center; height: 64px; padding: 0 16px; border-bottom: 1px solid var(--color-outline-variant); transition: background-color 120ms cubic-bezier(.2,.8,.2,1);" onmouseenter="this.style.backgroundColor='var(--color-surface-container-low)'" onmouseleave="this.style.backgroundColor='transparent'">
+            <div style="width: 32px; flex-shrink: 0;">
+              <div style="width: 32px; height: 32px; border-radius: var(--radius-md); background-color: #059669; display: flex; align-items: center; justify-content: center;">
+                <i data-lucide="trending-down" style="width: 16px; height: 16px; color: #ffffff;"></i>
+              </div>
+            </div>
+            <div style="flex: 2; min-width: 0; padding-left: 12px; font-size: 13px; font-weight: 500; color: var(--color-foreground);">减排项目管理</div>
+            <div style="flex: 2; min-width: 0; font-size: 12px; color: var(--color-muted-foreground);">减排项目跟踪与效果评估</div>
+            <div style="width: 72px; flex-shrink: 0; text-align: center;">
+              <span style="display: inline-flex; align-items: center; padding: 2px 8px; border-radius: var(--radius-full); font-size: 12px; font-weight: 500; background-color: var(--status-identitySuccess-2); color: var(--color-success);">运行中</span>
+            </div>
+            <div style="width: 120px; flex-shrink: 0; font-size: 12px; color: var(--color-muted-foreground);">1周前</div>
+            <div style="width: 180px; flex-shrink: 0; display: flex; flex-wrap: wrap; gap: 4px;">
+              <span style="display: inline-flex; align-items: center; gap: 3px; padding: 1px 6px; border-radius: var(--radius-full); font-size: 11px; background-color: var(--color-primary-container); color: var(--color-primary); white-space: nowrap;">项目经理</span>
+              <span style="display: inline-flex; align-items: center; gap: 3px; padding: 1px 6px; border-radius: var(--radius-full); font-size: 11px; background-color: var(--color-primary-container); color: var(--color-primary); white-space: nowrap;">数据查看者</span>
+            </div>
+            <div style="width: 48px; flex-shrink: 0; display: flex; justify-content: flex-end;">
+              <button data-dom-id="btn-enter-devops-list" style="width: 28px; height: 28px; display: flex; align-items: center; justify-content: center; border: none; background: none; cursor: pointer; border-radius: var(--radius-md); color: var(--color-primary);" aria-label="进入减排项目管理">
+                <i data-lucide="arrow-right" style="width: 16px; height: 16px;"></i>
+              </button>
+            </div>
+          </div>
+
+          <!-- Row 8: 配额管理系统 -->
+          <div style="display: flex; align-items: center; height: 64px; padding: 0 16px; transition: background-color 120ms cubic-bezier(.2,.8,.2,1);" onmouseenter="this.style.backgroundColor='var(--color-surface-container-low)'" onmouseleave="this.style.backgroundColor='transparent'">
+            <div style="width: 32px; flex-shrink: 0;">
+              <div style="width: 32px; height: 32px; border-radius: var(--radius-md); background-color: #EA580C; display: flex; align-items: center; justify-content: center;">
+                <i data-lucide="pie-chart" style="width: 16px; height: 16px; color: #ffffff;"></i>
+              </div>
+            </div>
+            <div style="flex: 2; min-width: 0; padding-left: 12px; font-size: 13px; font-weight: 500; color: var(--color-foreground);">配额管理系统</div>
+            <div style="flex: 2; min-width: 0; font-size: 12px; color: var(--color-muted-foreground);">碳配额分配与履约管理</div>
+            <div style="width: 72px; flex-shrink: 0; text-align: center;">
+              <span style="display: inline-flex; align-items: center; padding: 2px 8px; border-radius: var(--radius-full); font-size: 12px; font-weight: 500; background-color: var(--status-identitySuccess-2); color: var(--color-success);">运行中</span>
+            </div>
+            <div style="width: 120px; flex-shrink: 0; font-size: 12px; color: var(--color-muted-foreground);">3天前</div>
+            <div style="width: 180px; flex-shrink: 0; display: flex; flex-wrap: wrap; gap: 4px;">
+              <span style="display: inline-flex; align-items: center; gap: 3px; padding: 1px 6px; border-radius: var(--radius-full); font-size: 11px; background-color: var(--color-primary-container); color: var(--color-primary); white-space: nowrap;">配额管理员</span>
+              <span style="display: inline-flex; align-items: center; gap: 3px; padding: 1px 6px; border-radius: var(--radius-full); font-size: 11px; background-color: var(--color-primary-container); color: var(--color-primary); white-space: nowrap;">履约专员</span>
+            </div>
+            <div style="width: 48px; flex-shrink: 0; display: flex; justify-content: flex-end;">
+              <button data-dom-id="btn-enter-knowledge-list" style="width: 28px; height: 28px; display: flex; align-items: center; justify-content: center; border: none; background: none; cursor: pointer; border-radius: var(--radius-md); color: var(--color-primary);" aria-label="进入配额管理系统">
+                <i data-lucide="arrow-right" style="width: 16px; height: 16px;"></i>
+              </button>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+    </main>
+
+    <!-- ===== SCRIPTS ===== -->
+    <script>
+    // View toggle
+    function toggleAppView(mode) {
+      const cardView = document.getElementById('app-card-view');
+      const listView = document.getElementById('app-list-view');
+      const cardBtn = document.getElementById('view-card-btn');
+      const listBtn = document.getElementById('view-list-btn');
+      if (mode === 'card') {
+        cardView.style.display = '';
+        listView.style.display = 'none';
+        cardBtn.style.backgroundColor = 'var(--color-primary-container)';
+        cardBtn.style.color = 'var(--color-primary)';
+        cardBtn.style.border = 'none';
+        listBtn.style.backgroundColor = 'transparent';
+        listBtn.style.color = 'var(--color-muted-foreground)';
+        listBtn.style.border = '1px solid var(--color-border)';
+      } else {
+        cardView.style.display = 'none';
+        listView.style.display = '';
+        cardBtn.style.backgroundColor = 'transparent';
+        cardBtn.style.color = 'var(--color-muted-foreground)';
+        cardBtn.style.border = '1px solid var(--color-border)';
+        listBtn.style.backgroundColor = 'var(--color-primary-container)';
+        listBtn.style.color = 'var(--color-primary)';
+        listBtn.style.border = 'none';
+      }
+    }
+
+    // Sidebar collapse/expand (same as user-home)
+    function toggleSidebar() {
+      const sidebar = document.getElementById('sidebar');
+      const main = document.querySelector('main');
+      const labels = document.querySelectorAll('.sidebar-label');
+      const toggleBtn = document.getElementById('sidebar-toggle');
+      const icon = toggleBtn.querySelector('i');
+      if (sidebar.style.width === '48px') {
+        sidebar.style.width = '200px';
+        main.style.marginLeft = '200px';
+        labels.forEach(function(el) { el.style.display = ''; });
+        icon.setAttribute('data-lucide', 'panel-left-close');
+      } else {
+        sidebar.style.width = '48px';
+        main.style.marginLeft = '48px';
+        labels.forEach(function(el) { el.style.display = 'none'; });
+        icon.setAttribute('data-lucide', 'panel-left-open');
+      }
+      lucide.createIcons();
+    }
+
+    lucide.createIcons();
+    </script>
+</body>
+</html>

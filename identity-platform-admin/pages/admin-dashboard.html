@@ -1,0 +1,745 @@
+<!DOCTYPE html>
+<html lang="zh-CN" class="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>管理概览 - Identity Platform</title>
+    <style id="theme-vars">
+:root {
+  /* === Colors === */
+  --primary-identityBlue-1: #f3f7ff;
+  --primary-identityBlue-2: #ebf1ff;
+  --primary-identityBlue-3: #a0c0ff;
+  --primary-identityBlue-4: #ccddff;
+  --primary-identityBlue-5: #387bff;
+  --primary-identityBlue-6: #1664ff;
+  --primary-identityBlue-7: #0055ff;
+  --primary-foreground: #ffffff;
+  --primary-accent-foreground: #ffffff;
+  --primary: #1664ff;
+  --primary-accent: #1664ff;
+  --primary-accent-hover: #0055ff;
+  --primary-link: #1664ff;
+  --primary-ring: #1664ff;
+  --text-identityNeutral-1: #ffffff;
+  --text-identityNeutral-2: #fcfdfe;
+  --text-identityNeutral-3: #eceded;
+  --text-identityNeutral-4: #dde2e9;
+  --text-identityNeutral-5: #c9cdd4;
+  --text-identityNeutral-6: #86909c;
+  --text-identityNeutral-7: #4e5969;
+  --text-identityNeutral-8: #333333;
+  --text-identityNeutral-9: #1d2129;
+  --text-identityNeutral-10: #0c0d0e;
+  --text-identityNeutral-11: #000b1a;
+  --text-fg: #0c0d0e;
+  --text-foreground: #0c0d0e;
+  --text-secondary: #eceded;
+  --text-secondary-foreground: #1d2129;
+  --text-muted: #86909c;
+  --text-muted-foreground: #86909c;
+  --text-color-text-strong: #0c0d0e;
+  --text-color-text-regular: #1d2129;
+  --text-color-text-subtle: #86909c;
+  --text-color-text-disabled: #c9cdd4;
+  --foundation-surface-container: #f7f9fb;
+  --foundation-surface-container-high: #f1f4f8;
+  --foundation-bg: #ffffff;
+  --foundation-background: #ffffff;
+  --foundation-surface-bright: #ffffff;
+  --foundation-surface: #ffffff;
+  --foundation-surface-dim: #fcfdfe;
+  --foundation-surface-container-lowest: #ffffff;
+  --foundation-surface-container-low: #fcfdfe;
+  --foundation-surface-container-highest: #eceded;
+  --foundation-inverse-surface: #1d2129;
+  --foundation-inverse-on-surface: #ffffff;
+  --foundation-card: #ffffff;
+  --foundation-card-foreground: #0c0d0e;
+  --foundation-popover: #f1f4f8;
+  --foundation-popover-foreground: #0c0d0e;
+  --foundation-rule: #dde2e9;
+  --foundation-border: #dde2e9;
+  --foundation-input: #eceded;
+  --border-identityBorder-1: #eaedf1;
+  --border-identityBorder-2: #e1e4e8;
+  --border-identityBorder-3: #d1d5da;
+  --border-identityBorder-4: #959da5;
+  --status-identityDanger-2: #feeced;
+  --status-identityDanger-3: #fa9ea3;
+  --status-identityDanger-5: #f65159;
+  --status-identityDanger-6: #d7312a;
+  --status-identityDanger-7: #c43138;
+  --status-identitySuccess-2: #e2f5eb;
+  --status-identitySuccess-3: #8dd8b3;
+  --status-identitySuccess-5: #1ebf6f;
+  --status-identitySuccess-6: #2a814b;
+  --status-identitySuccess-7: #189959;
+  --status-identityWarning-2: #fdf3de;
+  --status-identityWarning-3: #f8d080;
+  --status-identityWarning-5: #f5b433;
+  --status-identityWarning-6: #bd7e00;
+  --status-identityWarning-7: #de9400;
+  --status-on-error: #ffffff;
+  --status-error: #d7312a;
+  --status-error-container: #feeced;
+  --status-on-error-container: #c43138;
+  --status-success: #2a814b;
+  --status-warning: #bd7e00;
+  --state-hover: rgba(22, 100, 255, 0.08);
+  --state-focus: rgba(22, 100, 255, 0.12);
+  --state-press: rgba(22, 100, 255, 0.16);
+  --state-drag: rgba(22, 100, 255, 0.16);
+  --color-on-primary: #ffffff;
+  --color-background: #ffffff;
+  --color-foreground: #0c0d0e;
+  --color-surface: #ffffff;
+  --color-surface-dim: #fcfdfe;
+  --color-surface-variant: #f1f4f8;
+  --color-surface-container: #f7f9fb;
+  --color-surface-container-low: #fcfdfe;
+  --color-surface-container-high: #f1f4f8;
+  --color-surface-container-highest: #eceded;
+  --color-card: #ffffff;
+  --color-sidebar: #fcfdfe;
+  --color-on-surface: #0c0d0e;
+  --color-on-surface-variant: #86909c;
+  --color-muted-foreground: #86909c;
+  --color-primary: #1664ff;
+  --color-primary-hover: #0055ff;
+  --color-primary-container: #f3f7ff;
+  --color-on-primary-container: #0055ff;
+  --color-secondary: #eceded;
+  --color-secondary-container: #fcfdfe;
+  --color-on-secondary-container: #333333;
+  --color-error: #d7312a;
+  --color-error-container: #feeced;
+  --color-on-error: #ffffff;
+  --color-on-error-container: #c43138;
+  --color-outline: #dde2e9;
+  --color-outline-variant: #eceded;
+  --color-border: #dde2e9;
+  --color-success: #2a814b;
+  --color-warning: #bd7e00;
+  --color-danger: #d7312a;
+  --chart-1: #1664ff;
+  --chart-2: #2a814b;
+  --chart-3: #bd7e00;
+  --chart-4: #d7312a;
+  --chart-5: #4e5969;
+
+  /* === Typography === */
+  --font-display: "PingFang SC", "Microsoft YaHei", "Helvetica Neue", Arial, sans-serif;
+  --font-heading: "PingFang SC", "Microsoft YaHei", "Helvetica Neue", Arial, sans-serif;
+  --font-body: "PingFang SC", "Roboto", "Helvetica Neue", Arial, sans-serif;
+  --font-mono: "SFMono-Regular", "SF Mono", "Roboto Mono", "Consolas", "Liberation Mono", monospace;
+  --font-family-base: "PingFang SC", "Roboto", "Helvetica Neue", Arial, sans-serif;
+  --font-size-display: 24px;
+  --font-size-h1: 20px;
+  --font-size-h2: 18px;
+  --font-size-h3: 16px;
+  --font-size-h4: 14px;
+  --font-size-body: 12px;
+  --font-size-lead: 13px;
+  --font-size-caption: 10px;
+  --font-size-eyebrow: 10px;
+  --font-size-mono: 12px;
+  --font-size-price: 20px;
+  --type-display-sm: 24px;
+  --type-heading-sm: 14px;
+  --type-body-md: 12px;
+  --type-body-sm: 10px;
+  --font-weight-regular: 400;
+  --font-weight-medium: 500;
+  --font-weight-semibold: 600;
+  --line-height-display: 32px;
+  --line-height-h1: 28px;
+  --line-height-h2: 26px;
+  --line-height-h3: 24px;
+  --line-height-h4: 22px;
+  --line-height-body: 20px;
+  --line-height-lead: 22px;
+  --line-height-caption: 18px;
+  --line-height-eyebrow: 16px;
+  --line-height-mono: 20px;
+  --line-height-price: 28px;
+
+  /* === Radius === */
+  --identitytest-radius-sm: 4px;
+  --radius-full: 9999px;
+  --radius-sm: 4px;
+  --radius-md: 8px;
+  --radius-lg: 12px;
+  --radius-xl: 16px;
+
+  /* === Spacing === */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 20px;
+  --space-6: 24px;
+  --space-8: 32px;
+  --space-10: 40px;
+  --space-12: 48px;
+  --space-16: 64px;
+
+  /* === Size === */
+  --max-content: 1440px;
+  --max-prose: 72ch;
+  --gutter-desk: 24px;
+  --gutter-mob: 16px;
+  --nav-height: 56px;
+  --sidebar-width: 240px;
+
+  /* === Shadow === */
+  --shadow-1: 0px 1px 2px 0px rgba(12, 13, 14, 0.05);
+  --shadow-2: 0px 2px 6px 0px rgba(12, 13, 14, 0.08);
+  --shadow-3: 0px 5px 15px 0px rgba(12, 13, 14, 0.08), 0px 2px 4px 0px rgba(12, 13, 14, 0.04);
+  --shadow-4: 0px 15px 35px -2px rgba(12, 13, 14, 0.1), 0px 5px 15px 0px rgba(12, 13, 14, 0.06);
+  --shadow-5: 0px 24px 48px -4px rgba(12, 13, 14, 0.12), 0px 8px 20px 0px rgba(12, 13, 14, 0.08);
+}
+
+.dark {
+  --identityDanger-6: #ff706d;
+  --identitySuccess-6: #7ccd94;
+  --identityWarning-6: #f0a50f;
+  --fg: #ffffff;
+  --foreground: #ffffff;
+  --secondary: #333333;
+  --secondary-foreground: #ffffff;
+  --muted: #86909c;
+  --muted-foreground: #c9cdd4;
+  --bg: #0c0d0e;
+  --background: #0c0d0e;
+  --surface-dim: #000b1a;
+  --surface: #1d2129;
+  --surface-bright: #333333;
+  --surface-container-lowest: #0c0d0e;
+  --surface-container-low: #1d2129;
+  --surface-container: #202833;
+  --surface-container-high: #2a3440;
+  --surface-container-highest: #41464f;
+  --inverse-surface: #ffffff;
+  --inverse-on-surface: #0c0d0e;
+  --card: #1d2129;
+  --card-foreground: #ffffff;
+  --popover: #2a3440;
+  --popover-foreground: #ffffff;
+  --rule: #333333;
+  --border: #333333;
+  --input: #41464f;
+  --error: #ff706d;
+  --error-container: rgba(255, 112, 109, 0.16);
+  --on-error: #1f0a0c;
+  --on-error-container: #ffd9d7;
+  --success: #7ccd94;
+  --warning: #f0a50f;
+  --state-hover: rgba(56, 123, 255, 0.16);
+  --state-focus: rgba(56, 123, 255, 0.24);
+  --state-press: rgba(56, 123, 255, 0.32);
+  --state-drag: rgba(56, 123, 255, 0.32);
+  --color-background: #0c0d0e;
+  --color-foreground: #ffffff;
+  --color-surface: #1d2129;
+  --color-surface-dim: #000b1a;
+  --color-surface-variant: #2a3440;
+  --color-surface-container: #202833;
+  --color-surface-container-low: #1d2129;
+  --color-surface-container-high: #2a3440;
+  --color-surface-container-highest: #41464f;
+  --color-card: #1d2129;
+  --color-sidebar: #1d2129;
+  --color-on-surface: #ffffff;
+  --color-on-surface-variant: #86909c;
+  --color-muted-foreground: #86909c;
+  --color-primary: #1664ff;
+  --color-primary-hover: #0055ff;
+  --color-primary-container: #0055ff;
+  --color-on-primary-container: #ffffff;
+  --color-secondary: #333333;
+  --color-secondary-container: #1d2129;
+  --color-on-secondary-container: #ffffff;
+  --color-error: #ff706d;
+  --color-error-container: rgba(255, 112, 109, 0.16);
+  --color-on-error: #1f0a0c;
+  --color-on-error-container: #ffd9d7;
+  --color-outline: #333333;
+  --color-outline-variant: #333333;
+  --color-border: #333333;
+  --color-success: #7ccd94;
+  --color-warning: #f0a50f;
+  --color-danger: #ff706d;
+  --chart-1: #387bff;
+  --chart-2: #7ccd94;
+  --chart-3: #f0a50f;
+  --chart-4: #ff706d;
+  --chart-5: #86909c;
+  --shadow-1: 0px 1px 2px 0px rgba(0, 0, 0, 0.24);
+  --shadow-2: 0px 2px 6px 0px rgba(0, 0, 0, 0.32);
+  --shadow-3: 0px 5px 15px 0px rgba(0, 0, 0, 0.36), 0px 2px 4px 0px rgba(0, 0, 0, 0.2);
+  --shadow-4: 0px 15px 35px -2px rgba(0, 0, 0, 0.44), 0px 5px 15px 0px rgba(0, 0, 0, 0.28);
+  --shadow-5: 0px 24px 48px -4px rgba(0, 0, 0, 0.5), 0px 8px 20px 0px rgba(0, 0, 0, 0.32);
+}
+
+/* === Typography utility classes === */
+.type-display {
+  font-size: var(--font-size-display);
+  line-height: var(--line-height-display);
+  font-family: var(--font-sans, "PingFang SC", "Microsoft YaHei", "Helvetica Neue", Arial, sans-serif);
+}
+
+.type-h1 {
+  font-size: var(--font-size-h1);
+  line-height: var(--line-height-h1);
+  font-family: var(--font-sans, "PingFang SC", "Microsoft YaHei", "Helvetica Neue", Arial, sans-serif);
+}
+
+.type-h2 {
+  font-size: var(--font-size-h2);
+  line-height: var(--line-height-h2);
+  font-family: var(--font-sans, "PingFang SC", "Microsoft YaHei", "Helvetica Neue", Arial, sans-serif);
+}
+
+.type-h3 {
+  font-size: var(--font-size-h3);
+  line-height: var(--line-height-h3);
+  font-family: var(--font-sans, "PingFang SC", "Microsoft YaHei", "Helvetica Neue", Arial, sans-serif);
+}
+
+.type-h4 {
+  font-size: var(--font-size-h4);
+  line-height: var(--line-height-h4);
+  font-family: var(--font-sans, "PingFang SC", "Microsoft YaHei", "Helvetica Neue", Arial, sans-serif);
+}
+
+.type-body {
+  font-size: var(--font-size-body);
+  line-height: var(--line-height-body);
+  font-family: var(--font-sans, "PingFang SC", "Microsoft YaHei", "Helvetica Neue", Arial, sans-serif);
+}
+
+.type-lead {
+  font-size: var(--font-size-lead);
+  line-height: var(--line-height-lead);
+  font-family: var(--font-sans, "PingFang SC", "Microsoft YaHei", "Helvetica Neue", Arial, sans-serif);
+}
+
+.type-caption {
+  font-size: var(--font-size-caption);
+  line-height: var(--line-height-caption);
+  font-family: var(--font-sans, "PingFang SC", "Microsoft YaHei", "Helvetica Neue", Arial, sans-serif);
+}
+
+.type-eyebrow {
+  font-size: var(--font-size-eyebrow);
+  line-height: var(--line-height-eyebrow);
+  font-family: var(--font-sans, "PingFang SC", "Microsoft YaHei", "Helvetica Neue", Arial, sans-serif);
+}
+
+.type-mono {
+  font-size: var(--font-size-mono);
+  line-height: var(--line-height-mono);
+  font-family: var(--font-sans, "PingFang SC", "Microsoft YaHei", "Helvetica Neue", Arial, sans-serif);
+}
+
+.type-price {
+  font-size: var(--font-size-price);
+  line-height: var(--line-height-price);
+  font-family: var(--font-sans, "PingFang SC", "Microsoft YaHei", "Helvetica Neue", Arial, sans-serif);
+}
+
+.type-type-display-sm {
+  font-size: var(--type-display-sm);
+  font-family: var(--font-sans, "PingFang SC", "Microsoft YaHei", "Helvetica Neue", Arial, sans-serif);
+}
+
+.type-type-heading-sm {
+  font-size: var(--type-heading-sm);
+  font-family: var(--font-sans, "PingFang SC", "Microsoft YaHei", "Helvetica Neue", Arial, sans-serif);
+}
+
+.type-type-body-md {
+  font-size: var(--type-body-md);
+  font-family: var(--font-sans, "PingFang SC", "Microsoft YaHei", "Helvetica Neue", Arial, sans-serif);
+}
+
+.type-type-body-sm {
+  font-size: var(--type-body-sm);
+  font-family: var(--font-sans, "PingFang SC", "Microsoft YaHei", "Helvetica Neue", Arial, sans-serif);
+}
+
+    </style>
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4.3.1/dist/index.global.js"></script>
+    <script src="https://unpkg.com/lucide@1.8.0/dist/umd/lucide.min.js"></script>
+    <style type="text/tailwindcss">
+  @theme inline {
+    --color-background: var(--foundation-background);
+    --color-foreground: var(--text-foreground);
+    --color-card: var(--foundation-card);
+    --color-card-foreground: var(--text-foreground);
+    --color-primary: var(--primary);
+    --color-primary-foreground: var(--primary-foreground);
+    --color-secondary: var(--foundation-surface-dim);
+    --color-secondary-foreground: var(--text-secondary-foreground);
+    --color-muted: var(--foundation-surface-container);
+    --color-muted-foreground: var(--text-muted-foreground);
+    --color-accent: var(--primary-accent);
+    --color-accent-foreground: var(--primary-accent-foreground);
+    --color-destructive: var(--status-danger);
+    --color-destructive-foreground: #ffffff;
+    --color-border: var(--border-default);
+    --color-input: var(--border-default);
+    --color-ring: var(--primary-ring);
+    --color-chart-1: var(--primary);
+    --color-chart-2: var(--status-success);
+    --color-chart-3: var(--status-warning);
+    --color-chart-4: var(--status-danger);
+    --color-chart-5: var(--text-muted-foreground);
+    --color-sidebar: var(--foundation-surface-dim);
+    --color-sidebar-foreground: var(--text-foreground);
+    --color-sidebar-primary: var(--primary);
+    --color-sidebar-primary-foreground: #ffffff;
+    --color-sidebar-accent: var(--foundation-surface-container);
+    --color-sidebar-accent-foreground: var(--text-secondary-foreground);
+    --radius-sm: var(--radius-small);
+    --radius-md: var(--radius-medium);
+    --radius-lg: var(--radius-large);
+    --radius-xl: var(--radius-xlarge);
+  }
+  
+  @layer base {
+    body { background: var(--identity-background); color: var(--identity-foreground); }
+    td, th { @apply break-words; word-break: break-all; word-break: auto-phrase; }
+    th { @apply whitespace-nowrap; }
+  }
+    </style>
+    <style>
+      .no-scrollbar::-webkit-scrollbar { display: none; }
+      .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+      [data-icon] {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        -webkit-mask-size: contain;
+        mask-size: contain;
+        -webkit-mask-repeat: no-repeat;
+        mask-repeat: no-repeat;
+        -webkit-mask-position: center;
+        mask-position: center;
+        color: inherit; background-color: currentColor;
+      }
+
+      #sidebar.collapsed { width: 64px; }
+      #sidebar.collapsed .sidebar-label { display: none; }
+      #sidebar.collapsed .sidebar-nav-item { justify-content: center; padding: 8px; margin: 0 8px; }
+      #sidebar.collapsed #sidebar-toggle { justify-content: center; padding: 8px; }
+    </style>
+</head>
+<body class="min-h-screen font-sans antialiased" style="background-color: var(--color-background); color: var(--color-foreground); font-family: var(--font-family-base);">
+
+    <!-- ===== TOP NAV ===== -->
+    <header style="height: 48px; background-color: var(--color-background); border-bottom: 1px solid var(--color-border); position: fixed; top: 0; left: 0; right: 0; z-index: 50; display: flex; align-items: center; padding: 0 16px;">
+      <!-- Left: hamburger + logo -->
+      <div style="display: flex; align-items: center; gap: 12px; flex-shrink: 0;">
+        <button data-dom-id="btn-hamburger" style="width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; border: none; background: none; cursor: pointer; border-radius: var(--radius-md); color: var(--color-on-surface-variant);" aria-label="菜单">
+          <i data-lucide="menu" style="width: 20px; height: 20px;"></i>
+        </button>
+        <span style="font-size: 15px; font-weight: 600; color: var(--color-foreground); white-space: nowrap;">Identity Platform</span>
+      </div>
+
+      <!-- Right: search + icons + avatar -->
+      <div style="margin-left: auto; display: flex; align-items: center; gap: 8px; flex-shrink: 0;">
+        <!-- Search box -->
+        <div style="width: 200px; height: 32px; display: flex; align-items: center; gap: 8px; padding: 0 10px; border: 1px solid var(--color-border); border-radius: var(--radius-md); background-color: var(--color-surface-container-low);">
+          <i data-lucide="search" style="width: 14px; height: 14px; color: var(--color-muted-foreground); flex-shrink: 0;"></i>
+          <input type="text" placeholder="搜索" style="border: none; outline: none; background: none; font-size: 13px; color: var(--color-foreground); width: 100%; font-family: var(--font-family-base);" />
+        </div>
+        <!-- Notification bell -->
+        <button data-dom-id="btn-notification" style="position: relative; width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; border: none; background: none; cursor: pointer; border-radius: var(--radius-md); color: var(--color-on-surface-variant);" aria-label="通知">
+          <i data-lucide="bell" style="width: 18px; height: 18px;"></i>
+          <span style="position: absolute; top: 6px; right: 6px; width: 7px; height: 7px; background-color: var(--color-danger); border-radius: 50%; border: 1.5px solid var(--color-background);"></span>
+        </button>
+        <!-- Help icon -->
+        <button data-dom-id="btn-help" style="width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; border: none; background: none; cursor: pointer; border-radius: var(--radius-md); color: var(--color-on-surface-variant);" aria-label="帮助">
+          <i data-lucide="help-circle" style="width: 18px; height: 18px;"></i>
+        </button>
+        <!-- Avatar -->
+        <div data-dom-id="avatar-menu" style="width: 32px; height: 32px; border-radius: var(--radius-full); background-color: var(--color-primary-container); display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 12px; font-weight: 600; color: var(--color-primary);">A</div>
+      </div>
+    </header>
+
+        <!-- ===== SIDEBAR ===== -->
+    <aside id="sidebar" style="position: fixed; top: 48px; left: 0; bottom: 0; width: 200px; background-color: var(--color-sidebar); border-right: 1px solid var(--color-border); overflow-y: auto; overflow-x: hidden; padding: 16px 0 8px 0; z-index: 40; transition: width 200ms cubic-bezier(.2,.8,.2,1);">
+      <nav style="display: flex; flex-direction: column; gap: 2px;">
+        <a class="sidebar-nav-item" data-nav-key="overview" data-active="true" data-dom-id="nav-overview" href="#" style="display: flex; align-items: center; gap: 10px; padding: 8px 16px; margin: 0 8px; border-radius: var(--radius-md); background-color: var(--color-primary-container); color: var(--color-primary); text-decoration: none; font-size: 13px; font-weight: 500;">
+          <span data-icon class="w-4 h-4" style="-webkit-mask-image: url('../assets/icons/Y2JIZFT9CG4WDK/House_Dashboard.svg'); mask-image: url('../assets/icons/Y2JIZFT9CG4WDK/House_Dashboard.svg');"></span>
+          <span class="sidebar-label">概览</span>
+        </a>
+        <a class="sidebar-nav-item" data-nav-key="users" data-dom-id="nav-users" href="#" style="display: flex; align-items: center; gap: 10px; padding: 8px 16px; margin: 0 8px; border-radius: var(--radius-md); color: var(--color-on-surface-variant); text-decoration: none; font-size: 13px; font-weight: 400; transition: background-color 120ms cubic-bezier(.2,.8,.2,1);">
+          <span data-icon class="w-4 h-4" style="-webkit-mask-image: url('../assets/icons/Y2JIZFT9CG4WDK/add-user.svg'); mask-image: url('../assets/icons/Y2JIZFT9CG4WDK/add-user.svg');"></span>
+          <span class="sidebar-label">用户管理</span>
+        </a>
+        <a data-nav-key="registration-approval" data-dom-id="nav-registration-approval" href="#" class="sidebar-nav-item" style="display: flex; align-items: center; gap: 10px; padding: 6px 16px 6px 34px; margin: 0 8px; border-radius: var(--radius-md); color: var(--color-muted-foreground); text-decoration: none; font-size: 12px; font-weight: 400; white-space: nowrap; overflow: hidden; transition: background-color 120ms cubic-bezier(.2,.8,.2,1);">
+          <span class="sidebar-label">注册审批</span>
+        </a>
+        <a class="sidebar-nav-item" data-nav-key="orgs" data-dom-id="nav-orgs" href="#" style="display: flex; align-items: center; gap: 10px; padding: 8px 16px; margin: 0 8px; border-radius: var(--radius-md); color: var(--color-on-surface-variant); text-decoration: none; font-size: 13px; font-weight: 400; transition: background-color 120ms cubic-bezier(.2,.8,.2,1);">
+          <span data-icon class="w-4 h-4" style="-webkit-mask-image: url('../assets/icons/Y2JIZFT9CG4WDK/Card_Team.svg'); mask-image: url('../assets/icons/Y2JIZFT9CG4WDK/Card_Team.svg');"></span>
+          <span class="sidebar-label">组织/租户</span>
+        </a>
+        <a class="sidebar-nav-item" data-nav-key="apps" data-dom-id="nav-apps" href="#" style="display: flex; align-items: center; gap: 10px; padding: 8px 16px; margin: 0 8px; border-radius: var(--radius-md); color: var(--color-on-surface-variant); text-decoration: none; font-size: 13px; font-weight: 400; transition: background-color 120ms cubic-bezier(.2,.8,.2,1);">
+          <span data-icon class="w-4 h-4" style="-webkit-mask-image: url('../assets/icons/Y2JIZFT9CG4WDK/apps.svg'); mask-image: url('../assets/icons/Y2JIZFT9CG4WDK/apps.svg');"></span>
+          <span class="sidebar-label">应用管理</span>
+        </a>
+        <a class="sidebar-nav-item" data-nav-key="roles" data-dom-id="nav-roles" href="#" style="display: flex; align-items: center; gap: 10px; padding: 8px 16px; margin: 0 8px; border-radius: var(--radius-md); color: var(--color-on-surface-variant); text-decoration: none; font-size: 13px; font-weight: 400; transition: background-color 120ms cubic-bezier(.2,.8,.2,1);">
+          <span data-icon class="w-4 h-4" style="-webkit-mask-image: url('../assets/icons/Y2JIZFT9CG4WDK/key.svg'); mask-image: url('../assets/icons/Y2JIZFT9CG4WDK/key.svg');"></span>
+          <span class="sidebar-label">角色权限</span>
+        </a>
+        <a class="sidebar-nav-item" data-nav-key="audit" data-dom-id="nav-audit" href="#" style="display: flex; align-items: center; gap: 10px; padding: 8px 16px; margin: 0 8px; border-radius: var(--radius-md); color: var(--color-on-surface-variant); text-decoration: none; font-size: 13px; font-weight: 400; transition: background-color 120ms cubic-bezier(.2,.8,.2,1);">
+          <span data-icon class="w-4 h-4" style="-webkit-mask-image: url('../assets/icons/Y2JIZFT9CG4WDK/Doc_Log.svg'); mask-image: url('../assets/icons/Y2JIZFT9CG4WDK/Doc_Log.svg');"></span>
+          <span class="sidebar-label">审计日志</span>
+        </a>
+        <a class="sidebar-nav-item" data-nav-key="settings" data-dom-id="nav-settings" href="#" style="display: flex; align-items: center; gap: 10px; padding: 8px 16px; margin: 0 8px; border-radius: var(--radius-md); color: var(--color-on-surface-variant); text-decoration: none; font-size: 13px; font-weight: 400; transition: background-color 120ms cubic-bezier(.2,.8,.2,1);">
+          <span data-icon class="w-4 h-4" style="-webkit-mask-image: url('../assets/icons/Y2JIZFT9CG4WDK/config.svg'); mask-image: url('../assets/icons/Y2JIZFT9CG4WDK/config.svg');"></span>
+          <span class="sidebar-label">系统设置</span>
+        </a>
+        <a data-nav-key="registration-config" data-dom-id="nav-registration-config" href="#" class="sidebar-nav-item" style="display: flex; align-items: center; gap: 10px; padding: 6px 16px 6px 34px; margin: 0 8px; border-radius: var(--radius-md); color: var(--color-muted-foreground); text-decoration: none; font-size: 12px; font-weight: 400; white-space: nowrap; overflow: hidden; transition: background-color 120ms cubic-bezier(.2,.8,.2,1);">
+          <span class="sidebar-label">注册管理</span>
+        </a>
+      </nav>
+      <!-- Collapse toggle -->
+      <div style="padding: 12px 8px 0; margin-top: auto;">
+        <button id="sidebar-toggle" onclick="toggleSidebar()" style="display: flex; align-items: center; gap: 10px; width: 100%; padding: 8px 16px; border: none; background: none; cursor: pointer; border-radius: var(--radius-md); color: var(--color-muted-foreground); font-size: 13px; white-space: nowrap; overflow: hidden; transition: background-color 120ms;" onmouseenter="this.style.backgroundColor='var(--color-primary-container)'" onmouseleave="this.style.backgroundColor='transparent'">
+          <i data-lucide="panel-left-close" class="w-4 h-4 shrink-0"></i>
+          <span class="sidebar-label">收起菜单</span>
+        </button>
+      </div>
+    </aside>
+
+    <!-- ===== MAIN CONTENT ===== -->
+    <main style="margin-top: 48px; margin-left: 200px; padding: 32px; min-height: calc(100vh - 48px); background-color: var(--color-background);">
+
+      <!-- Page title row -->
+      <div style="display: flex; align-items: baseline; justify-content: space-between; margin-bottom: 32px;">
+        <div>
+          <h1 style="font-size: 20px; font-weight: 600; color: var(--color-foreground); line-height: 28px; margin: 0; text-wrap: balance; word-break: keep-all;">管理概览</h1>
+          <p style="font-size: 13px; color: var(--color-muted-foreground); margin-top: 4px; line-height: 20px;">身份平台核心指标与使用趋势</p>
+        </div>
+        <div style="display: flex; align-items: center; gap: 4px; flex-shrink: 0;">
+          <span style="font-size: 12px; color: var(--color-muted-foreground);">数据更新于</span>
+          <span style="font-size: 12px; color: var(--color-on-surface-variant);">2026-06-27 10:30</span>
+        </div>
+      </div>
+
+      <!-- ===== KPI CARDS ROW ===== -->
+      <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 16px; margin-bottom: 40px;">
+
+        <!-- KPI: 用户总数 -->
+        <div data-dom-id="kpi-total-users" style="background-color: var(--color-card); border: 1px solid var(--color-border); border-radius: var(--radius-lg); padding: 20px; display: flex; flex-direction: column; gap: 12px;">
+          <div style="display: flex; align-items: center; justify-content: space-between;">
+            <span style="font-size: 13px; color: var(--color-on-surface-variant);">用户总数</span>
+            <span data-icon class="w-5 h-5" style="-webkit-mask-image: url('../assets/icons/Y2JIZFT9CG4WDK/account.svg'); mask-image: url('../assets/icons/Y2JIZFT9CG4WDK/account.svg'); color: var(--color-primary);"></span>
+          </div>
+          <div style="display: flex; align-items: baseline; gap: 8px;">
+            <span style="font-size: 28px; font-weight: 600; color: var(--color-foreground); line-height: 1.1; font-variant-numeric: tabular-nums;">12,847</span>
+            <span style="display: inline-flex; align-items: center; gap: 2px; font-size: 12px; color: var(--color-success); font-weight: 500;">
+              <i data-lucide="trending-up" style="width: 12px; height: 12px;"></i>
+              +5.2%
+            </span>
+          </div>
+        </div>
+
+        <!-- KPI: 活跃用户 -->
+        <div data-dom-id="kpi-active-users" style="background-color: var(--color-card); border: 1px solid var(--color-border); border-radius: var(--radius-lg); padding: 20px; display: flex; flex-direction: column; gap: 12px;">
+          <div style="display: flex; align-items: center; justify-content: space-between;">
+            <span style="font-size: 13px; color: var(--color-on-surface-variant);">活跃用户</span>
+            <span data-icon class="w-5 h-5" style="-webkit-mask-image: url('../assets/icons/Y2JIZFT9CG4WDK/eye.svg'); mask-image: url('../assets/icons/Y2JIZFT9CG4WDK/eye.svg'); color: var(--color-success);"></span>
+          </div>
+          <div style="display: flex; align-items: baseline; gap: 8px;">
+            <span style="font-size: 28px; font-weight: 600; color: var(--color-foreground); line-height: 1.1; font-variant-numeric: tabular-nums;">8,532</span>
+            <span style="display: inline-flex; align-items: center; gap: 2px; font-size: 12px; color: var(--color-success); font-weight: 500;">
+              <i data-lucide="trending-up" style="width: 12px; height: 12px;"></i>
+              +5.2%
+            </span>
+          </div>
+        </div>
+
+        <!-- KPI: 接入应用 -->
+        <div data-dom-id="kpi-total-apps" style="background-color: var(--color-card); border: 1px solid var(--color-border); border-radius: var(--radius-lg); padding: 20px; display: flex; flex-direction: column; gap: 12px;">
+          <div style="display: flex; align-items: center; justify-content: space-between;">
+            <span style="font-size: 13px; color: var(--color-on-surface-variant);">接入应用</span>
+            <span data-icon class="w-5 h-5" style="-webkit-mask-image: url('../assets/icons/Y2JIZFT9CG4WDK/apps.svg'); mask-image: url('../assets/icons/Y2JIZFT9CG4WDK/apps.svg'); color: var(--color-warning);"></span>
+          </div>
+          <div style="display: flex; align-items: baseline; gap: 8px;">
+            <span style="font-size: 28px; font-weight: 600; color: var(--color-foreground); line-height: 1.1; font-variant-numeric: tabular-nums;">16</span>
+            <span style="display: inline-flex; align-items: center; gap: 2px; font-size: 12px; color: var(--color-success); font-weight: 500;">
+              <i data-lucide="trending-up" style="width: 12px; height: 12px;"></i>
+              +5.2%
+            </span>
+          </div>
+        </div>
+
+        <!-- KPI: 本月新增 -->
+        <div data-dom-id="kpi-new-users" style="background-color: var(--color-card); border: 1px solid var(--color-border); border-radius: var(--radius-lg); padding: 20px; display: flex; flex-direction: column; gap: 12px;">
+          <div style="display: flex; align-items: center; justify-content: space-between;">
+            <span style="font-size: 13px; color: var(--color-on-surface-variant);">本月新增</span>
+            <span data-icon class="w-5 h-5" style="-webkit-mask-image: url('../assets/icons/Y2JIZFT9CG4WDK/arrow-rise.svg'); mask-image: url('../assets/icons/Y2JIZFT9CG4WDK/arrow-rise.svg'); color: var(--color-primary);"></span>
+          </div>
+          <div style="display: flex; align-items: baseline; gap: 8px;">
+            <span style="font-size: 28px; font-weight: 600; color: var(--color-foreground); line-height: 1.1; font-variant-numeric: tabular-nums;">342</span>
+            <span style="display: inline-flex; align-items: center; gap: 2px; font-size: 12px; color: var(--color-success); font-weight: 500;">
+              <i data-lucide="trending-up" style="width: 12px; height: 12px;"></i>
+              +5.2%
+            </span>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- ===== CHART CARDS GRID (3 columns) ===== -->
+      <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(380px, 1fr)); gap: 16px;">
+
+        <!-- Chart 1: 用户增长趋势 -->
+        <div data-dom-id="chart-user-growth" style="background-color: var(--color-card); border: 1px solid var(--color-border); border-radius: var(--radius-lg); padding: 20px; display: flex; flex-direction: column; gap: 16px;">
+          <div style="display: flex; flex-direction: column; gap: 10px;">
+            <span style="font-size: 14px; font-weight: 600; color: var(--color-foreground);">用户增长趋势</span>
+            <div style="display: flex; align-items: center; gap: 4px;">
+              <button data-dom-id="filter-1h" style="height: 28px; padding: 0 10px; font-size: 12px; border: 1px solid var(--color-border); border-radius: var(--radius-md); background: var(--color-surface); color: var(--color-on-surface-variant); cursor: pointer; font-family: var(--font-family-base); white-space: nowrap;">1小时</button>
+              <button data-dom-id="filter-3h" style="height: 28px; padding: 0 10px; font-size: 12px; border: 1px solid var(--color-border); border-radius: var(--radius-md); background: var(--color-surface); color: var(--color-on-surface-variant); cursor: pointer; font-family: var(--font-family-base); white-space: nowrap;">3小时</button>
+              <button data-dom-id="filter-12h" style="height: 28px; padding: 0 10px; font-size: 12px; border: 1px solid var(--color-primary); border-radius: var(--radius-md); background: var(--color-primary-container); color: var(--color-primary); cursor: pointer; font-family: var(--font-family-base); font-weight: 500; white-space: nowrap;">12小时</button>
+              <button data-dom-id="filter-24h" style="height: 28px; padding: 0 10px; font-size: 12px; border: 1px solid var(--color-border); border-radius: var(--radius-md); background: var(--color-surface); color: var(--color-on-surface-variant); cursor: pointer; font-family: var(--font-family-base); white-space: nowrap;">24小时</button>
+              <button data-dom-id="filter-3d" style="height: 28px; padding: 0 10px; font-size: 12px; border: 1px solid var(--color-border); border-radius: var(--radius-md); background: var(--color-surface); color: var(--color-on-surface-variant); cursor: pointer; font-family: var(--font-family-base); white-space: nowrap;">3天</button>
+              <button data-dom-id="filter-7d" style="height: 28px; padding: 0 10px; font-size: 12px; border: 1px solid var(--color-border); border-radius: var(--radius-md); background: var(--color-surface); color: var(--color-on-surface-variant); cursor: pointer; font-family: var(--font-family-base); white-space: nowrap;">7天</button>
+            </div>
+          </div>
+          <!-- CSS-only chart area placeholder -->
+          <div style="position: relative; height: 180px; display: flex; align-items: flex-end; gap: 0;">
+            <!-- Grid lines -->
+            <div style="position: absolute; inset: 0; display: flex; flex-direction: column; justify-content: space-between; pointer-events: none;">
+              <div style="border-bottom: 1px dashed var(--color-outline-variant); height: 0;"></div>
+              <div style="border-bottom: 1px dashed var(--color-outline-variant); height: 0;"></div>
+              <div style="border-bottom: 1px dashed var(--color-outline-variant); height: 0;"></div>
+              <div style="border-bottom: 1px dashed var(--color-outline-variant); height: 0;"></div>
+            </div>
+            <!-- Gradient area simulating line chart -->
+            <svg viewBox="0 0 300 180" preserveAspectRatio="none" style="position: absolute; inset: 0; width: 100%; height: 100%;">
+              <defs>
+                <linearGradient id="grad1" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0%" stop-color="var(--chart-1)" stop-opacity="0.2"/>
+                  <stop offset="100%" stop-color="var(--chart-1)" stop-opacity="0.02"/>
+                </linearGradient>
+              </defs>
+              <path d="M0,140 C30,130 50,120 75,110 C100,100 120,95 150,80 C180,65 210,55 225,50 C240,45 270,35 300,20 L300,180 L0,180 Z" fill="url('#grad1')"/>
+              <path d="M0,140 C30,130 50,120 75,110 C100,100 120,95 150,80 C180,65 210,55 225,50 C240,45 270,35 300,20" fill="none" stroke="var(--chart-1)" stroke-width="2"/>
+            </svg>
+          </div>
+          <!-- X-axis labels -->
+          <div style="display: flex; justify-content: space-between; padding: 0 2px;">
+            <span style="font-size: 10px; color: var(--color-muted-foreground);">00:00</span>
+            <span style="font-size: 10px; color: var(--color-muted-foreground);">04:00</span>
+            <span style="font-size: 10px; color: var(--color-muted-foreground);">08:00</span>
+            <span style="font-size: 10px; color: var(--color-muted-foreground);">12:00</span>
+          </div>
+        </div>
+
+        <!-- Chart 2: 登录活跃度 -->
+        <div data-dom-id="chart-login-activity" style="background-color: var(--color-card); border: 1px solid var(--color-border); border-radius: var(--radius-lg); padding: 20px; display: flex; flex-direction: column; gap: 16px;">
+          <div style="display: flex; flex-direction: column; gap: 10px;">
+            <span style="font-size: 14px; font-weight: 600; color: var(--color-foreground);">登录活跃度</span>
+            <div style="display: flex; align-items: center; gap: 4px;">
+              <button style="height: 28px; padding: 0 10px; font-size: 12px; border: 1px solid var(--color-border); border-radius: var(--radius-md); background: var(--color-surface); color: var(--color-on-surface-variant); cursor: pointer; font-family: var(--font-family-base); white-space: nowrap;">1小时</button>
+              <button style="height: 28px; padding: 0 10px; font-size: 12px; border: 1px solid var(--color-border); border-radius: var(--radius-md); background: var(--color-surface); color: var(--color-on-surface-variant); cursor: pointer; font-family: var(--font-family-base); white-space: nowrap;">3小时</button>
+              <button style="height: 28px; padding: 0 10px; font-size: 12px; border: 1px solid var(--color-primary); border-radius: var(--radius-md); background: var(--color-primary-container); color: var(--color-primary); cursor: pointer; font-family: var(--font-family-base); font-weight: 500; white-space: nowrap;">12小时</button>
+              <button style="height: 28px; padding: 0 10px; font-size: 12px; border: 1px solid var(--color-border); border-radius: var(--radius-md); background: var(--color-surface); color: var(--color-on-surface-variant); cursor: pointer; font-family: var(--font-family-base); white-space: nowrap;">24小时</button>
+              <button style="height: 28px; padding: 0 10px; font-size: 12px; border: 1px solid var(--color-border); border-radius: var(--radius-md); background: var(--color-surface); color: var(--color-on-surface-variant); cursor: pointer; font-family: var(--font-family-base); white-space: nowrap;">3天</button>
+              <button style="height: 28px; padding: 0 10px; font-size: 12px; border: 1px solid var(--color-border); border-radius: var(--radius-md); background: var(--color-surface); color: var(--color-on-surface-variant); cursor: pointer; font-family: var(--font-family-base); white-space: nowrap;">7天</button>
+            </div>
+          </div>
+          <!-- CSS-only chart area placeholder -->
+          <div style="position: relative; height: 180px; display: flex; align-items: flex-end; gap: 0;">
+            <div style="position: absolute; inset: 0; display: flex; flex-direction: column; justify-content: space-between; pointer-events: none;">
+              <div style="border-bottom: 1px dashed var(--color-outline-variant); height: 0;"></div>
+              <div style="border-bottom: 1px dashed var(--color-outline-variant); height: 0;"></div>
+              <div style="border-bottom: 1px dashed var(--color-outline-variant); height: 0;"></div>
+              <div style="border-bottom: 1px dashed var(--color-outline-variant); height: 0;"></div>
+            </div>
+            <svg viewBox="0 0 300 180" preserveAspectRatio="none" style="position: absolute; inset: 0; width: 100%; height: 100%;">
+              <defs>
+                <linearGradient id="grad2" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0%" stop-color="var(--chart-2)" stop-opacity="0.2"/>
+                  <stop offset="100%" stop-color="var(--chart-2)" stop-opacity="0.02"/>
+                </linearGradient>
+              </defs>
+              <path d="M0,100 C40,95 60,85 90,90 C120,95 140,60 170,45 C200,30 230,40 260,35 C280,32 290,28 300,25 L300,180 L0,180 Z" fill="url('#grad2')"/>
+              <path d="M0,100 C40,95 60,85 90,90 C120,95 140,60 170,45 C200,30 230,40 260,35 C280,32 290,28 300,25" fill="none" stroke="var(--chart-2)" stroke-width="2"/>
+            </svg>
+          </div>
+          <div style="display: flex; justify-content: space-between; padding: 0 2px;">
+            <span style="font-size: 10px; color: var(--color-muted-foreground);">00:00</span>
+            <span style="font-size: 10px; color: var(--color-muted-foreground);">04:00</span>
+            <span style="font-size: 10px; color: var(--color-muted-foreground);">08:00</span>
+            <span style="font-size: 10px; color: var(--color-muted-foreground);">12:00</span>
+          </div>
+        </div>
+
+        <!-- Chart 3: 应用使用分布 -->
+        <div data-dom-id="chart-app-distribution" style="background-color: var(--color-card); border: 1px solid var(--color-border); border-radius: var(--radius-lg); padding: 20px; display: flex; flex-direction: column; gap: 16px;">
+          <div style="display: flex; flex-direction: column; gap: 10px;">
+            <span style="font-size: 14px; font-weight: 600; color: var(--color-foreground);">应用使用分布</span>
+            <div style="display: flex; align-items: center; gap: 4px;">
+              <button style="height: 28px; padding: 0 10px; font-size: 12px; border: 1px solid var(--color-border); border-radius: var(--radius-md); background: var(--color-surface); color: var(--color-on-surface-variant); cursor: pointer; font-family: var(--font-family-base); white-space: nowrap;">1小时</button>
+              <button style="height: 28px; padding: 0 10px; font-size: 12px; border: 1px solid var(--color-border); border-radius: var(--radius-md); background: var(--color-surface); color: var(--color-on-surface-variant); cursor: pointer; font-family: var(--font-family-base); white-space: nowrap;">3小时</button>
+              <button style="height: 28px; padding: 0 10px; font-size: 12px; border: 1px solid var(--color-primary); border-radius: var(--radius-md); background: var(--color-primary-container); color: var(--color-primary); cursor: pointer; font-family: var(--font-family-base); font-weight: 500; white-space: nowrap;">12小时</button>
+              <button style="height: 28px; padding: 0 10px; font-size: 12px; border: 1px solid var(--color-border); border-radius: var(--radius-md); background: var(--color-surface); color: var(--color-on-surface-variant); cursor: pointer; font-family: var(--font-family-base); white-space: nowrap;">24小时</button>
+              <button style="height: 28px; padding: 0 10px; font-size: 12px; border: 1px solid var(--color-border); border-radius: var(--radius-md); background: var(--color-surface); color: var(--color-on-surface-variant); cursor: pointer; font-family: var(--font-family-base); white-space: nowrap;">3天</button>
+              <button style="height: 28px; padding: 0 10px; font-size: 12px; border: 1px solid var(--color-border); border-radius: var(--radius-md); background: var(--color-surface); color: var(--color-on-surface-variant); cursor: pointer; font-family: var(--font-family-base); white-space: nowrap;">7天</button>
+            </div>
+          </div>
+          <!-- CSS-only chart area placeholder -->
+          <div style="position: relative; height: 180px; display: flex; align-items: flex-end; gap: 0;">
+            <div style="position: absolute; inset: 0; display: flex; flex-direction: column; justify-content: space-between; pointer-events: none;">
+              <div style="border-bottom: 1px dashed var(--color-outline-variant); height: 0;"></div>
+              <div style="border-bottom: 1px dashed var(--color-outline-variant); height: 0;"></div>
+              <div style="border-bottom: 1px dashed var(--color-outline-variant); height: 0;"></div>
+              <div style="border-bottom: 1px dashed var(--color-outline-variant); height: 0;"></div>
+            </div>
+            <svg viewBox="0 0 300 180" preserveAspectRatio="none" style="position: absolute; inset: 0; width: 100%; height: 100%;">
+              <defs>
+                <linearGradient id="grad3" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0%" stop-color="var(--chart-3)" stop-opacity="0.2"/>
+                  <stop offset="100%" stop-color="var(--chart-3)" stop-opacity="0.02"/>
+                </linearGradient>
+              </defs>
+              <path d="M0,80 C30,85 50,75 80,90 C110,105 130,70 160,55 C190,40 210,50 240,42 C260,38 280,30 300,22 L300,180 L0,180 Z" fill="url('#grad3')"/>
+              <path d="M0,80 C30,85 50,75 80,90 C110,105 130,70 160,55 C190,40 210,50 240,42 C260,38 280,30 300,22" fill="none" stroke="var(--chart-3)" stroke-width="2"/>
+            </svg>
+          </div>
+          <div style="display: flex; justify-content: space-between; padding: 0 2px;">
+            <span style="font-size: 10px; color: var(--color-muted-foreground);">00:00</span>
+            <span style="font-size: 10px; color: var(--color-muted-foreground);">04:00</span>
+            <span style="font-size: 10px; color: var(--color-muted-foreground);">08:00</span>
+            <span style="font-size: 10px; color: var(--color-muted-foreground);">12:00</span>
+          </div>
+        </div>
+
+      </div>
+
+    </main>
+
+    
+    <script>
+    function toggleSidebar() {
+      const sb = document.getElementById('sidebar');
+      const main = sb.nextElementSibling;
+      if (!main || main.tagName !== 'MAIN') return;
+      sb.classList.toggle('collapsed');
+      if (sb.classList.contains('collapsed')) {
+        main.style.marginLeft = '64px';
+      } else {
+        main.style.marginLeft = '200px';
+      }
+    }
+    </script>
+<script>lucide.createIcons();</script>
+</body>
+</html>
