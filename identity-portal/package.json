@@ -14,7 +14,9 @@
     "bootstrap:keycloak": "tsx scripts/bootstrap-keycloak-realm.ts"
   },
   "pnpm": {
-    "onlyBuiltDependencies": ["esbuild"]
+    "onlyBuiltDependencies": [
+      "esbuild"
+    ]
   },
   "dependencies": {
     "next": "16.2.10",
@@ -35,6 +37,7 @@
     "dotenv": "^17.4.2",
     "eslint": "^9",
     "eslint-config-next": "16.2.10",
+    "eslint-import-resolver-typescript": "^4.4.5",
     "eslint-plugin-boundaries": "^6.0.2",
     "tailwindcss": "^4",
     "tsx": "^4.22.4",

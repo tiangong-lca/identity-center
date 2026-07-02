@@ -33,6 +33,14 @@ tsx 4.22.4          dotenv 17.4.2
 @keycloak/keycloak-admin-client 26.6.4
 ```
 
+## eslint-plugin-boundaries v6 实测结论
+
+- v5 → v6 破坏性变更:规则 `boundaries/element-types` 更名为 **`boundaries/dependencies`**,规则选择器改为对象形式 `{ from: { type: "x" }, allow: { to: { type: [...] } } }`(旧字符串语法只告警不生效)。
+- 元素默认 `mode: "folder"` 时 `pattern: "server/services/*"` 只匹配**子文件夹**,不匹配该层文件;本项目统一用 `mode: "full"` + `dir/**/*` 全路径匹配。
+- 模式分组用花括号 `lib/{a,b}/**/*`(micromatch),不要用圆括号。
+- `@/` 别名解析:settings `import/resolver: { typescript: { alwaysTryTypes: true } }` + devDep `eslint-import-resolver-typescript`(classic interfaceVersion 2 可用)。
+- 调试:`ESLINT_PLUGIN_BOUNDARIES_DEBUG=1`,看 dependency 的 `to.path/type/isUnknown` 判断解析与元素匹配哪层失败。
+
 ## 已知注意事项
 
 - pnpm 10 默认拦截依赖构建脚本;已在 `package.json` `pnpm.onlyBuiltDependencies` 放行 `esbuild`(tsx 依赖)。
