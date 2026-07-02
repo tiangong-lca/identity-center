@@ -76,5 +76,25 @@ services:
       - "1025:1025"
       - "8025:8025"
 
+  # KingbaseES V8R6(arm64 社区镜像,双库兼容验证用):
+  #   docker compose --profile kes -f deploy/docker/docker-compose.dev.yml up -d kingbase
+  # 默认库 test,用户 kingbase/kingbase;详见 docs/references/kingbasees-environment.md
+  kingbase:
+    image: warm3snow/kingbase:v8r6
+    profiles: ["kes"]
+    environment:
+      SYSTEM_USER: kingbase
+      SYSTEM_PWD: kingbase
+    ports:
+      - "54321:54321"
+    volumes:
+      - kingbase-data:/opt/kingbase/data
+    healthcheck:
+      test: ["CMD-SHELL", "sh -c 'cd /home/kingbase/install/kingbase/Server/bin 2>/dev/null || cd */Server/bin; ./ksql -Ukingbase -c \"SELECT 1\" test' || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 30
+
 volumes:
   postgres-data:
+  kingbase-data:
