@@ -6,6 +6,8 @@
 
 按已评审通过的设计文档集,构建 Keycloak + Next.js 统一身份平台:统一登录/SSO、注册审批、用户/应用/准入/角色管理、事件同步管道、审计,并完成首个业务应用(Supabase)接入。交付物是可上线运行的系统,不是原型或最小可用版本。
 
+**开发模式:全部开发、测试、文档与交付由 Claude Code 自主完成。人不参与编码、不做评审门禁;人的唯一介入通道是 issue(需求、缺陷、阻塞裁决),处理规则见 §5 第 6 条。**
+
 ## 2. 权威输入与冲突裁决
 
 | 输入 | 位置 | 作用 |
@@ -15,7 +17,7 @@
 | 高保真原型(15 页) | `identity-platform-admin/pages/*.html` | 页面布局与交互依据 |
 | 设计库 | `.design_library/identity-platform/` | tokens、主题、组件规范、图标 |
 
-裁决顺序:**架构与行为语义以设计文档为准;实施顺序、范围与新增需求(i18n、主题、双库)以实施方案为准;视觉以原型与设计库为准。** 发现设计缺口或文档间矛盾时:在 `docs/implementation/decisions.md` 记录问题、选项与所做决定后继续推进;涉及安全语义或数据模型的重大矛盾则停下并向用户提问。
+裁决顺序:**架构与行为语义以设计文档为准;实施顺序、范围与新增需求(i18n、主题、双库)以实施方案为准;视觉以原型与设计库为准。** 发现设计缺口或文档间矛盾时:在 `docs/implementation/decisions.md` 记录问题、选项与所做决定后继续推进;涉及安全语义或数据模型的重大矛盾,则按 §5 第 6 条创建阻塞 issue 提请人裁决,期间继续不受影响的工作。
 
 ## 3. 交付范围(全量,不裁剪)
 
@@ -47,6 +49,7 @@
 3. **按层推进,层内完成再进下一层**:执行顺序 L0→L7(见 §6);每层完成:全部该层测试绿 → git commit → 更新 `docs/implementation/README.md` §9 进度表(日期 + commit)。
 4. **文案与主题从第一行代码起资源化**:UI 字符串一律进 i18n messages,颜色一律走主题 token,避免后期返工。
 5. **诚实报告**:测试失败、KingbaseES 镜像不可得、Keycloak 行为与文档不符等,如实记录并处理,不粉饰跳过。
+6. **issue 驱动协作**:人只通过 issue 介入。渠道:仓库配置 GitHub remote 时用 GitHub Issues(`gh` CLI),否则用仓库内 `docs/issues/NNN-<slug>.md`(状态 open / in-progress / resolved)。AI 在开工时与每层完成时检查 issue,按类型处理:缺陷(复现 → 修复 → 测试 → 在 issue 回执证据)、需求(评估对范围与 §4 不变量的影响,记录 `docs/implementation/decisions.md` 后排入计划)、裁决答复(解除对应阻塞项)。AI 需要人裁决时,同样以 issue 提出。
 
 ## 6. 执行顺序(细节见实施方案 §5)
 
@@ -87,5 +90,5 @@
 
 ## 9. 受阻与恢复规则
 
-- **受阻**(如 KingbaseES 镜像不可得、Supabase 环境缺失、Keycloak 版本行为差异):记录到 `docs/implementation/decisions.md`,给出候选方案与建议,向用户提问;其余不受影响的工作继续。
+- **受阻**(如 KingbaseES 镜像不可得、Supabase 环境缺失、Keycloak 版本行为差异):记录到 `docs/implementation/decisions.md`,并按 §5 第 6 条创建阻塞 issue,给出候选方案与建议供人裁决;其余不受影响的工作继续,不空转等待。
 - **中断恢复**:以 git log + 进度表(§9 of 实施方案)定位当前层,从该层验收标准的未通过项继续;任何时候仓库应处于"上一层全绿"的稳定状态。
