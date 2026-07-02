@@ -1,0 +1,20 @@
+{
+  "common": {
+    "appName": "统一身份平台",
+    "language": {
+      "label": "语言",
+      "zh-CN": "中文",
+      "en": "English"
+    },
+    "theme": {
+      "label": "主题",
+      "light": "浅色",
+      "dark": "深色",
+      "system": "跟随系统"
+    }
+  },
+  "home": {
+    "title": "统一身份平台",
+    "description": "统一登录、账号管理与应用准入"
+  }
+}

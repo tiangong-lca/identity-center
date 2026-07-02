@@ -1,0 +1,20 @@
+{
+  "common": {
+    "appName": "Identity Platform",
+    "language": {
+      "label": "Language",
+      "zh-CN": "中文",
+      "en": "English"
+    },
+    "theme": {
+      "label": "Theme",
+      "light": "Light",
+      "dark": "Dark",
+      "system": "System"
+    }
+  },
+  "home": {
+    "title": "Identity Platform",
+    "description": "Unified sign-in, account management and application access"
+  }
+}
