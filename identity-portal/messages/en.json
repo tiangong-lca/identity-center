@@ -23,5 +23,29 @@
     "loginHint": "Sign in with your identity account",
     "signedInAs": "Signed in as {email}",
     "adminBadge": "Admin console access granted"
+  },
+  "errors": {
+    "forbidden": "You do not have permission to view this page",
+    "backHome": "Back to home"
+  },
+  "nav": {
+    "overview": "Overview",
+    "users": "Users",
+    "registrations": "Registrations",
+    "apps": "Applications",
+    "orgs": "Organizations",
+    "roles": "Roles",
+    "audit": "Audit Logs",
+    "settings": "Settings"
+  },
+  "admin": {
+    "overview": {
+      "title": "Overview",
+      "totalUsers": "Platform users",
+      "activeApps": "Active applications",
+      "pendingRegistrations": "Pending registrations",
+      "activeAssignments": "Active assignments",
+      "hint": "Live statistics from the platform database"
+    }
   }
 }

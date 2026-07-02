@@ -23,5 +23,29 @@
     "loginHint": "使用统一身份账号登录",
     "signedInAs": "已登录:{email}",
     "adminBadge": "管理后台访问已授权"
+  },
+  "errors": {
+    "forbidden": "您没有访问该页面的权限",
+    "backHome": "返回首页"
+  },
+  "nav": {
+    "overview": "概览",
+    "users": "用户管理",
+    "registrations": "注册审批",
+    "apps": "应用管理",
+    "orgs": "组织管理",
+    "roles": "角色权限",
+    "audit": "审计日志",
+    "settings": "系统设置"
+  },
+  "admin": {
+    "overview": {
+      "title": "概览",
+      "totalUsers": "平台用户",
+      "activeApps": "在用应用",
+      "pendingRegistrations": "待审批注册",
+      "activeAssignments": "生效准入",
+      "hint": "数据实时统计自平台数据库"
+    }
   }
 }
