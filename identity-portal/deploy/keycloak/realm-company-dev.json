@@ -31,7 +31,7 @@
   "registrationAllowed": false,
   "registrationEmailAsUsername": true,
   "rememberMe": false,
-  "verifyEmail": true,
+  "verifyEmail": false,
   "loginWithEmailAllowed": true,
   "duplicateEmailsAllowed": false,
   "resetPasswordAllowed": true,
@@ -419,6 +419,14 @@
           "attributes": {}
         },
         {
+          "id": "a24a5212-a18a-41df-b24c-ea90223ef53f",
+          "name": "pipe_app_bea777d0_access",
+          "composite": false,
+          "clientRole": true,
+          "containerId": "c9ccf31c-038a-4a03-a418-e1d9715607eb",
+          "attributes": {}
+        },
+        {
           "id": "39b3a09d-6e58-427a-a7f9-ff682db67f60",
           "name": "it_app_b86c8fee_access",
           "composite": false,
@@ -443,6 +451,14 @@
           "attributes": {}
         },
         {
+          "id": "3b74a76f-623d-4037-8707-4d899f31523c",
+          "name": "contract_app_059b58a2_access",
+          "composite": false,
+          "clientRole": true,
+          "containerId": "c9ccf31c-038a-4a03-a418-e1d9715607eb",
+          "attributes": {}
+        },
+        {
           "id": "1a1ed5a9-42c5-4d83-91c7-6fd4ba30c069",
           "name": "contract_app_1440b708_access",
           "composite": false,
@@ -461,6 +477,14 @@
         {
           "id": "c7ca4bba-5c02-4f24-afc0-1394df3a2912",
           "name": "contract_app_7cb41525_access",
+          "composite": false,
+          "clientRole": true,
+          "containerId": "c9ccf31c-038a-4a03-a418-e1d9715607eb",
+          "attributes": {}
+        },
+        {
+          "id": "6e587155-a16a-449c-af7b-78f65fae5b3f",
+          "name": "it_app_4f7e152f_access",
           "composite": false,
           "clientRole": true,
           "containerId": "c9ccf31c-038a-4a03-a418-e1d9715607eb",
@@ -621,6 +645,14 @@
         {
           "id": "ccbcaad2-d31f-410a-934e-af156eeb8ff8",
           "name": "it_app_9d0fdc7c_access",
+          "composite": false,
+          "clientRole": true,
+          "containerId": "c9ccf31c-038a-4a03-a418-e1d9715607eb",
+          "attributes": {}
+        },
+        {
+          "id": "2df7a189-9527-4abb-a33b-0f349cdbad6f",
+          "name": "role_app_51b62423_access",
           "composite": false,
           "clientRole": true,
           "containerId": "c9ccf31c-038a-4a03-a418-e1d9715607eb",
@@ -1992,12 +2024,7 @@
     "contentSecurityPolicy": "frame-src 'self'; frame-ancestors 'self'; object-src 'none';",
     "strictTransportSecurity": "max-age=31536000; includeSubDomains"
   },
-  "smtpServer": {
-    "host": "localhost",
-    "from": "noreply@identity.local",
-    "fromDisplayName": "Identity Platform",
-    "port": "1025"
-  },
+  "smtpServer": {},
   "loginTheme": "identity",
   "eventsEnabled": false,
   "eventsListeners": [
@@ -2963,7 +2990,7 @@
       "alias": "VERIFY_PROFILE",
       "name": "Verify Profile",
       "providerId": "VERIFY_PROFILE",
-      "enabled": true,
+      "enabled": false,
       "defaultAction": false,
       "priority": 100,
       "config": {}

@@ -1,5 +1,6 @@
 import type { NextAuthConfig } from 'next-auth'
 import Keycloak from 'next-auth/providers/keycloak'
+import { terminateKeycloakSession } from './end-session'
 
 const BASE_URL = process.env.KEYCLOAK_BASE_URL ?? 'http://localhost:8080'
 const REALM = process.env.KEYCLOAK_REALM ?? 'company-dev'
@@ -32,6 +33,13 @@ export const authConfig: NextAuthConfig = {
   ],
   session: { strategy: 'jwt' },
   pages: { signIn: '/login' },
+  events: {
+    /** 登出第二层:终止 Keycloak SSO 会话,避免下次登录免密直入 */
+    async signOut(message) {
+      const idToken = 'token' in message ? message.token?.idToken : undefined
+      await terminateKeycloakSession(idToken)
+    },
+  },
   callbacks: {
     jwt({ token, account, profile }) {
       if (account) {

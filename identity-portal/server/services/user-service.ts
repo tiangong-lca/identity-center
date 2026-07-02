@@ -1,6 +1,7 @@
 import { eq } from 'drizzle-orm'
 import * as schema from '@/db/schema'
 import { getAuditContext } from '@/lib/audit/context'
+import { defaultEmailVerified } from '@/lib/config/email'
 import { ApiError } from '@/lib/http/api-error'
 import { EVENT_TYPES } from '@/lib/sync/event-types'
 import { appendOutboxEvent } from '@/lib/sync/outbox'
@@ -56,7 +57,8 @@ export function createUserService(ctx: ServiceContext) {
         displayName: input.displayName,
         temporaryPassword: input.temporaryPassword,
         enabled: true,
-        emailVerified: false,
+        // 不要求邮箱验证时直接标记已验证(无 SMTP 场景),否则登录会被验证流程拦截
+        emailVerified: defaultEmailVerified(),
       })
 
       try {

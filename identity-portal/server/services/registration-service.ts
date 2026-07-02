@@ -1,6 +1,7 @@
 import { count, desc, eq } from 'drizzle-orm'
 import * as schema from '@/db/schema'
 import { getAuditContext } from '@/lib/audit/context'
+import { defaultEmailVerified } from '@/lib/config/email'
 import { buildPageResult, paginate, type PageParams } from '@/lib/db/pagination'
 import { ApiError } from '@/lib/http/api-error'
 import { EVENT_TYPES } from '@/lib/sync/event-types'
@@ -85,7 +86,8 @@ export function createRegistrationService(ctx: ServiceContext) {
           displayName: request.displayName ?? undefined,
           temporaryPassword: input.temporaryPassword ?? `Welcome-${crypto.randomUUID().slice(0, 8)}!`,
           enabled: true,
-          emailVerified: false,
+          // 不要求邮箱验证时直接标记已验证,避免开通账号登录被验证流程拦截(无 SMTP 场景)
+          emailVerified: defaultEmailVerified(),
         })
       }
 

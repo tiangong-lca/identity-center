@@ -2,6 +2,18 @@
 
 > 按 GOAL.md §2:实施中发现的设计缺口、矛盾与用户裁决在此记录。
 
+## D-003 邮箱验证与 SMTP 转为可选,默认关闭(2026-07-02,用户裁决)
+
+**背景**:用户实测发现两个问题:(1)新开通账号首次登录报"send email fail"——realm `verifyEmail=true` + 开通账号 `emailVerified=false` 触发验证邮件,而 realm SMTP host 配为 `localhost`(容器内指向 Keycloak 自身)不可达;(2)门户登出后再登录免密直入——缺 Keycloak 侧 federated logout。调查后用户裁决:**当前环境默认不需要 SMTP、无需邮箱验证**。
+
+**执行口径**:
+
+1. **邮箱验证开关** `KC_VERIFY_EMAIL`(默认关):`lib/config/email.ts`;关闭时 realm `verifyEmail=false` 且**不配置 SMTP**(`smtpServer: {}`),开通账号(管理员新建/注册审批通过)直接 `emailVerified=true`,登录零邮件依赖。
+2. **开启方式**:`KC_VERIFY_EMAIL=true` + `KC_SMTP_HOST`(Keycloak 容器可达地址,dev 为 `mailpit`,不能用 `localhost`)后重跑 bootstrap;此时开通账号 `emailVerified=false` 走验证流。
+3. **VERIFY_PROFILE 禁用**:用户资料是平台侧事实(`portal_users.display_name`),Keycloak 默认 user profile 的 lastName 必填会把首登用户卡在"更新账户信息"页,bootstrap 中禁用该 required action。
+4. **登出两层化**:`signOut` 事件回调调用 Keycloak end-session(`id_token_hint`)终止 SSO 会话,登出后再登录必须重新认证。
+5. **回归测试**:`realm-config` 单测(SMTP 可选/verifyEmail 开关)、`keycloak-email` 集成套件(默认 skip,配 SMTP 时启用)、`first-login` e2e(临时密码→改密→直达门户)、`logout` e2e(登出后不免密)。
+
 ## D-002 注册入口口径修正(2026-07-02)
 
 **发现**:实现初期开启了 Keycloak 自助注册(registrationAllowed=true,登录页"注册账号"链接),但未搭配"注册后进平台审批"的桥接——用户可绕过审批直接建号,违反核心设计原则"注册默认需管理员审批";且门户缺少 /register 表单页,公共申请 API 无用户入口。

@@ -10,6 +10,8 @@
 import KcAdminClient from '@keycloak/keycloak-admin-client'
 import 'dotenv/config'
 import { writeFile } from 'node:fs/promises'
+import { emailVerificationEnabled } from '@/lib/config/email'
+import { buildRealmRepresentation } from './keycloak/realm-config'
 
 const BASE_URL = process.env.KEYCLOAK_BASE_URL ?? 'http://localhost:8080'
 const REALM = process.env.KEYCLOAK_REALM ?? 'company-dev'
@@ -42,32 +44,13 @@ async function main() {
     clientId: 'admin-cli',
   })
 
-  const realmRepresentation = {
+  // 邮箱验证默认关闭(无需 SMTP);设 KC_VERIFY_EMAIL=true + KC_SMTP_HOST 开启邮件链路
+  const realmRepresentation = buildRealmRepresentation({
     realm: REALM,
-    enabled: true,
-    displayName: 'Identity Platform',
-    // 设计原则:注册默认需管理员审批 —— 关闭 KC 自助注册,统一走门户 /register 申请 → 审批 → 开通
-    registrationAllowed: false,
-    registrationEmailAsUsername: true,
-    verifyEmail: true,
-    resetPasswordAllowed: true,
-    rememberMe: false,
-    loginWithEmailAllowed: true,
-    duplicateEmailsAllowed: false,
-    bruteForceProtected: true,
-    failureFactor: 5,
-    passwordPolicy: 'length(10) and notUsername(undefined) and notEmail(undefined)',
-    internationalizationEnabled: true,
-    supportedLocales: ['zh-CN', 'en'],
-    defaultLocale: 'zh-CN',
-    loginTheme: 'identity',
-    smtpServer: {
-      host: process.env.SMTP_HOST ?? 'localhost',
-      port: process.env.SMTP_PORT ?? '1025',
-      from: 'noreply@identity.local',
-      fromDisplayName: 'Identity Platform',
-    },
-  }
+    verifyEmail: emailVerificationEnabled(),
+    smtpHost: process.env.KC_SMTP_HOST,
+    smtpPort: process.env.KC_SMTP_PORT,
+  })
 
   const existing = (await kc.realms.find()).find((r) => r.realm === REALM)
   if (existing) {
@@ -79,6 +62,18 @@ async function main() {
   }
 
   kc.setConfig({ realmName: REALM })
+
+  // 用户资料由平台侧维护(portal_users.display_name),Keycloak 不做资料补全拦截:
+  // 禁用 VERIFY_PROFILE,否则 lastName 等默认必填项缺失时首次登录会被"更新账户信息"页卡住
+  const requiredActions = await kc.authenticationManagement.getRequiredActions()
+  const verifyProfile = requiredActions.find((a) => a.alias === 'VERIFY_PROFILE')
+  if (verifyProfile?.enabled) {
+    await kc.authenticationManagement.updateRequiredAction(
+      { alias: 'VERIFY_PROFILE' },
+      { ...verifyProfile, enabled: false, defaultAction: false },
+    )
+    console.log('required action VERIFY_PROFILE 已禁用(资料平台侧维护)')
+  }
 
   for (const [name, description] of Object.entries(REALM_ROLES)) {
     const found = await kc.roles.findOneByName({ name }).catch(() => null)

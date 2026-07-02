@@ -22,7 +22,7 @@
 | PostgreSQL | 5432 | 库 `identity_platform`(用户 identity)+ `keycloak`(用户 keycloak) |
 | Redis | 6379 | BullMQ 任务队列 + 速率限制 |
 | RabbitMQ | 5672(UI 15672,identity/identity) | 事件分发(exchange `identity.events`) |
-| Mailpit(仅 dev) | SMTP 1025 / UI 8025 | 开发邮件收件箱 |
+| Mailpit(仅 dev,可选) | SMTP 1025 / UI 8025 | 开发邮件收件箱(默认不启用邮件验证,仅 `KC_VERIFY_EMAIL=true` 时需要) |
 | KingbaseES(可选 profile `kes`) | 54321 | 双库兼容验证(D-001) |
 
 ---
@@ -35,7 +35,8 @@
 # 1) 起基础设施(五服务,含健康等待)
 docker compose -f deploy/docker/docker-compose.dev.yml up -d --wait
 
-# 2) 引导 Keycloak(幂等):realm/clients/角色/策略/SMTP/双语/登录主题,并导出配置留档
+# 2) 引导 Keycloak(幂等):realm/clients/角色/策略/双语/登录主题,并导出配置留档
+#    邮箱验证默认关闭(无需 SMTP);如需开启:KC_VERIFY_EMAIL=true + KC_SMTP_HOST=mailpit 后重跑本步
 pnpm bootstrap:keycloak
 pnpm bootstrap:keycloak -- --export     # 产物: deploy/keycloak/realm-company-dev.json
 
@@ -87,7 +88,8 @@ vi deploy/env/.env.production
 #   必填:DATABASE_URL、POSTGRES_USER/PASSWORD、KC_DB_* 、KC_BOOTSTRAP_ADMIN_*、
 #        AUTH_SECRET、KEYCLOAK_BASE_URL(公网 https)、KEYCLOAK_CLIENT_SECRET、
 #        KEYCLOAK_ADMIN_API_CLIENT_SECRET、REDIS_URL、RABBITMQ_URL、
-#        PII_ENCRYPTION_KEY(openssl rand -base64 32)、SMTP_*、
+#        PII_ENCRYPTION_KEY(openssl rand -base64 32)、
+#        (可选)KC_VERIFY_EMAIL=true + KC_SMTP_HOST/KC_SMTP_PORT(启用邮箱验证时)、
 #        CAPTCHA_PROVIDER/CAPTCHA_SECRET(启用人机验证)、各业务应用 Webhook secret
 
 # 2) 起基础设施
