@@ -25,7 +25,7 @@ const boundariesConfig = {
       {
         type: "lib-server",
         pattern:
-          "lib/{keycloak,audit,mq,rate-limit,permissions,sync,auth}/**/*",
+          "lib/{keycloak,audit,mq,rate-limit,permissions,sync,auth,security}/**/*",
         mode: "full",
       },
       {
