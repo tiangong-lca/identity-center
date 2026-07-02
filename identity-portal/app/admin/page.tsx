@@ -1,33 +1,15 @@
-import { count, eq } from 'drizzle-orm'
 import { getTranslations } from 'next-intl/server'
-import * as schema from '@/db/schema'
 import { createServiceContext } from '@/server/services/context'
-
-async function loadKpis() {
-  const { db } = createServiceContext()
-  const [[users], [apps], [pending], [assignments]] = await Promise.all([
-    db.select({ n: count() }).from(schema.portalUsers),
-    db.select({ n: count() }).from(schema.applications).where(eq(schema.applications.status, 'active')),
-    db
-      .select({ n: count() })
-      .from(schema.registrationRequests)
-      .where(eq(schema.registrationRequests.status, 'pending')),
-    db
-      .select({ n: count() })
-      .from(schema.applicationAssignments)
-      .where(eq(schema.applicationAssignments.status, 'active')),
-  ])
-  return { users: users.n, apps: apps.n, pending: pending.n, assignments: assignments.n }
-}
+import { createStatsService } from '@/server/services/stats-service'
 
 export default async function AdminOverviewPage() {
   const t = await getTranslations('admin.overview')
-  const kpis = await loadKpis()
+  const kpis = await createStatsService(createServiceContext()).overview()
   const cards = [
     { key: 'totalUsers', value: kpis.users },
     { key: 'activeApps', value: kpis.apps },
-    { key: 'pendingRegistrations', value: kpis.pending },
-    { key: 'activeAssignments', value: kpis.assignments },
+    { key: 'pendingRegistrations', value: kpis.pendingRegistrations },
+    { key: 'activeAssignments', value: kpis.activeAssignments },
   ] as const
 
   return (

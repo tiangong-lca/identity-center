@@ -8,13 +8,13 @@ import { ThemeToggle } from './theme-toggle'
 
 const NAV_ITEMS = [
   { href: '/admin', key: 'overview', exact: true },
-  { href: '/admin/users', key: 'users' },
-  { href: '/admin/registration-requests', key: 'registrations' },
-  { href: '/admin/apps', key: 'apps' },
-  { href: '/admin/orgs', key: 'orgs' },
-  { href: '/admin/roles', key: 'roles' },
-  { href: '/admin/audit', key: 'audit' },
-  { href: '/admin/settings', key: 'settings' },
+  { href: '/admin/users', key: 'users', exact: false },
+  { href: '/admin/registration-requests', key: 'registrations', exact: false },
+  { href: '/admin/apps', key: 'apps', exact: false },
+  { href: '/admin/orgs', key: 'orgs', exact: false },
+  { href: '/admin/roles', key: 'roles', exact: false },
+  { href: '/admin/audit', key: 'audit', exact: false },
+  { href: '/admin/settings', key: 'settings', exact: false },
 ] as const
 
 export function AdminShell({
