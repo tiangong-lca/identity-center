@@ -11,7 +11,10 @@
     "test": "vitest run --project unit",
     "test:integration": "vitest run --project integration",
     "check-env": "tsx scripts/check-env.ts",
-    "bootstrap:keycloak": "tsx scripts/bootstrap-keycloak-realm.ts"
+    "bootstrap:keycloak": "tsx scripts/bootstrap-keycloak-realm.ts",
+    "db:generate": "drizzle-kit generate",
+    "db:migrate": "drizzle-kit migrate",
+    "db:seed": "tsx scripts/seed-portal-db.ts"
   },
   "pnpm": {
     "onlyBuiltDependencies": [
