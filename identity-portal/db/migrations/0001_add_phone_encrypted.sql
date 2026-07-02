@@ -1,0 +1,1 @@
+ALTER TABLE "portal_users" ADD COLUMN "phone_encrypted" text;

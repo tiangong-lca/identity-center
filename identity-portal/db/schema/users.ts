@@ -11,6 +11,8 @@ export const portalUsers = pgTable(
     keycloakUserId: text('keycloak_user_id'),
     email: text('email').notNull(),
     displayName: text('display_name'),
+    /** PII:手机号,AES-256-GCM 密文存储(lib/crypto),明文不落库 */
+    phoneEncrypted: text('phone_encrypted'),
     /** active | disabled | pending_deprovision | deleted */
     status: text('status').notNull().default('active'),
     /** in_sync | pending | failed */
