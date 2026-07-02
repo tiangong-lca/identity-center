@@ -34,7 +34,7 @@
   "verifyEmail": false,
   "loginWithEmailAllowed": true,
   "duplicateEmailsAllowed": false,
-  "resetPasswordAllowed": true,
+  "resetPasswordAllowed": false,
   "editUsernameAllowed": false,
   "bruteForceProtected": true,
   "permanentLockout": false,
@@ -435,6 +435,14 @@
           "attributes": {}
         },
         {
+          "id": "23236b56-8507-448d-8e04-12c402c4802f",
+          "name": "pipe_app_5a3d563a_access",
+          "composite": false,
+          "clientRole": true,
+          "containerId": "c9ccf31c-038a-4a03-a418-e1d9715607eb",
+          "attributes": {}
+        },
+        {
           "id": "649a1a61-033c-4aaa-9e50-e8c42f94ee31",
           "name": "role_app_cad5ea68_access",
           "composite": false,
@@ -507,6 +515,14 @@
           "attributes": {}
         },
         {
+          "id": "60a0e743-ec0b-4af5-991a-eec045f2730e",
+          "name": "role_app_3d5edeaf_access",
+          "composite": false,
+          "clientRole": true,
+          "containerId": "c9ccf31c-038a-4a03-a418-e1d9715607eb",
+          "attributes": {}
+        },
+        {
           "id": "2da38832-3bcb-4167-9716-294490d99c81",
           "name": "pipe_app_64d0fbc5_access",
           "composite": false,
@@ -563,6 +579,14 @@
           "attributes": {}
         },
         {
+          "id": "38385860-1310-45da-a607-d1ee1c4d4b6f",
+          "name": "contract_app_29ae4874_access",
+          "composite": false,
+          "clientRole": true,
+          "containerId": "c9ccf31c-038a-4a03-a418-e1d9715607eb",
+          "attributes": {}
+        },
+        {
           "id": "3f4f73b7-3fcb-4f99-aa5f-b76a7ae65f40",
           "name": "pipe_app_4f6a5403_access",
           "composite": false,
@@ -595,6 +619,14 @@
           "attributes": {}
         },
         {
+          "id": "0f75dfbd-a9d9-422f-a611-8c5949b19e6f",
+          "name": "it_app_3704fd28_access",
+          "composite": false,
+          "clientRole": true,
+          "containerId": "c9ccf31c-038a-4a03-a418-e1d9715607eb",
+          "attributes": {}
+        },
+        {
           "id": "6e1ccbaf-0d33-4556-b49d-f686c52b71eb",
           "name": "role_app_7a3021c2_access",
           "composite": false,
@@ -605,6 +637,14 @@
         {
           "id": "29ccbad4-78e5-4240-9e14-3e836361ba11",
           "name": "role_app_294e48d9_access",
+          "composite": false,
+          "clientRole": true,
+          "containerId": "c9ccf31c-038a-4a03-a418-e1d9715607eb",
+          "attributes": {}
+        },
+        {
+          "id": "4c47011a-ba56-49cf-b61d-0c834c7cb2db",
+          "name": "e2e_app_1782998833247_access",
           "composite": false,
           "clientRole": true,
           "containerId": "c9ccf31c-038a-4a03-a418-e1d9715607eb",

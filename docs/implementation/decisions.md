@@ -13,6 +13,7 @@
 3. **VERIFY_PROFILE 禁用**:用户资料是平台侧事实(`portal_users.display_name`),Keycloak 默认 user profile 的 lastName 必填会把首登用户卡在"更新账户信息"页,bootstrap 中禁用该 required action。
 4. **登出两层化**:`signOut` 事件回调调用 Keycloak end-session(`id_token_hint`)终止 SSO 会话,登出后再登录必须重新认证。
 5. **回归测试**:`realm-config` 单测(SMTP 可选/verifyEmail 开关)、`keycloak-email` 集成套件(默认 skip,配 SMTP 时启用)、`first-login` e2e(临时密码→改密→直达门户)、`logout` e2e(登出后不免密)。
+6. **存量用户修复(补充,2026-07-02 二次报障)**:realm 开关不清除用户身上已挂的 `VERIFY_EMAIL` required action,历史账号登录仍尝试发邮件失败。bootstrap 在邮件关闭模式下执行幂等 sweep(`scripts/keycloak/remediate-email-state.ts`):存量用户统一 `emailVerified=true` 并剥离邮件依赖动作;同时**无 SMTP 时关闭自助找回密码**(`resetPasswordAllowed` 跟随 SMTP 配置,登录页不再出现"忘记密码"死链,密码重置由管理员兜底)。集成回归:`remediate-email-state.test.ts`。
 
 ## D-002 注册入口口径修正(2026-07-02)
 

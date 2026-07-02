@@ -24,7 +24,8 @@ export type RealmRepresentation = {
   registrationAllowed: false
   registrationEmailAsUsername: true
   verifyEmail: boolean
-  resetPasswordAllowed: true
+  /** 自助找回密码依赖邮件外发:未配置 SMTP 时必须关闭(否则点击即"无法发送邮件"),由管理员重置兜底 */
+  resetPasswordAllowed: boolean
   rememberMe: false
   loginWithEmailAllowed: true
   duplicateEmailsAllowed: false
@@ -59,7 +60,7 @@ export function buildRealmRepresentation(input: RealmConfigInput): RealmRepresen
     registrationAllowed: false,
     registrationEmailAsUsername: true,
     verifyEmail: input.verifyEmail,
-    resetPasswordAllowed: true,
+    resetPasswordAllowed: Boolean(input.smtpHost),
     rememberMe: false,
     loginWithEmailAllowed: true,
     duplicateEmailsAllowed: false,

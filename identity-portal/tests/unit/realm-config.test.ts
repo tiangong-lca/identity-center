@@ -9,6 +9,16 @@ describe('realm 配置(邮箱验证默认关 / SMTP 可选)', () => {
     expect(rep.smtpServer).toEqual({}) // 空对象 = Keycloak 视为未配置,不发邮件
   })
 
+  it('无 SMTP 时自助找回密码必须关闭(点击即发邮件,必然失败)', () => {
+    const rep = buildRealmRepresentation({ realm: 'company-dev', verifyEmail: false })
+    expect(rep.resetPasswordAllowed).toBe(false)
+  })
+
+  it('配置 SMTP 后自助找回密码开启', () => {
+    const rep = buildRealmRepresentation({ realm: 'company-dev', verifyEmail: true, smtpHost: 'mailpit' })
+    expect(rep.resetPasswordAllowed).toBe(true)
+  })
+
   it('开启验证并提供 SMTP host 时配置 smtpServer', () => {
     const rep = buildRealmRepresentation({
       realm: 'company-dev',

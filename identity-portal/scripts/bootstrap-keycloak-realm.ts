@@ -12,6 +12,7 @@ import 'dotenv/config'
 import { writeFile } from 'node:fs/promises'
 import { emailVerificationEnabled } from '@/lib/config/email'
 import { buildRealmRepresentation } from './keycloak/realm-config'
+import { remediateEmailState } from './keycloak/remediate-email-state'
 
 const BASE_URL = process.env.KEYCLOAK_BASE_URL ?? 'http://localhost:8080'
 const REALM = process.env.KEYCLOAK_REALM ?? 'company-dev'
@@ -62,6 +63,13 @@ async function main() {
   }
 
   kc.setConfig({ realmName: REALM })
+
+  // 邮件关闭模式:修复存量用户(realm 开关不清除用户身上已挂的 VERIFY_EMAIL 动作,
+  // 历史账号登录仍会尝试发邮件并失败),统一 emailVerified=true 并剥离邮件依赖动作
+  if (!emailVerificationEnabled()) {
+    const { patched } = await remediateEmailState(kc)
+    if (patched > 0) console.log(`存量用户邮件状态已修复:${patched} 个`)
+  }
 
   // 用户资料由平台侧维护(portal_users.display_name),Keycloak 不做资料补全拦截:
   // 禁用 VERIFY_PROFILE,否则 lastName 等默认必填项缺失时首次登录会被"更新账户信息"页卡住
