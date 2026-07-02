@@ -26,11 +26,15 @@ export function createKeycloakAdmin(cfg: KeycloakConfig) {
 
   async function ensureAuth() {
     if (Date.now() < expiresAt - 10_000) return
-    await kc.auth({
-      grantType: 'client_credentials',
-      clientId: cfg.clientId,
-      clientSecret: cfg.clientSecret,
-    })
+    try {
+      await kc.auth({
+        grantType: 'client_credentials',
+        clientId: cfg.clientId,
+        clientSecret: cfg.clientSecret,
+      })
+    } catch (e) {
+      throw toApiError(e, 'Keycloak 认证')
+    }
     // access token 默认 60s~300s;从 token 解析 exp
     const token = kc.accessToken
     if (token) {
