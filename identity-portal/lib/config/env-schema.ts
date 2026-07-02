@@ -6,6 +6,10 @@ export const envSchema = z.object({
   KEYCLOAK_REALM: z.string().min(1),
   REDIS_URL: z.url(),
   RABBITMQ_URL: z.url(),
+  AUTH_SECRET: z.string().min(32),
+  KEYCLOAK_CLIENT_ID: z.string().min(1),
+  KEYCLOAK_CLIENT_SECRET: z.string().min(1),
+  KEYCLOAK_ADMIN_API_CLIENT_SECRET: z.string().min(1),
 })
 
 export type Env = z.infer<typeof envSchema>

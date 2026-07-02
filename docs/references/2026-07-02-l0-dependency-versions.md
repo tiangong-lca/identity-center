@@ -41,6 +41,13 @@ tsx 4.22.4          dotenv 17.4.2
 - `@/` 别名解析:settings `import/resolver: { typescript: { alwaysTryTypes: true } }` + devDep `eslint-import-resolver-typescript`(classic interfaceVersion 2 可用)。
 - 调试:`ESLINT_PLUGIN_BOUNDARIES_DEBUG=1`,看 dependency 的 `to.path/type/isUnknown` 判断解析与元素匹配哪层失败。
 
+## L2 追加查证(2026-07-02)
+
+- **next-auth 5.0.0-beta.31**:v5 于 2024 底重写,对 Next 16 处于"beta 但生态广泛使用"状态;维护方对全新项目推荐 Better Auth。**本项目按设计文档/GOAL 锁定 Auth.js 不改**,此为生态风险注记(若后续 beta 线出现阻塞性问题,再走 decisions.md 提请裁决)。JWT 模块增强需在 d.ts 中显式 `import 'next-auth/jwt'`。
+- **amqplib 2.0.1**:大版本自带 TypeScript 类型(移除 @types/amqplib);`connect()` 返回 `ChannelModel`;confirm channel + `waitForConfirms()` 可用。
+- **drizzle-orm 0.45.2 / drizzle-kit 0.31.10**:稳定线(v1 仍 beta 不采用);无 down migration,回滚策略=dev 重建/prod 仅前滚。
+- ioredis 5.11.1、pg 8.22。
+
 ## 已知注意事项
 
 - pnpm 10 默认拦截依赖构建脚本;已在 `package.json` `pnpm.onlyBuiltDependencies` 放行 `esbuild`(tsx 依赖)。

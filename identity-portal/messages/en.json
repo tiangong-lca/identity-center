@@ -16,5 +16,12 @@
   "home": {
     "title": "Identity Platform",
     "description": "Unified sign-in, account management and application access"
+  },
+  "auth": {
+    "signIn": "Sign in",
+    "signOut": "Sign out",
+    "loginHint": "Sign in with your identity account",
+    "signedInAs": "Signed in as {email}",
+    "adminBadge": "Admin console access granted"
   }
 }
