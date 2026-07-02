@@ -1,0 +1,480 @@
+version: 1
+layout: repo
+lastReviewedAt: "2026-07-02"
+lastReviewedCommit: "b069317a03165b3345e842d1616bb6171bfc803c"
+
+# Repo-local docpact governance for identity-center.
+# The workspace root config governs the submodule pointer and cross-repo view;
+# this config governs identity-center-internal changes. Evaluate with
+# `scripts/docpact <cmd> --root identity-center`.
+#
+# Modeling boundary:
+# - deterministic ownership/routing/rule facts belong here in config
+# - architecture and behavior belong in docs/design/**
+# - GOAL.md and docs/implementation/** own delivery scope and proof
+catalog:
+  repos:
+    - id: identity-center
+      path: .
+      canonicalRepo: tiangong-lca/identity-center
+      entryDoc: docs/README.md
+      workflowDocs:
+        - GOAL.md
+        - docs/implementation/README.md
+        - docs/implementation/decisions.md
+        - identity-portal/AGENTS.md
+      workspaceIntegrationRequired: true
+
+repo:
+  id: identity-center
+  owner: identity-center
+  runtime: node
+
+ownership:
+  domains:
+    - id: identity-portal-application
+      paths:
+        include:
+          - identity-portal/app/**
+          - identity-portal/components/**
+          - identity-portal/features/**
+          - identity-portal/server/**
+          - identity-portal/lib/**
+          - identity-portal/db/**
+          - identity-portal/i18n/**
+          - identity-portal/messages/**
+          - identity-portal/public/**
+          - identity-portal/types/**
+          - identity-portal/proxy.ts
+          - identity-portal/next.config.ts
+          - identity-portal/drizzle.config.ts
+          - identity-portal/components.json
+      ownerRepo: identity-center
+    - id: identity-testing-and-quality-gates
+      paths:
+        include:
+          - identity-portal/tests/**
+          - identity-portal/scripts/**
+          - identity-portal/package.json
+          - identity-portal/eslint.config.mjs
+          - identity-portal/vitest.config.ts
+          - identity-portal/playwright.config.ts
+          - identity-portal/postcss.config.mjs
+          - identity-portal/tsconfig.json
+          - .github/workflows/ci.yml
+      ownerRepo: identity-center
+    - id: identity-deployment-and-operations
+      paths:
+        include:
+          - identity-portal/deploy/**
+      ownerRepo: identity-center
+    - id: identity-governance-and-docs
+      paths:
+        include:
+          - GOAL.md
+          - docs/**
+          - .docpact/**
+          - identity-portal/AGENTS.md
+          - identity-portal/CLAUDE.md
+          - identity-portal/README.md
+      ownerRepo: identity-center
+    - id: identity-design-prototypes-and-library
+      paths:
+        include:
+          - identity-platform-admin/**
+          - .design_library/**
+      ownerRepo: identity-center
+
+routing:
+  intents:
+    portal-ui:
+      paths:
+        - identity-portal/app/**
+        - identity-portal/components/**
+        - identity-portal/features/**
+        - identity-portal/i18n/**
+        - identity-portal/messages/**
+        - docs/design/02-application/01-frontend-product-interaction-design/README.md
+    auth-session-keycloak:
+      paths:
+        - identity-portal/lib/auth/**
+        - identity-portal/lib/keycloak/**
+        - identity-portal/lib/permissions/**
+        - identity-portal/app/login/**
+        - identity-portal/app/register/**
+        - identity-portal/app/api/auth/**
+        - identity-portal/deploy/keycloak/**
+        - docs/design/01-architecture/03-auth-session-design/README.md
+        - docs/design/01-architecture/04-user-permission-model/README.md
+        - docs/design/01-architecture/05-keycloak-configuration-design/README.md
+    api-endpoints:
+      paths:
+        - identity-portal/app/api/**
+        - docs/design/02-application/02-api-design/README.md
+        - docs/references/openapi.yaml
+    data-layer:
+      paths:
+        - identity-portal/db/**
+        - identity-portal/lib/db/**
+        - identity-portal/drizzle.config.ts
+        - docs/design/02-application/04-project-structure-design/README.md
+        - docs/references/kingbasees-compatibility-conventions.md
+        - docs/references/kingbasees-environment.md
+    sync-and-jobs:
+      paths:
+        - identity-portal/server/jobs/**
+        - identity-portal/server/services/**
+        - identity-portal/server/policies/**
+        - identity-portal/lib/mq/**
+        - identity-portal/lib/sync/**
+        - docs/design/02-application/03-sync-event-design/README.md
+    security-and-audit:
+      paths:
+        - identity-portal/lib/audit/**
+        - identity-portal/lib/crypto/**
+        - identity-portal/lib/security/**
+        - identity-portal/lib/rate-limit/**
+        - docs/design/03-governance/01-security-design/README.md
+        - docs/references/security-checklist-signoff.md
+    deploy-and-ops:
+      paths:
+        - identity-portal/deploy/**
+        - .github/workflows/ci.yml
+        - docs/design/03-governance/02-deployment-operations-design/README.md
+    business-app-onboarding:
+      paths:
+        - identity-portal/lib/business-app-kit/**
+        - docs/guides/business-app-onboarding.md
+        - docs/design/03-governance/03-migration-onboarding-guide/README.md
+    testing-gates:
+      paths:
+        - identity-portal/tests/**
+        - identity-portal/package.json
+        - identity-portal/vitest.config.ts
+        - identity-portal/playwright.config.ts
+        - identity-portal/eslint.config.mjs
+        - .github/workflows/ci.yml
+        - docs/implementation/definition-of-done.md
+    repo-docs:
+      paths:
+        - GOAL.md
+        - docs/**
+        - .docpact/**
+        - identity-portal/AGENTS.md
+    design-prototypes:
+      paths:
+        - identity-platform-admin/**
+        - .design_library/**
+        - docs/design/**
+
+coverage:
+  include:
+    - GOAL.md
+    - docs/**
+    - .docpact/**
+    - identity-portal/AGENTS.md
+    - identity-portal/CLAUDE.md
+    - identity-portal/README.md
+    - identity-portal/app/**
+    - identity-portal/components/**
+    - identity-portal/features/**
+    - identity-portal/server/**
+    - identity-portal/lib/**
+    - identity-portal/db/**
+    - identity-portal/i18n/**
+    - identity-portal/messages/**
+    - identity-portal/types/**
+    - identity-portal/scripts/**
+    - identity-portal/tests/**
+    - identity-portal/deploy/**
+    - identity-portal/proxy.ts
+    - identity-portal/next.config.ts
+    - identity-portal/drizzle.config.ts
+    - identity-portal/vitest.config.ts
+    - identity-portal/playwright.config.ts
+    - identity-portal/eslint.config.mjs
+    - identity-portal/tsconfig.json
+    - identity-portal/package.json
+    - identity-platform-admin/**
+    - .design_library/**
+    - .github/workflows/ci.yml
+  exclude:
+    - identity-portal/node_modules/**
+    - identity-portal/.next/**
+    - identity-portal/dist/**
+    - identity-portal/coverage/**
+    - identity-portal/pnpm-lock.yaml
+    - docs/design/_drafts/**
+    - docs/implementation/plans/**
+
+docInventory:
+  include:
+    - GOAL.md
+    - docs/README.md
+    - docs/design/README.md
+    - docs/design/01-architecture/01-overall-architecture/README.md
+    - docs/design/01-architecture/02-user-portal-admin-architecture/README.md
+    - docs/design/01-architecture/03-auth-session-design/README.md
+    - docs/design/01-architecture/04-user-permission-model/README.md
+    - docs/design/01-architecture/05-keycloak-configuration-design/README.md
+    - docs/design/02-application/01-frontend-product-interaction-design/README.md
+    - docs/design/02-application/02-api-design/README.md
+    - docs/design/02-application/03-sync-event-design/README.md
+    - docs/design/02-application/04-project-structure-design/README.md
+    - docs/design/03-governance/01-security-design/README.md
+    - docs/design/03-governance/02-deployment-operations-design/README.md
+    - docs/design/03-governance/03-migration-onboarding-guide/README.md
+    - docs/implementation/README.md
+    - docs/implementation/decisions.md
+    - docs/implementation/definition-of-done.md
+    - docs/guides/business-app-onboarding.md
+    - docs/references/kingbasees-compatibility-conventions.md
+    - docs/references/kingbasees-environment.md
+    - docs/references/security-checklist-signoff.md
+    - docs/references/2026-07-02-l0-dependency-versions.md
+    - identity-portal/AGENTS.md
+    - identity-portal/README.md
+    - identity-portal/deploy/runbooks/README.md
+    - .docpact/config.yaml
+  exclude:
+    - docs/design/_drafts/**
+    - docs/implementation/plans/**
+
+freshness:
+  warn_after_commits: 40
+  warn_after_days: 60
+  critical_after_days: 120
+
+rules:
+  - id: identity-bootstrap-contract
+    scope: repo
+    repo: identity-center
+    triggers:
+      - path: docs/README.md
+        kind: doc-entry
+      - path: GOAL.md
+        kind: goal-contract
+      - path: .docpact/**
+        kind: doc-ai-layer
+      - path: docs/implementation/README.md
+        kind: impl-plan
+      - path: identity-portal/AGENTS.md
+        kind: agent-entry
+    requiredDocs:
+      - path: docs/README.md
+        mode: review_or_update
+      - path: .docpact/config.yaml
+        mode: review_or_update
+      - path: GOAL.md
+        mode: review_or_update
+      - path: docs/implementation/README.md
+        mode: review_or_update
+    reason: Repo entry, delivery goal, machine-readable routing, and the implementation plan must stay aligned.
+  - id: identity-portal-ui-contract
+    scope: repo
+    repo: identity-center
+    triggers:
+      - path: identity-portal/app/**
+        kind: page-ui
+      - path: identity-portal/components/**
+        kind: shared-ui
+      - path: identity-portal/features/**
+        kind: feature-ui
+      - path: identity-portal/i18n/**
+        kind: ui-locale
+      - path: identity-portal/messages/**
+        kind: ui-locale
+    requiredDocs:
+      - path: identity-portal/AGENTS.md
+        mode: review_or_update
+      - path: .docpact/config.yaml
+        mode: review_or_update
+      - path: docs/design/02-application/01-frontend-product-interaction-design/README.md
+        mode: review_or_update
+    reason: Portal pages, feature modules, and localization changes alter the shipped product surface and should refresh the portal agent contract, routing layer, and frontend interaction design.
+  - id: identity-auth-session-and-permission-contract
+    scope: repo
+    repo: identity-center
+    triggers:
+      - path: identity-portal/lib/auth/**
+        kind: auth-runtime
+      - path: identity-portal/lib/keycloak/**
+        kind: keycloak-integration
+      - path: identity-portal/lib/permissions/**
+        kind: rbac
+      - path: identity-portal/app/login/**
+        kind: auth-ui
+      - path: identity-portal/app/register/**
+        kind: auth-ui
+      - path: identity-portal/app/api/auth/**
+        kind: auth-api
+      - path: identity-portal/deploy/keycloak/**
+        kind: keycloak-config
+    requiredDocs:
+      - path: .docpact/config.yaml
+        mode: review_or_update
+      - path: docs/design/01-architecture/03-auth-session-design/README.md
+        mode: review_or_update
+      - path: docs/design/01-architecture/04-user-permission-model/README.md
+        mode: review_or_update
+      - path: docs/design/01-architecture/05-keycloak-configuration-design/README.md
+        mode: review_or_update
+    reason: Authentication, session, RBAC, and Keycloak integration changes touch identity invariants and should refresh the matching auth, permission, and Keycloak configuration designs.
+  - id: identity-api-contract
+    scope: repo
+    repo: identity-center
+    triggers:
+      - path: identity-portal/app/api/**
+        kind: api-endpoint
+    requiredDocs:
+      - path: .docpact/config.yaml
+        mode: review_or_update
+      - path: docs/design/02-application/02-api-design/README.md
+        mode: review_or_update
+      - path: docs/references/openapi.yaml
+        mode: review_or_update
+    reason: API endpoint changes alter the platform contract surface and should refresh the API design and the OpenAPI contract.
+  - id: identity-data-layer-contract
+    scope: repo
+    repo: identity-center
+    triggers:
+      - path: identity-portal/db/**
+        kind: data-schema
+      - path: identity-portal/lib/db/**
+        kind: db-adapter
+      - path: identity-portal/drizzle.config.ts
+        kind: orm-config
+    requiredDocs:
+      - path: .docpact/config.yaml
+        mode: review_or_update
+      - path: docs/design/02-application/04-project-structure-design/README.md
+        mode: review_or_update
+      - path: docs/references/kingbasees-compatibility-conventions.md
+        mode: review_or_update
+      - path: docs/references/kingbasees-environment.md
+        mode: review_or_update
+    reason: Schema, migration, and DB-adapter changes affect the dual-database boundary and should refresh the structure design and the KingbaseES compatibility references.
+  - id: identity-sync-and-jobs-contract
+    scope: repo
+    repo: identity-center
+    triggers:
+      - path: identity-portal/server/jobs/**
+        kind: background-job
+      - path: identity-portal/server/services/**
+        kind: domain-service
+      - path: identity-portal/server/policies/**
+        kind: domain-policy
+      - path: identity-portal/lib/mq/**
+        kind: mq-adapter
+      - path: identity-portal/lib/sync/**
+        kind: sync-runtime
+    requiredDocs:
+      - path: .docpact/config.yaml
+        mode: review_or_update
+      - path: docs/design/02-application/03-sync-event-design/README.md
+        mode: review_or_update
+      - path: docs/design/01-architecture/01-overall-architecture/README.md
+        mode: review_or_update
+    reason: Service, policy, background-job, MQ, and sync changes alter the event and reconciliation pipeline and should refresh the sync-event design and the overall architecture.
+  - id: identity-security-and-audit-contract
+    scope: repo
+    repo: identity-center
+    triggers:
+      - path: identity-portal/lib/audit/**
+        kind: audit
+      - path: identity-portal/lib/crypto/**
+        kind: crypto
+      - path: identity-portal/lib/security/**
+        kind: security
+      - path: identity-portal/lib/rate-limit/**
+        kind: rate-limit
+    requiredDocs:
+      - path: .docpact/config.yaml
+        mode: review_or_update
+      - path: docs/design/03-governance/01-security-design/README.md
+        mode: review_or_update
+      - path: docs/references/security-checklist-signoff.md
+        mode: review_or_update
+    reason: Audit chain, PII encryption, security, and rate-limit changes affect the security posture and should refresh the security design and the checklist sign-off.
+  - id: identity-deployment-and-operations-contract
+    scope: repo
+    repo: identity-center
+    triggers:
+      - path: identity-portal/deploy/**
+        kind: deploy-asset
+      - path: .github/workflows/ci.yml
+        kind: ci
+    requiredDocs:
+      - path: .docpact/config.yaml
+        mode: review_or_update
+      - path: docs/design/03-governance/02-deployment-operations-design/README.md
+        mode: review_or_update
+      - path: identity-portal/deploy/runbooks/README.md
+        mode: review_or_update
+    reason: Compose, Keycloak realm, monitoring, and CI changes alter the operational surface and should refresh the deployment/operations design and the runbooks index.
+  - id: identity-business-app-onboarding-contract
+    scope: repo
+    repo: identity-center
+    triggers:
+      - path: identity-portal/lib/business-app-kit/**
+        kind: onboarding-kit
+    requiredDocs:
+      - path: .docpact/config.yaml
+        mode: review_or_update
+      - path: docs/guides/business-app-onboarding.md
+        mode: review_or_update
+      - path: docs/design/03-governance/03-migration-onboarding-guide/README.md
+        mode: review_or_update
+    reason: Business-app onboarding kit changes affect how downstream applications integrate and should refresh the onboarding guide and the migration design.
+  - id: identity-testing-and-gate-contract
+    scope: repo
+    repo: identity-center
+    triggers:
+      - path: identity-portal/tests/**
+        kind: repo-test
+      - path: identity-portal/package.json
+        kind: runtime-config
+      - path: identity-portal/vitest.config.ts
+        kind: test-gate
+      - path: identity-portal/playwright.config.ts
+        kind: test-gate
+      - path: identity-portal/eslint.config.mjs
+        kind: lint-gate
+    requiredDocs:
+      - path: .docpact/config.yaml
+        mode: review_or_update
+      - path: docs/implementation/definition-of-done.md
+        mode: review_or_update
+      - path: docs/implementation/README.md
+        mode: review_or_update
+    reason: Test suites, runtime config, and quality-gate changes alter how delivery is validated and should refresh the definition-of-done and the implementation plan.
+  - id: identity-design-source-contract
+    scope: repo
+    repo: identity-center
+    triggers:
+      - path: docs/design/**
+        kind: design-doc
+      - path: docs/implementation/decisions.md
+        kind: decision-log
+    requiredDocs:
+      - path: .docpact/config.yaml
+        mode: review_or_update
+      - path: docs/README.md
+        mode: review_or_update
+      - path: docs/design/README.md
+        mode: review_or_update
+    reason: The authoritative design docs and the decision log define product intent and should keep the docs entry and the design index aligned.
+  - id: identity-prototype-and-design-library-contract
+    scope: repo
+    repo: identity-center
+    triggers:
+      - path: identity-platform-admin/**
+        kind: hifi-prototype
+      - path: .design_library/**
+        kind: design-library
+    requiredDocs:
+      - path: .docpact/config.yaml
+        mode: review_or_update
+      - path: docs/design/02-application/01-frontend-product-interaction-design/README.md
+        mode: review_or_update
+    reason: Hi-fi prototypes and the design library are the visual source of truth and should stay aligned with the frontend interaction design.
