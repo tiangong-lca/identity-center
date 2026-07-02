@@ -147,6 +147,7 @@ const boundariesConfig = {
                   "lib-db",
                   "server-services",
                   "server-repositories",
+                  "server-jobs",
                   "db",
                   "types",
                   "i18n",
