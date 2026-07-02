@@ -6,6 +6,8 @@
 
 - [设计文档集](./design/README.md) — 目标态架构设计（已通过评审）
 - [实施方案](./implementation/README.md) — 实施顺序、里程碑、范围裁剪与验收标准
+- [部署/启动/运行 Runbook](../identity-portal/deploy/runbooks/README.md) — 从零到运行的完整操作手册（含 5 份专项手册）
+- [业务应用接入指南](./guides/business-app-onboarding.md) — 新应用接入十步与验收清单
 
 ## 目录结构
 

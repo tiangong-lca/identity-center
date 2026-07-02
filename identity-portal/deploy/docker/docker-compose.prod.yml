@@ -30,8 +30,8 @@ services:
     build:
       context: ../..
       dockerfile: deploy/docker/Dockerfile
+      target: worker
     env_file: ../env/.env.production
-    command: ["node", "--import", "tsx", "scripts/worker.ts"]
     depends_on:
       postgres: { condition: service_healthy }
       rabbitmq: { condition: service_healthy }

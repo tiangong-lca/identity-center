@@ -27,3 +27,10 @@ USER nextjs
 EXPOSE 3000
 ENV PORT=3000 HOSTNAME=0.0.0.0
 CMD ["node", "server.js"]
+
+# Worker 镜像(BullMQ 任务 + MQ 消费;含完整依赖与 scripts,tsx 运行)
+FROM base AS worker
+ENV NODE_ENV=production
+COPY --from=deps /app/node_modules ./node_modules
+COPY . .
+CMD ["pnpm", "worker"]
