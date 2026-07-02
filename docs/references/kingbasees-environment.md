@@ -11,7 +11,11 @@
 | 社区镜像 `warm3snow/kingbase:v8r6` | V8R6,**arm64**(0.35GB)——本机 Apple Silicon 首选 |
 | 社区镜像 `huzhihui/kingbase:v8r6` | V008R006C007B0012,amd64(0.47GB),Apple Silicon 需模拟 |
 
-2026-07-02 实测:本机网络到 Docker Hub 吞吐极低(0.35GB 拉取 >25 分钟未完成),多次尝试未落地——触发 D-001 裁决,不再阻塞等待。
+2026-07-02 实测:
+- `warm3snow/kingbase:v8r6`(arm64,0.35GB)镜像拉取成功,但**启动失败**——该镜像实为 x86 二进制打包,在 arm64/OrbStack 上报 `Dynamic loader not found: /lib64/ld-linux-x86-64.so.2`,且 initdb 对挂载卷 `chown` 失败。不可用。
+- `huzhihui/kingbase:v8r6`(amd64,0.47GB)镜像层多次拉取在网络层反复重试(Docker Hub 吞吐不稳),未能落地。amd64 镜像即便拉到,本机 arm64 需 QEMU 模拟,性能与稳定性存疑。
+
+**结论(D-001 非阻塞)**:开发机本地无可用 KES 容器。双库兼容三件套已就绪(兼容约定成文 + `lib/db` thin adapter + `KES_ENABLED=1` 参数化矩阵),KES 实测推迟到具备 x86 主机或官方授权 tar 镜像的环境执行。PostgreSQL 侧全部迁移与测试已通过,兼容约定已作为 code review 检查项强制执行。
 
 ## 已预留的接入点(镜像可得后即插即用)
 
