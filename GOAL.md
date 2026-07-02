@@ -38,7 +38,7 @@
 4. **一致性语义**:用户禁用以 Keycloak disable 成功为完成点;准入撤销以 Keycloak Client Role 移除成功为完成点(响应语义 200/202/409/502/424);授权/资料走最终一致(Outbox→MQ→Worker→对账)。
 5. **安全红线**:secrets/service token/DB 连接串不进浏览器;所有管理接口服务端三层校验(入口/Service/UI 仅体验);高风险操作二次确认+审计;审计 append-only + hash chain;Keycloak 不可用时降级"仅拒绝不放行"。
 6. **密码与 MFA 全部由 Keycloak 承载**,Next.js 不落任何凭据,不成为第二套认证系统。
-7. **双库一等公民**:迁移与核心数据访问在 PostgreSQL 与 KingbaseES 上行为一致;禁止核心路径使用 PG 专有特性;KingbaseES 环境不可得时上报阻塞,**不得静默只验 PG**。
+7. **双库兼容(KES 非阻塞,见 decisions.md D-001)**:PostgreSQL 为一等公民必须实测;KingbaseES 兼容通过三件套保障——禁止核心路径使用 PG 专有特性(约定文档)、`lib/db` thin adapter(连接可切换)、参数化双库测试矩阵(`KES_ENABLED=1` 一键补验)。KES 实测在环境可得后补做,不阻塞交付,但三件套缺一不可。
 8. **目录与依赖边界**:按 `docs/design/02-application/04-project-structure-design/` 的分层与禁止依赖方向执行,并用 ESLint 规则固化。
 9. **API 约定**:响应 `{data|error, requestId}`;DB snake_case,JSON camelCase;列表统一 `page/pageSize/keyword/sort/order/filters`;写操作支持 `Idempotency-Key`。
 
@@ -69,7 +69,7 @@
 以下全部满足才算交付完成,逐项提供证据(命令输出/测试报告/文档链接):
 
 1. `docker compose -f deploy/docker/docker-compose.dev.yml up -d` 后所有服务健康;`scripts/bootstrap-keycloak-realm.ts` 可从零重建 realm。
-2. 数据库迁移在 **PostgreSQL 与 KingbaseES** 上均从零执行成功;双库集成测试矩阵全绿,双库验证报告存于 `docs/references/`。
+2. 数据库迁移在 **PostgreSQL** 上从零执行成功且集成测试全绿;KES 侧交付"兼容约定文档 + thin adapter + 参数化矩阵(`KES_ENABLED=1` 可跑)",实测状态如实记录于 `docs/references/kingbasees-environment.md`(D-001:非阻塞)。
 3. 质量门:lint、typecheck、unit、integration、contract 测试全部通过;Playwright e2e 通过(登录、用户禁用、准入授予/撤销、注册审批、语言切换、主题切换)。
 4. 端到端演示通过并录入文档:注册 → 审批 → 开通 → 准入 → 角色 → 同步 → 用户登录 Supabase 应用;随后撤权,用户被业务侧拒绝,对账无差异。
 5. 全部 UI 在 zh-CN/en 与 light/dark 下无硬编码文案、无主题遗漏(抽查 + ESLint 规则证明)。
