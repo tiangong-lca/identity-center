@@ -1,4 +1,4 @@
-import { and, count, desc, eq } from 'drizzle-orm'
+import { and, count, desc, eq, inArray } from 'drizzle-orm'
 import * as schema from '@/db/schema'
 import { getAuditContext } from '@/lib/audit/context'
 import { buildPageResult, paginate, type PageParams } from '@/lib/db/pagination'
@@ -90,6 +90,25 @@ export function createAssignmentService(ctx: ServiceContext) {
       return ctx.db.query.applicationAssignments.findMany({
         where: eq(schema.applicationAssignments.portalUserId, portalUserId),
       })
+    },
+
+    async getById(assignmentId: string) {
+      return ctx.db.query.applicationAssignments.findFirst({
+        where: eq(schema.applicationAssignments.id, assignmentId),
+      })
+    },
+
+    /** 当前用户可访问应用(active 准入 join active 应用) */
+    async listAccessibleApps(portalUserId: string) {
+      const assignments = await this.listByUser(portalUserId)
+      const activeIds = assignments.filter((a) => a.status === 'active').map((a) => a.applicationId)
+      if (activeIds.length === 0) return []
+      const apps = await ctx.db.query.applications.findMany({
+        where: inArray(schema.applications.id, activeIds),
+      })
+      return apps
+        .filter((a) => a.status === 'active')
+        .map((a) => ({ id: a.id, code: a.code, name: a.name, loginUrl: a.loginUrl }))
     },
 
     /** 授予(最终一致):事实+outbox 同事务 → 同步尝试 KC 投影,失败留给重投影任务 */

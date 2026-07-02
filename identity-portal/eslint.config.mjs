@@ -61,6 +61,7 @@ const boundariesConfig = {
                   "i18n",
                   "lib-shared",
                   "lib-server",
+                  "lib-db",
                   "server-services",
                   "server-policies",
                 ],

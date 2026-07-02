@@ -9,8 +9,11 @@ import {
   createPortalUsersRepository,
   type ListPortalUsersParams,
   type PortalUser,
+  type PortalUserStatus,
 } from '@/server/repositories/portal-users-repository'
 import type { ServiceContext } from './context'
+
+export type { ListPortalUsersParams, PortalUser, PortalUserStatus }
 
 export type CreateUserInput = {
   email: string
@@ -157,6 +160,34 @@ export function createUserService(ctx: ServiceContext) {
         targetId: portalUserId,
         beforeData: { status: user.status },
         afterData: { status: 'active' },
+        result: 'success',
+      })
+      return updated
+    },
+
+    /** 更新资料(displayName 等非身份字段);身份键与 email 不在此处变更 */
+    async update(portalUserId: string, patch: { displayName?: string }): Promise<PortalUser> {
+      const user = await users.findById(portalUserId)
+      if (!user) throw new ApiError('USER_NOT_FOUND', '用户不存在')
+      const updated = await ctx.db.transaction(async (tx) => {
+        const [row] = await tx
+          .update(schema.portalUsers)
+          .set({ displayName: patch.displayName, updatedAt: new Date() })
+          .where(eq(schema.portalUsers.id, portalUserId))
+          .returning()
+        await appendOutboxEvent(tx, {
+          eventType: EVENT_TYPES.USER_UPDATED,
+          payload: { keycloakSub: user.keycloakSub, displayName: patch.displayName ?? null },
+        })
+        return row
+      })
+      await audit(ctx).append({
+        ...actorOf(),
+        action: 'user.update',
+        targetType: 'user',
+        targetId: portalUserId,
+        beforeData: { displayName: user.displayName },
+        afterData: patch,
         result: 'success',
       })
       return updated

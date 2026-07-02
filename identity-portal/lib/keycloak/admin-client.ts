@@ -199,6 +199,15 @@ export function createKeycloakAdmin(cfg: KeycloakConfig) {
       }
     },
 
+    async listUserSessions(userId: string) {
+      await ensureAuth()
+      try {
+        return await kc.users.listSessions({ id: userId })
+      } catch (e) {
+        throw toApiError(e, '查询用户会话')
+      }
+    },
+
     async deleteUser(userId: string) {
       await ensureAuth()
       try {

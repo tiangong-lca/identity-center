@@ -11,6 +11,14 @@ export type ServiceContext = {
   keycloak: KeycloakAdmin
 }
 
+let testOverride: ServiceContext | null = null
+
+/** 仅测试使用:注入独立 DB/Keycloak 的 ServiceContext */
+export function __setServiceContextForTests(ctx: ServiceContext | null) {
+  testOverride = ctx
+}
+
 export function createServiceContext(): ServiceContext {
+  if (testOverride) return testOverride
   return { db: getDb().db, keycloak: getKeycloakAdmin() }
 }
