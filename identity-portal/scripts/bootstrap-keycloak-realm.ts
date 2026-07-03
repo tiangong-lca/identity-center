@@ -108,27 +108,37 @@ async function main() {
     },
   })
 
-  // 首个业务应用:Supabase(接入示例;redirect 为占位,接入方按实际域名更新)
-  const supabaseOrigin = process.env.SUPABASE_APP_ORIGIN ?? 'http://localhost:3100'
-  const supabaseClient = await ensureClient(kc, {
-    clientId: 'supabase-business-app',
-    name: 'Supabase Business App',
-    description: '首个接入的业务应用(Supabase)',
+  // 首个业务应用:TianGong LCA(Supabase self-host 形态;OAuth RP 是 GoTrue,redirect 指向 GoTrue 回调)
+  const lcaGotrueCallback =
+    process.env.TIANGONG_LCA_GOTRUE_CALLBACK ?? 'http://localhost:54321/auth/v1/callback'
+  const lcaAppOrigin = process.env.TIANGONG_LCA_APP_ORIGIN ?? 'http://localhost:8000'
+  const lcaClient = await ensureClient(kc, {
+    clientId: 'tiangong-lca-business-app',
+    name: 'TianGong LCA Platform',
+    description: '首个接入的业务应用(TianGong LCA,Supabase self-host)',
     publicClient: false,
     standardFlowEnabled: true,
     implicitFlowEnabled: false,
     directAccessGrantsEnabled: false,
     serviceAccountsEnabled: false,
-    redirectUris: [`${supabaseOrigin}/*`],
-    webOrigins: [supabaseOrigin],
-    attributes: { 'pkce.code.challenge.method': 'S256' },
+    redirectUris: [lcaGotrueCallback],
+    webOrigins: [lcaAppOrigin],
+    // GoTrue 对上游 IdP 不发 code_challenge(见 docs/references/2026-07-03-gotrue-keycloak-federation.md),
+    // 不设 pkce.code.challenge.method;凭 client secret 保障
+    attributes: {},
   })
-  // 准入投影角色 supabase_app_access
-  const existingRole = await kc.clients
-    .findRole({ id: supabaseClient.id, roleName: 'supabase_app_access' })
+  // 准入投影角色 tiangong_lca_access
+  const existingLcaRole = await kc.clients
+    .findRole({ id: lcaClient.id, roleName: 'tiangong_lca_access' })
     .catch(() => null)
-  if (!existingRole) {
-    await kc.clients.createRole({ id: supabaseClient.id, name: 'supabase_app_access' })
+  if (!existingLcaRole) {
+    await kc.clients.createRole({ id: lcaClient.id, name: 'tiangong_lca_access' })
+  }
+
+  const legacySupabaseClient = (await kc.clients.find({ clientId: 'supabase-business-app' }))[0]
+  if (legacySupabaseClient?.id) {
+    await kc.clients.del({ id: legacySupabaseClient.id })
+    console.log('legacy client supabase-business-app 已移除')
   }
 
   const adminApiClient = await ensureClient(kc, {

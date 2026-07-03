@@ -329,10 +329,10 @@
           "attributes": {}
         }
       ],
-      "supabase-business-app": [
+      "tiangong-lca-business-app": [
         {
           "id": "fd1c94a3-5570-4ff2-8621-efb2c9447a32",
-          "name": "supabase_app_access",
+          "name": "tiangong_lca_access",
           "composite": false,
           "clientRole": true,
           "containerId": "45d8a67a-bc42-4377-b4a0-784162dd8550",
@@ -1212,19 +1212,19 @@
     },
     {
       "id": "45d8a67a-bc42-4377-b4a0-784162dd8550",
-      "clientId": "supabase-business-app",
-      "name": "Supabase Business App",
-      "description": "首个接入的业务应用(Supabase)",
+      "clientId": "tiangong-lca-business-app",
+      "name": "TianGong LCA Platform",
+      "description": "首个接入的业务应用(TianGong LCA,Supabase self-host)",
       "surrogateAuthRequired": false,
       "enabled": true,
       "alwaysDisplayInConsole": false,
       "clientAuthenticatorType": "client-secret",
       "secret": "**********",
       "redirectUris": [
-        "http://localhost:3100/*"
+        "http://localhost:54321/auth/v1/callback"
       ],
       "webOrigins": [
-        "http://localhost:3100"
+        "http://localhost:8000"
       ],
       "notBefore": 0,
       "bearerOnly": false,
@@ -1238,8 +1238,7 @@
       "protocol": "openid-connect",
       "attributes": {
         "realm_client": "false",
-        "client.secret.creation.time": "1782979909",
-        "pkce.code.challenge.method": "S256"
+        "client.secret.creation.time": "1782979909"
       },
       "authenticationFlowBindingOverrides": {},
       "fullScopeAllowed": true,
