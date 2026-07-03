@@ -145,6 +145,8 @@ export function createAppRoleAssignmentService(ctx: ServiceContext) {
       const role = await ctx.db.query.applicationRoles.findFirst({
         where: eq(schema.applicationRoles.id, existing.applicationRoleId),
       })
+      // 软失败(与 assign 的硬失败不同):撤销是既有角色行的清理,应用可能已被删除;
+      // 缺应用时 applicationCode 置 null,消费端按 applicationCode 过滤时会忽略该事件。
       const app = await ctx.db.query.applications.findFirst({
         where: eq(schema.applications.id, existing.applicationId),
       })

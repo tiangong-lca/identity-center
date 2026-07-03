@@ -37,7 +37,7 @@ describe('L6 tiangong-lca 端到端开通链路(真实 PG/KC/RabbitMQ)', () => {
   const received: Array<{ headers: Record<string, string | string[] | undefined>; body: string; valid: boolean }> = []
   let keycloakUserId: string
   let portalUserId: string
-  let supabaseAppId: string
+  let lcaAppId: string
   const WEBHOOK_SECRET = 'l6-tiangong-lca-secret'
 
   beforeAll(async () => {
@@ -70,11 +70,11 @@ describe('L6 tiangong-lca 端到端开通链路(真实 PG/KC/RabbitMQ)', () => {
     // 登记 tiangong-lca 应用并挂真实 webhook 端点
     await seedBusinessApps(tdb.db)
     const app = await createApplicationService(ctx).getByCode('tiangong-lca')
-    supabaseAppId = app!.id
+    lcaAppId = app!.id
     await tdb.db
       .update(schema.applications)
       .set({ webhookUrl: `http://127.0.0.1:${webhookPort}/hooks` })
-      .where(eq(schema.applications.id, supabaseAppId))
+      .where(eq(schema.applications.id, lcaAppId))
   })
 
   afterAll(async () => {
@@ -95,7 +95,7 @@ describe('L6 tiangong-lca 端到端开通链路(真实 PG/KC/RabbitMQ)', () => {
   })
 
   it('授予 tiangong-lca 准入 → 投影 KC Client Role → 业务侧 verifier 放行', async () => {
-    const { projection } = await createAssignmentService(ctx).grant(supabaseAppId, portalUserId)
+    const { projection } = await createAssignmentService(ctx).grant(lcaAppId, portalUserId)
     expect(projection).toBe('projected')
 
     // 用真实 access token 验证(client credentials 无 resource_access,改用 admin 查角色映射构造断言)
@@ -131,7 +131,7 @@ describe('L6 tiangong-lca 端到端开通链路(真实 PG/KC/RabbitMQ)', () => {
   })
 
   it('撤销准入 → KC 角色移除 → 业务侧 verifier 拒绝 → 对账无差异', async () => {
-    const { outcome } = await createAssignmentService(ctx).revoke(supabaseAppId, portalUserId)
+    const { outcome } = await createAssignmentService(ctx).revoke(lcaAppId, portalUserId)
     expect(outcome).toBe('revoked')
 
     const kcClient = await ctx.keycloak.findClientByClientId('tiangong-lca-business-app')
