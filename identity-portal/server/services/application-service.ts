@@ -117,6 +117,28 @@ export function createApplicationService(ctx: ServiceContext) {
       })
     },
 
+    /** 注册页应用/角色选择目录(D7):仅 active 应用与 active 角色,仅暴露 code/name */
+    async listCatalog(): Promise<Array<{ code: string; name: string; roles: Array<{ code: string; name: string }> }>> {
+      const apps = await ctx.db.query.applications.findMany({
+        where: eq(schema.applications.status, 'active'),
+      })
+      return Promise.all(
+        apps.map(async (app) => {
+          const roles = await ctx.db.query.applicationRoles.findMany({
+            where: and(
+              eq(schema.applicationRoles.applicationId, app.id),
+              eq(schema.applicationRoles.status, 'active'),
+            ),
+          })
+          return {
+            code: app.code,
+            name: app.name,
+            roles: roles.map((r) => ({ code: r.code, name: r.name })),
+          }
+        }),
+      )
+    },
+
     async createRole(applicationId: string, input: { code: string; name: string; description?: string }) {
       const app = await this.get(applicationId)
       if (!app) throw new ApiError('APPLICATION_NOT_FOUND', '应用不存在')

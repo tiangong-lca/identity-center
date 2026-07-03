@@ -1,8 +1,7 @@
 import { NextRequest } from 'next/server'
 import { afterAll, beforeAll, describe, expect, it, vi } from 'vitest'
-import * as schema from '@/db/schema'
 import { seedBusinessApps } from '@/scripts/seed/business-apps'
-import { __setServiceContextForTests, type ServiceContext } from '@/server/services/context'
+import { __setServiceContextForTests } from '@/server/services/context'
 import { getDbTargets } from './helpers/db-targets'
 import { createMigratedTestDb, type TestDb } from './helpers/test-db'
 
