@@ -1,0 +1,1 @@
+ALTER TABLE "registration_requests" ADD COLUMN "requested_access" jsonb;

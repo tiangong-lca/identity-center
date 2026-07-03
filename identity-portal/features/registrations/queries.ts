@@ -3,6 +3,8 @@ import { apiFetch, listQuery, type PageResult } from '@/features/shared/api'
 
 export type RegistrationStatus = 'pending' | 'approved' | 'rejected' | 'cancelled'
 
+export type RequestedAccessEntry = { applicationCode: string; roleCode?: string }
+
 export type RegistrationRequest = {
   id: string
   email: string
@@ -14,6 +16,7 @@ export type RegistrationRequest = {
   reviewedAt: string | null
   reviewComment: string | null
   createdAt: string
+  requestedAccess?: RequestedAccessEntry[]
 }
 
 export type RegistrationListParams = {

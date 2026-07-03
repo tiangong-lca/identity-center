@@ -37,6 +37,8 @@ export const registrationRequests = pgTable(
     /** 申请加入的组织(软引用 platform_organizations.id,不设 FK 以避免申请记录受组织生命周期约束) */
     requestedOrganizationId: uuid('requested_organization_id'),
     requestedReason: text('requested_reason'),
+    /** 申请的应用与角色快照(设计 §4.6):[{ applicationCode, roleCode? }],软引用不设 FK */
+    requestedAccess: jsonb('requested_access'),
     /** pending | approved | rejected | cancelled */
     status: text('status').notNull().default('pending'),
     approvalRequired: boolean('approval_required').notNull().default(true),
