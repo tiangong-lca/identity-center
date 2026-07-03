@@ -3,11 +3,13 @@ import * as schema from '@/db/schema'
 import { getAuditContext } from '@/lib/audit/context'
 import { defaultEmailVerified } from '@/lib/config/email'
 import { buildPageResult, paginate, type PageParams } from '@/lib/db/pagination'
-import { ApiError } from '@/lib/http/api-error'
+import { ApiError, isApiError } from '@/lib/http/api-error'
 import { requestedAccessSchema, type RequestedAccessEntry } from '@/lib/registration/requested-access'
 import { EVENT_TYPES } from '@/lib/sync/event-types'
 import { appendOutboxEvent } from '@/lib/sync/outbox'
 import { createAuditLogRepository } from '@/server/repositories/audit-log-repository'
+import { createAppRoleAssignmentService } from './app-role-assignment-service'
+import { createAssignmentService } from './assignment-service'
 import type { ServiceContext } from './context'
 
 export type RegistrationRequest = typeof schema.registrationRequests.$inferSelect
@@ -167,15 +169,76 @@ export function createRegistrationService(ctx: ServiceContext) {
         return { request: updated, portalUser }
       })
 
+      /**
+       * D7:审批开通账号后,逐项授予申请时选择的应用准入/角色。
+       * 独立于开通事务(账号已成立的事实不因授予失败回滚),失败逐项容忍不中断循环。
+       */
+      type GrantOutcome = {
+        applicationCode: string
+        admission: 'granted' | 'skipped' | 'failed'
+        role?: 'assigned' | 'failed'
+        error?: string
+      }
+      const grants: GrantOutcome[] = []
+      const requested = (request.requestedAccess ?? []) as RequestedAccessEntry[]
+      if (requested.length > 0) {
+        const assignments = createAssignmentService(ctx)
+        const roleAssignments = createAppRoleAssignmentService(ctx)
+        for (const entry of requested) {
+          const outcome: GrantOutcome = { applicationCode: entry.applicationCode, admission: 'granted' }
+          try {
+            const app = await ctx.db.query.applications.findFirst({
+              where: and(
+                eq(schema.applications.code, entry.applicationCode),
+                eq(schema.applications.status, 'active'),
+              ),
+            })
+            if (!app) throw new ApiError('APPLICATION_NOT_FOUND', '应用不存在或未启用')
+            try {
+              await assignments.grant(app.id, result.portalUser.id, 'registration')
+            } catch (e) {
+              if (isApiError(e) && e.code === 'CONFLICT') outcome.admission = 'skipped' // 已有准入
+              else throw e
+            }
+            if (entry.roleCode) {
+              const roles = await ctx.db.query.applicationRoles.findMany({
+                where: eq(schema.applicationRoles.applicationId, app.id),
+              })
+              const role = roles.find((r) => r.code === entry.roleCode && r.status === 'active')
+              if (!role) throw new ApiError('NOT_FOUND', `角色不存在: ${entry.roleCode}`)
+              try {
+                await roleAssignments.assign({
+                  applicationId: app.id,
+                  applicationRoleId: role.id,
+                  portalUserId: result.portalUser.id,
+                  scopeType: 'global',
+                  source: 'registration',
+                })
+                outcome.role = 'assigned'
+              } catch (e) {
+                if (isApiError(e) && e.code === 'CONFLICT') outcome.role = 'assigned' // 已存在等价分配
+                else throw e
+              }
+            }
+          } catch (e) {
+            const msg = e instanceof Error ? e.message : String(e)
+            if (outcome.admission === 'granted' && !outcome.role) outcome.admission = 'failed'
+            else outcome.role = 'failed'
+            outcome.error = msg
+          }
+          grants.push(outcome)
+        }
+      }
+
       await audit.append({
         ...reviewer,
         action: 'registration.approve',
         targetType: 'registration_request',
         targetId: id,
-        afterData: { email: request.email, portalUserId: result.portalUser.id },
+        afterData: { email: request.email, portalUserId: result.portalUser.id, grants },
         result: 'success',
       })
-      return result
+      return { ...result, grants }
     },
 
     async reject(id: string, input: { reviewComment?: string }) {
