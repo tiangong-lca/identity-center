@@ -45,6 +45,8 @@
       "email": "邮箱",
       "displayName": "姓名",
       "reason": "申请理由",
+      "requestedAccess": "申请的应用/角色",
+      "noRequestedAccess": "未选择",
       "createdAt": "提交时间",
       "approvalRequired": "需要审批",
       "yes": "是",

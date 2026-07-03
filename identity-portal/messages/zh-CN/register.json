@@ -25,6 +25,13 @@
     "success": {
       "title": "申请已提交",
       "description": "管理员审批通过后,您将收到邮件通知并可登录平台"
+    },
+    "apps": {
+      "title": "申请的应用",
+      "optional": "(可选)",
+      "roleLabel": "角色",
+      "noRole": "不指定角色(默认身份)",
+      "loadFailed": "应用目录加载失败,可稍后在开通后由管理员分配"
     }
   }
 }
