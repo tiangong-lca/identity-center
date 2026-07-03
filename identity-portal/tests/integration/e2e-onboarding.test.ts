@@ -27,9 +27,9 @@ const suffix = randomUUID().slice(0, 8)
 /**
  * L6 全链路联调:注册→审批→开通→准入→角色→同步(outbox→MQ→webhook)
  * →业务侧 verifier 校验放行→撤权→verifier 拒绝→对账无差异。
- * 以 business-app-kit 参考 verifier 代替真实 Supabase。
+ * 以 business-app-kit 参考 verifier 代替真实 tiangong-lca。
  */
-describe('L6 Supabase 端到端开通链路(真实 PG/KC/RabbitMQ)', () => {
+describe('L6 tiangong-lca 端到端开通链路(真实 PG/KC/RabbitMQ)', () => {
   let tdb: TestDb
   let ctx: JobContext & ServiceContext
   let webhookServer: Server
@@ -38,7 +38,7 @@ describe('L6 Supabase 端到端开通链路(真实 PG/KC/RabbitMQ)', () => {
   let keycloakUserId: string
   let portalUserId: string
   let supabaseAppId: string
-  const WEBHOOK_SECRET = 'l6-supabase-secret'
+  const WEBHOOK_SECRET = 'l6-tiangong-lca-secret'
 
   beforeAll(async () => {
     tdb = await createMigratedTestDb(pg.adminUrl)
@@ -47,7 +47,7 @@ describe('L6 Supabase 端到端开通链路(真实 PG/KC/RabbitMQ)', () => {
     ctx = { db: tdb.db, keycloak: kc, mq }
     await seedAdminRbac(tdb.db)
 
-    process.env.SUPABASE_WEBHOOK_SECRET = WEBHOOK_SECRET
+    process.env.TIANGONG_LCA_WEBHOOK_SECRET = WEBHOOK_SECRET
     // 业务侧 webhook 接收端(验签)
     webhookServer = createServer((req, res) => {
       let body = ''
@@ -67,9 +67,9 @@ describe('L6 Supabase 端到端开通链路(真实 PG/KC/RabbitMQ)', () => {
     await new Promise<void>((r) => webhookServer.listen(0, () => r()))
     webhookPort = (webhookServer.address() as { port: number }).port
 
-    // 登记 Supabase 应用并挂真实 webhook 端点
+    // 登记 tiangong-lca 应用并挂真实 webhook 端点
     await seedBusinessApps(tdb.db)
-    const app = await createApplicationService(ctx).getByCode('supabase')
+    const app = await createApplicationService(ctx).getByCode('tiangong-lca')
     supabaseAppId = app!.id
     await tdb.db
       .update(schema.applications)
@@ -94,18 +94,18 @@ describe('L6 Supabase 端到端开通链路(真实 PG/KC/RabbitMQ)', () => {
     expect(keycloakUserId).toBeTruthy()
   })
 
-  it('授予 Supabase 准入 → 投影 KC Client Role → 业务侧 verifier 放行', async () => {
+  it('授予 tiangong-lca 准入 → 投影 KC Client Role → 业务侧 verifier 放行', async () => {
     const { projection } = await createAssignmentService(ctx).grant(supabaseAppId, portalUserId)
     expect(projection).toBe('projected')
 
     // 用真实 access token 验证(client credentials 无 resource_access,改用 admin 查角色映射构造断言)
-    const kcClient = await ctx.keycloak.findClientByClientId('supabase-business-app')
+    const kcClient = await ctx.keycloak.findClientByClientId('tiangong-lca-business-app')
     const roles = await ctx.keycloak.listUserClientRoles(keycloakUserId, kcClient!.id!)
-    expect(roles.some((r) => r.name === 'supabase_app_access')).toBe(true)
+    expect(roles.some((r) => r.name === 'tiangong_lca_access')).toBe(true)
 
     // 业务侧 verifier:模拟含该角色的 token
-    const token = fakeToken({ 'supabase-business-app': { roles: ['supabase_app_access'] } })
-    expect(checkApplicationAccess(token, 'supabase-business-app', 'supabase_app_access')).toEqual({
+    const token = fakeToken({ 'tiangong-lca-business-app': { roles: ['tiangong_lca_access'] } })
+    expect(checkApplicationAccess(token, 'tiangong-lca-business-app', 'tiangong_lca_access')).toEqual({
       allowed: true,
     })
   })
@@ -134,13 +134,13 @@ describe('L6 Supabase 端到端开通链路(真实 PG/KC/RabbitMQ)', () => {
     const { outcome } = await createAssignmentService(ctx).revoke(supabaseAppId, portalUserId)
     expect(outcome).toBe('revoked')
 
-    const kcClient = await ctx.keycloak.findClientByClientId('supabase-business-app')
+    const kcClient = await ctx.keycloak.findClientByClientId('tiangong-lca-business-app')
     const roles = await ctx.keycloak.listUserClientRoles(keycloakUserId, kcClient!.id!)
-    expect(roles.some((r) => r.name === 'supabase_app_access')).toBe(false)
+    expect(roles.some((r) => r.name === 'tiangong_lca_access')).toBe(false)
 
     // 撤权后 token 刷新不再含角色 → 业务侧拒绝
-    const tokenAfter = fakeToken({ 'supabase-business-app': { roles: [] } })
-    expect(checkApplicationAccess(tokenAfter, 'supabase-business-app', 'supabase_app_access')).toMatchObject({
+    const tokenAfter = fakeToken({ 'tiangong-lca-business-app': { roles: [] } })
+    expect(checkApplicationAccess(tokenAfter, 'tiangong-lca-business-app', 'tiangong_lca_access')).toMatchObject({
       allowed: false,
       code: 'APP_ACCESS_DENIED',
     })

@@ -9,7 +9,7 @@ export const applications = pgTable('applications', {
   code: text('code').notNull().unique(),
   name: text('name').notNull(),
   keycloakClientId: text('keycloak_client_id').notNull(),
-  /** 认证侧准入投影的 Client Role 名(如 supabase_app_access) */
+  /** 认证侧准入投影的 Client Role 名(如 tiangong_lca_access) */
   accessClientRole: text('access_client_role').notNull(),
   /** active | disabled */
   status: text('status').notNull().default('active'),

@@ -2,6 +2,13 @@
 
 > 按 GOAL.md §2:实施中发现的设计缺口、矛盾与用户裁决在此记录。
 
+## D-004 首个业务应用登记更名为 tiangong-lca(2026-07-03,workspace 决策 D4)
+
+Supabase 占位登记(code=supabase)更名为真实应用 tiangong-lca(client=tiangong-lca-business-app,role=tiangong_lca_access,env=TIANGONG_LCA_*)。
+Redirect URI 语义修正:RP 是 GoTrue,指向 <SUPABASE_URL>/auth/v1/callback。PKCE 属性处理结论见 docs/references/2026-07-03-gotrue-keycloak-federation.md。
+角色目录(admin/review-admin/review-member)随 seed 登记,互斥单角色为管理约定。role 事件 payload 补 applicationCode。
+依据:carbon-workspace/_docs/plans/2026-07-03-lca-platform-identity-center-integration-design.md。
+
 ## D-003 邮箱验证与 SMTP 转为可选,默认关闭(2026-07-02,用户裁决)
 
 **背景**:用户实测发现两个问题:(1)新开通账号首次登录报"send email fail"——realm `verifyEmail=true` + 开通账号 `emailVerified=false` 触发验证邮件,而 realm SMTP host 配为 `localhost`(容器内指向 Keycloak 自身)不可达;(2)门户登出后再登录免密直入——缺 Keycloak 侧 federated logout。调查后用户裁决:**当前环境默认不需要 SMTP、无需邮箱验证**。
