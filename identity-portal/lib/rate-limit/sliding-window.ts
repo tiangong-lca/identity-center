@@ -58,4 +58,6 @@ export const RATE_LIMIT_RULES = {
   forgotPassword: { windowMs: 3_600_000, max: 3 },
   adminApi: { windowMs: 60_000, max: 100 },
   webhook: { windowMs: 60_000, max: 60 },
+  /** 注册页应用/角色目录(D7):公开只读,30 次/分钟/IP */
+  catalog: { windowMs: 60_000, max: 30 },
 } as const satisfies Record<string, RateLimitRule>

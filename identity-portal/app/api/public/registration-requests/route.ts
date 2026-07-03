@@ -1,5 +1,6 @@
 import { z } from 'zod'
 import { ApiError, ok, parseBody, publicRoute } from '@/app/api/_helpers'
+import { requestedAccessSchema } from '@/lib/registration/requested-access'
 import { verifyCaptcha } from '@/lib/security/captcha'
 import { createRegistrationService } from '@/server/services/registration-service'
 
@@ -8,6 +9,7 @@ const schema = z.object({
   displayName: z.string().min(1).max(100).optional(),
   requestedOrganizationId: z.uuid().optional(),
   requestedReason: z.string().max(500).optional(),
+  requestedAccess: requestedAccessSchema.optional(),
   captchaToken: z.string().optional(),
 })
 

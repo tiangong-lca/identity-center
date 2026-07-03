@@ -45,6 +45,8 @@
       "email": "Email",
       "displayName": "Name",
       "reason": "Reason",
+      "requestedAccess": "Requested apps/roles",
+      "noRequestedAccess": "None",
       "createdAt": "Submitted at",
       "approvalRequired": "Approval required",
       "yes": "Yes",

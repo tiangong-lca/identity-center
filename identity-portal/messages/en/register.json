@@ -25,6 +25,13 @@
     "success": {
       "title": "Request submitted",
       "description": "Once approved by an administrator, you will be notified by email and can sign in"
+    },
+    "apps": {
+      "title": "Applications to request",
+      "optional": "(optional)",
+      "roleLabel": "Role",
+      "noRole": "No specific role (default)",
+      "loadFailed": "Failed to load the catalog; access can be granted by an admin after approval"
     }
   }
 }

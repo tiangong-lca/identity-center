@@ -15,6 +15,13 @@
       "when": 1782980385096,
       "tag": "0001_add_phone_encrypted",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1783063677455,
+      "tag": "0002_registration_requested_access",
+      "breakpoints": true
     }
   ]
 }

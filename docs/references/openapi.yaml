@@ -41,7 +41,9 @@ paths:
     post: { tags: [users], summary: 重置 MFA(user:reset-mfa,删除 OTP 凭据), parameters: [{ $ref: "#/components/parameters/Id" }], responses: { "200": { $ref: "#/components/responses/Ok" } } }
 
   /api/public/registration-requests:
-    post: { tags: [public], summary: 提交注册申请(IP 限流 10/h;防枚举固定响应), requestBody: { content: { application/json: { schema: { type: object, required: [email], properties: { email: { type: string, format: email }, displayName: { type: string }, requestedOrganizationId: { type: string, format: uuid }, requestedReason: { type: string } } } } } }, responses: { "202": { $ref: "#/components/responses/Ok" }, "429": { $ref: "#/components/responses/Error" } } }
+    post: { tags: [public], summary: 提交注册申请(IP 限流 10/h;防枚举固定响应), requestBody: { content: { application/json: { schema: { type: object, required: [email], properties: { email: { type: string, format: email }, displayName: { type: string }, requestedOrganizationId: { type: string, format: uuid }, requestedReason: { type: string }, requestedAccess: { type: array, maxItems: 20, description: "申请的应用/角色(D7,软引用快照);每应用至多一角色,应用去重", items: { type: object, required: [applicationCode], properties: { applicationCode: { type: string }, roleCode: { type: string, description: "可选,不填=仅申请准入(默认标准身份)" } } } } } } } } }, responses: { "202": { $ref: "#/components/responses/Ok" }, "429": { $ref: "#/components/responses/Error" } } }
+  /api/public/applications:
+    get: { tags: [public], summary: "应用/角色公共目录(D7,供注册页选择;仅 active,IP 限流;data.items: [{code,name,roles:[{code,name}]}])", responses: { "200": { $ref: "#/components/responses/Ok" } } }
   /api/admin/registration-requests:
     get: { tags: [registration], summary: 申请列表(registration:read), responses: { "200": { $ref: "#/components/responses/Ok" } } }
   /api/admin/registration-requests/{id}:

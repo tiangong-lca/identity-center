@@ -137,6 +137,23 @@ export function ReviewDialog({
           value: request.requestedReason ?? t('none'),
         },
         {
+          key: 'requestedAccess',
+          label: t('requestedAccess'),
+          value:
+            request.requestedAccess && request.requestedAccess.length > 0 ? (
+              <ul>
+                {request.requestedAccess.map((entry) => (
+                  <li key={entry.applicationCode}>
+                    {entry.applicationCode}
+                    {entry.roleCode ? ` · ${entry.roleCode}` : ''}
+                  </li>
+                ))}
+              </ul>
+            ) : (
+              t('noRequestedAccess')
+            ),
+        },
+        {
           key: 'createdAt',
           label: t('createdAt'),
           value: format.dateTime(new Date(request.createdAt), {
