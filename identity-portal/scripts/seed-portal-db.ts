@@ -20,7 +20,7 @@ async function main() {
     const { keycloakSub } = await seedKeycloakAdmin(client.db, seedAdminConfigFromEnv())
     console.log(`种子管理员就绪(keycloak_sub=${keycloakSub})`)
     await seedBusinessApps(client.db)
-    console.log('业务应用目录就绪(Supabase)')
+    console.log('业务应用目录就绪(tiangong-lca + 3 角色)')
   } finally {
     await client.close()
   }

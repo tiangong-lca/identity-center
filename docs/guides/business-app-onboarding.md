@@ -1,6 +1,6 @@
 # 业务应用接入指南
 
-> 面向接入统一身份平台的业务应用团队。首个接入应用为 Supabase,本指南由其接入过程沉淀,可复用于后续应用。
+> 面向接入统一身份平台的业务应用团队。首个接入应用为 TianGong LCA(`tiangong-lca`,基于 Supabase self-host),本指南由其接入过程沉淀,可复用于后续应用。
 > 权威依据:[迁移与接入指南](../design/03-governance/03-migration-onboarding-guide/README.md)、[总体架构设计 §12](../design/01-architecture/01-overall-architecture/README.md)。
 
 ## 接入十步
