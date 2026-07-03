@@ -55,6 +55,11 @@ export function createAppRoleAssignmentService(ctx: ServiceContext) {
       })
       if (!role) throw new ApiError('NOT_FOUND', '应用角色不存在')
 
+      const app = await ctx.db.query.applications.findFirst({
+        where: eq(schema.applications.id, input.applicationId),
+      })
+      if (!app) throw new ApiError('APPLICATION_NOT_FOUND', '应用不存在')
+
       const user = await ctx.db.query.portalUsers.findFirst({
         where: eq(schema.portalUsers.id, input.portalUserId),
       })
@@ -109,6 +114,7 @@ export function createAppRoleAssignmentService(ctx: ServiceContext) {
           payload: {
             keycloakSub: user.keycloakSub,
             applicationId: input.applicationId,
+            applicationCode: app.code,
             roleCode: role.code,
             scopeType,
             scopeId: scopeId || null,
@@ -139,6 +145,9 @@ export function createAppRoleAssignmentService(ctx: ServiceContext) {
       const role = await ctx.db.query.applicationRoles.findFirst({
         where: eq(schema.applicationRoles.id, existing.applicationRoleId),
       })
+      const app = await ctx.db.query.applications.findFirst({
+        where: eq(schema.applications.id, existing.applicationId),
+      })
 
       const row = await ctx.db.transaction(async (tx) => {
         const [saved] = await tx
@@ -151,6 +160,7 @@ export function createAppRoleAssignmentService(ctx: ServiceContext) {
           payload: {
             keycloakSub: existing.keycloakSub,
             applicationId: existing.applicationId,
+            applicationCode: app?.code ?? null,
             roleCode: role?.code ?? null,
             scopeType: existing.scopeType,
             scopeId: existing.scopeId || null,
