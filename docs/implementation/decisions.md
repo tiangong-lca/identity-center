@@ -2,6 +2,20 @@
 
 > 按 GOAL.md §2:实施中发现的设计缺口、矛盾与用户裁决在此记录。
 
+## D-005 注册申请选择应用与角色实施口径(2026-07-03,workspace 决策 D7,设计 §4.6)
+
+**背景**:注册链路原为 门户 `/register` 表单 → `POST /api/public/registration-requests` → 审批 → 开通;准入与角色分配是审批后的独立管理动作,申请单本身不携带目标应用/角色。workspace 设计追加指示(D7,§4.6):允许申请人在提交注册申请时一并选择目标应用与角色(多应用、每应用至多一角色、角色可不选)。以下为 identity-center 侧实施口径,按设计 §4.6 四条要点落地:
+
+1. **申请单快照,软引用,提交时双层校验**:`registration_requests` 新增 `requested_access` jsonb 列,结构 `[{ applicationCode, roleCode? }]`,与 `requestedOrganizationId` 同为软引用——申请记录不受应用/角色后续生命周期变化约束。校验在 `registration-service.submit` 内完成、不依赖前端表单约束:先经 zod(`requestedAccessSchema`)校验形状(`applicationCode` 格式、`roleCode` 可选、数组长度上限 20、`applicationCode` 去重),再查库校验存在性(`validateRequestedAccess`):应用必须存在且 `active`;`roleCode`(若填)必须属于该应用且 `active`。任一项不合法则整单拒绝(`VALIDATION_ERROR`),不做部分接受。
+2. **公共目录端点**:新增 `GET /api/public/applications`,返回 active 应用及其 active 角色的 `code`/`name`,供注册页渲染选择项;复用公共端点既有 IP 限流(scene=`catalog`)。应用/角色名的公开可枚举性经设计评审接受为非敏感信息。
+3. **审批通过后自动授予,逐项失败容忍,不回滚开通**:开通编排在建 Keycloak 用户 + `portal_users` 事务提交之后,对 `requested_access` 逐项依次调用既有 `assignment-service.grant`(source=`registration`)与 `app-role-assignment-service.assign`(source=`registration`)——事件出站、Keycloak 投影、审计写入全部走正常管道,不新增旁路。每项的准入(admission)与角色(role)结果分属独立 try/catch:角色环节失败绝不回改已成功/已跳过的准入结果,反之亦然;`CONFLICT`(已有等价准入/分配)视为良性 `skipped`,不计入失败。单项或多项失败(应用已下线、角色已失效等)**不回滚账号开通**,与平台"事实成立、投影最终一致"的既有语义一致;结果逐项体现在审批响应的 `grants` 数组(`{applicationCode, admission: granted|skipped|failed, role?: assigned|failed, error?}`)与准入/角色列表中,由既有重试/对账机制兜底。审计写入本身失败时只记日志、不抛出,避免已经成功落地的开通与授予被误报为 500。
+4. **审批动作本身不做改派**:审批人如需调整申请人实际获得的应用/角色(增补、更换、撤销),在开通完成后通过既有用户详情页/准入管理页操作;审批通过这一动作只按申请快照执行既定的自动授予,保持审批流程简单、可预测。
+5. **UI**:`/register` 表单增加应用多选(checkbox)+ 每个已选应用的单角色下拉(角色可留空 = 仅申请准入,取应用默认标准身份);目录加载失败不阻塞基本注册提交。审批详情弹窗展示申请人所选应用/角色快照。
+
+对 lca-platform(tiangong)侧无新增契约要求:授予产生的 `access.application.granted` 与 `application.role.assigned` 事件按既有 §4.4/§4.5 契约消费。
+
+依据:carbon-workspace/_docs/plans/2026-07-03-lca-platform-identity-center-integration-design.md §4.6。
+
 ## D-004 首个业务应用登记更名为 tiangong-lca(2026-07-03,workspace 决策 D4)
 
 Supabase 占位登记(code=supabase)更名为真实应用 tiangong-lca(client=tiangong-lca-business-app,role=tiangong_lca_access,env=TIANGONG_LCA_*)。

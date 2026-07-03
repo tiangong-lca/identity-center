@@ -2,6 +2,8 @@
 
 > 面向接入统一身份平台的业务应用团队。首个接入应用为 TianGong LCA(`tiangong-lca`,基于 Supabase self-host),本指南由其接入过程沉淀,可复用于后续应用。
 > 权威依据:[迁移与接入指南](../design/03-governance/03-migration-onboarding-guide/README.md)、[总体架构设计 §12](../design/01-architecture/01-overall-architecture/README.md)。
+>
+> 注:自 D7 起,平台注册申请页支持用户直接勾选申请的应用与角色(多应用、每应用至多一角色,角色可不选),审批通过后自动授予对应准入与角色。此为平台侧体验增强,不改变本指南定义的业务应用接入契约。
 
 ## 接入十步
 
