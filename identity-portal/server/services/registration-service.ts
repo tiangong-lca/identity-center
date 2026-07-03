@@ -1,15 +1,43 @@
-import { count, desc, eq } from 'drizzle-orm'
+import { and, count, desc, eq } from 'drizzle-orm'
 import * as schema from '@/db/schema'
 import { getAuditContext } from '@/lib/audit/context'
 import { defaultEmailVerified } from '@/lib/config/email'
 import { buildPageResult, paginate, type PageParams } from '@/lib/db/pagination'
 import { ApiError } from '@/lib/http/api-error'
+import { requestedAccessSchema, type RequestedAccessEntry } from '@/lib/registration/requested-access'
 import { EVENT_TYPES } from '@/lib/sync/event-types'
 import { appendOutboxEvent } from '@/lib/sync/outbox'
 import { createAuditLogRepository } from '@/server/repositories/audit-log-repository'
 import type { ServiceContext } from './context'
 
 export type RegistrationRequest = typeof schema.registrationRequests.$inferSelect
+
+/** D7:requested_access 的 DB 存在性校验(形状校验由 zod 完成) */
+export async function validateRequestedAccess(
+  db: ServiceContext['db'],
+  entries: RequestedAccessEntry[],
+): Promise<void> {
+  for (const entry of entries) {
+    const app = await db.query.applications.findFirst({
+      where: and(
+        eq(schema.applications.code, entry.applicationCode),
+        eq(schema.applications.status, 'active'),
+      ),
+    })
+    if (!app) throw new ApiError('VALIDATION_ERROR', `应用不存在或未启用: ${entry.applicationCode}`)
+    if (entry.roleCode) {
+      const roles = await db.query.applicationRoles.findMany({
+        where: and(
+          eq(schema.applicationRoles.applicationId, app.id),
+          eq(schema.applicationRoles.status, 'active'),
+        ),
+      })
+      if (!roles.some((r) => r.code === entry.roleCode)) {
+        throw new ApiError('VALIDATION_ERROR', `角色不属于该应用: ${entry.applicationCode}/${entry.roleCode}`)
+      }
+    }
+  }
+}
 
 function actorOf() {
   const c = getAuditContext()
@@ -28,16 +56,27 @@ export function createRegistrationService(ctx: ServiceContext) {
 
   return {
     /** 公共入口提交(防枚举:无论邮箱是否已存在都返回成功;重复 pending 幂等返回) */
-    async submit(input: { email: string; displayName?: string; requestedOrganizationId?: string; requestedReason?: string }) {
+    async submit(input: {
+      email: string
+      displayName?: string
+      requestedOrganizationId?: string
+      requestedReason?: string
+      requestedAccess?: RequestedAccessEntry[]
+    }) {
       const pending = await ctx.db.query.registrationRequests.findFirst({
         where: eq(schema.registrationRequests.email, input.email),
         orderBy: desc(schema.registrationRequests.createdAt),
       })
       if (pending?.status === 'pending') return pending
 
+      const requestedAccess = input.requestedAccess?.length
+        ? requestedAccessSchema.parse(input.requestedAccess)
+        : undefined
+      if (requestedAccess) await validateRequestedAccess(ctx.db, requestedAccess)
+
       const [row] = await ctx.db
         .insert(schema.registrationRequests)
-        .values({ ...input, status: 'pending', approvalRequired: true })
+        .values({ ...input, requestedAccess: requestedAccess ?? null, status: 'pending', approvalRequired: true })
         .returning()
       return row
     },
