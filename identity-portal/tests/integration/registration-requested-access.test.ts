@@ -90,4 +90,29 @@ describe('registration submit: requestedAccess (D7)', () => {
     await tdb.db.update(schema.applications).set({ status: 'active' })
       .where(eq(schema.applications.code, 'tiangong-lca'))
   })
+
+  it('准入成功但角色不存在(非 CONFLICT)→ admission 不应被误判为 failed', async () => {
+    const svc = createRegistrationService(ctx)
+    const req = await svc.submit({
+      email: 'role-fail@test.local',
+      requestedAccess: [{ applicationCode: 'tiangong-lca', roleCode: 'review-member' }],
+    })
+    // 提交时角色合法;审批前使其失效,复现"角色查找在准入之后失败"场景(非 CONFLICT)
+    await tdb.db.update(schema.applicationRoles).set({ status: 'disabled' })
+      .where(eq(schema.applicationRoles.code, 'review-member'))
+    const { portalUser, grants } = await svc.approve(req.id, {})
+    kcUserIds.push(portalUser.keycloakUserId!)
+    expect(grants[0]).toMatchObject({
+      applicationCode: 'tiangong-lca',
+      admission: 'granted',
+      role: 'failed',
+      error: expect.any(String),
+    })
+    const assignment = await tdb.db.query.applicationAssignments.findFirst({
+      where: eq(schema.applicationAssignments.portalUserId, portalUser.id),
+    })
+    expect(assignment).toMatchObject({ status: 'active' })
+    await tdb.db.update(schema.applicationRoles).set({ status: 'active' })
+      .where(eq(schema.applicationRoles.code, 'review-member'))
+  })
 })

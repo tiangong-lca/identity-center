@@ -172,6 +172,9 @@ export function createRegistrationService(ctx: ServiceContext) {
       /**
        * D7:审批开通账号后,逐项授予申请时选择的应用准入/角色。
        * 独立于开通事务(账号已成立的事实不因授予失败回滚),失败逐项容忍不中断循环。
+       *
+       * 准入(admission)与角色(role)分属两个独立的 try/catch,各自只写各自的结果字段:
+       * 角色环节失败绝不会回过头去覆盖已经成功的准入结果,反之亦然。
        */
       type GrantOutcome = {
         applicationCode: string
@@ -182,10 +185,17 @@ export function createRegistrationService(ctx: ServiceContext) {
       const grants: GrantOutcome[] = []
       const requested = (request.requestedAccess ?? []) as RequestedAccessEntry[]
       if (requested.length > 0) {
+        // 不变式:本方法内 portalUser 或为新建、或为既有的启用用户(见上方事务),恒为 active。
+        // 因此下面 grant() 抛出的 CONFLICT 在此上下文中只可能是"已有准入",不可能是"用户未启用"
+        // (那个分支要求 user.status !== 'active',这里不成立)—— 据此可放心把 CONFLICT 当良性 skip。
+        if (result.portalUser.status !== 'active') {
+          throw new ApiError('CONFLICT', '账号未启用,无法进行自动授予(不变式被打破)')
+        }
         const assignments = createAssignmentService(ctx)
         const roleAssignments = createAppRoleAssignmentService(ctx)
         for (const entry of requested) {
           const outcome: GrantOutcome = { applicationCode: entry.applicationCode, admission: 'granted' }
+          let admissionOk = false
           try {
             const app = await ctx.db.query.applications.findFirst({
               where: and(
@@ -200,44 +210,63 @@ export function createRegistrationService(ctx: ServiceContext) {
               if (isApiError(e) && e.code === 'CONFLICT') outcome.admission = 'skipped' // 已有准入
               else throw e
             }
+            admissionOk = true
+
             if (entry.roleCode) {
-              const roles = await ctx.db.query.applicationRoles.findMany({
-                where: eq(schema.applicationRoles.applicationId, app.id),
-              })
-              const role = roles.find((r) => r.code === entry.roleCode && r.status === 'active')
-              if (!role) throw new ApiError('NOT_FOUND', `角色不存在: ${entry.roleCode}`)
               try {
-                await roleAssignments.assign({
-                  applicationId: app.id,
-                  applicationRoleId: role.id,
-                  portalUserId: result.portalUser.id,
-                  scopeType: 'global',
-                  source: 'registration',
+                const role = await ctx.db.query.applicationRoles.findFirst({
+                  where: and(
+                    eq(schema.applicationRoles.applicationId, app.id),
+                    eq(schema.applicationRoles.code, entry.roleCode),
+                    eq(schema.applicationRoles.status, 'active'),
+                  ),
                 })
-                outcome.role = 'assigned'
+                if (!role) throw new ApiError('NOT_FOUND', `角色不存在: ${entry.roleCode}`)
+                try {
+                  await roleAssignments.assign({
+                    applicationId: app.id,
+                    applicationRoleId: role.id,
+                    portalUserId: result.portalUser.id,
+                    scopeType: 'global',
+                    source: 'registration',
+                  })
+                  outcome.role = 'assigned'
+                } catch (e) {
+                  if (isApiError(e) && e.code === 'CONFLICT') outcome.role = 'assigned' // 已存在等价分配
+                  else throw e
+                }
               } catch (e) {
-                if (isApiError(e) && e.code === 'CONFLICT') outcome.role = 'assigned' // 已存在等价分配
-                else throw e
+                // 角色环节失败:只标记 role,绝不回改已经成功/跳过的 admission。
+                outcome.role = 'failed'
+                outcome.error = e instanceof Error ? e.message : String(e)
               }
             }
           } catch (e) {
-            const msg = e instanceof Error ? e.message : String(e)
-            if (outcome.admission === 'granted' && !outcome.role) outcome.admission = 'failed'
-            else outcome.role = 'failed'
-            outcome.error = msg
+            // 准入环节失败(含应用不存在/未启用、grant() 非 CONFLICT 报错):
+            // 走到这里时角色环节必然尚未尝试(admissionOk 仍为 false),只标记 admission。
+            if (!admissionOk) {
+              outcome.admission = 'failed'
+              outcome.error = e instanceof Error ? e.message : String(e)
+            }
           }
           grants.push(outcome)
         }
       }
 
-      await audit.append({
-        ...reviewer,
-        action: 'registration.approve',
-        targetType: 'registration_request',
-        targetId: id,
-        afterData: { email: request.email, portalUserId: result.portalUser.id, grants },
-        result: 'success',
-      })
+      try {
+        await audit.append({
+          ...reviewer,
+          action: 'registration.approve',
+          targetType: 'registration_request',
+          targetId: id,
+          afterData: { email: request.email, portalUserId: result.portalUser.id, grants },
+          result: 'success',
+        })
+      } catch (e) {
+        // 审计写入失败不得让已经成功落地的开通 + 授予结果回滚给调用方一个 500:
+        // 账号与准入/角色事实均已持久化,这里只记录、不抛出。
+        console.error('[registration-service] audit.append failed after approve()', e)
+      }
       return { ...result, grants }
     },
 
