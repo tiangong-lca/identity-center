@@ -1,3 +1,19 @@
+---
+docType: dod-checklist
+scope: repo
+status: active
+authoritative: true
+owner: identity-center
+language: zh
+whenToUse: 需要核对一期交付是否满足 GOAL.md §7 完成定义的各项条目及证据时阅读本文档。
+whenToUpdate: 完成定义条目、验收标准或核对证据发生变化时更新本文档。
+checkPaths:
+  - docs/implementation/definition-of-done.md
+  - GOAL.md
+lastReviewedAt: 2026-07-06
+lastReviewedCommit: 16f3661
+---
+
 # 完成定义(DoD)核对 — GOAL.md §7
 
 > 核对日期 2026-07-02。逐项附证据。

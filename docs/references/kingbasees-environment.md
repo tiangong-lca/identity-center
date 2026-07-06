@@ -1,3 +1,20 @@
+---
+docType: reference
+scope: repo
+status: active
+authoritative: true
+owner: identity-center
+language: zh
+whenToUse: 需要确认 KingbaseES 开发环境结论、当前非阻塞预留状态或相关裁决时阅读本文档。
+whenToUpdate: KingbaseES 开发环境结论或裁决状态发生变化时更新本文档。
+checkPaths:
+  - docs/references/kingbasees-environment.md
+  - docs/references/kingbasees-compatibility-conventions.md
+  - docs/implementation/decisions.md
+lastReviewedAt: 2026-07-06
+lastReviewedCommit: 16f3661
+---
+
 # KingbaseES 开发环境结论(2026-07-02)
 
 > 状态:**非阻塞预留**(用户裁决,见 `docs/implementation/decisions.md` D-001)。

@@ -1,0 +1,18 @@
+# config/business-apps.yaml —— 业务应用目录(声明式真源;由 seedBusinessApps 的 APP/APP_ROLES 转写)
+# 密钥只放 secretRef(env 变量名),url 用 ${ENV} 占位(部署环境注入)
+version: 1
+applications:
+  - code: tiangong-lca
+    name: TianGong LCA 平台
+    status: active
+    keycloak:
+      clientId: tiangong-lca-business-app
+      accessRole: tiangong_lca_access
+    webhook:
+      url: ${TIANGONG_LCA_WEBHOOK_URL}
+      secretRef: TIANGONG_LCA_WEBHOOK_SECRET
+    loginUrl: ${TIANGONG_LCA_LOGIN_URL}
+    roles:
+      - { code: admin, name: 系统管理员, description: TianGong LCA 系统管理员 }
+      - { code: review-admin, name: 评审管理员, description: 评审流程管理员 }
+      - { code: review-member, name: 评审成员, description: 评审成员 }

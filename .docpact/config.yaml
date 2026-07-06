@@ -1,7 +1,7 @@
 version: 1
 layout: repo
-lastReviewedAt: "2026-07-02"
-lastReviewedCommit: "b069317a03165b3345e842d1616bb6171bfc803c"
+lastReviewedAt: "2026-07-06"
+lastReviewedCommit: "16f3661"
 
 # Repo-local docpact governance for identity-center.
 # The workspace root config governs the submodule pointer and cross-repo view;
@@ -344,6 +344,14 @@ rules:
         kind: db-adapter
       - path: identity-portal/drizzle.config.ts
         kind: orm-config
+      - path: identity-portal/lib/catalog/**
+        kind: catalog-domain
+      - path: identity-portal/scripts/apply-catalog.ts
+        kind: catalog-cli
+      - path: identity-portal/scripts/seed-portal-db.ts
+        kind: seed-bootstrap
+      - path: identity-portal/scripts/seed/**
+        kind: seed-data
     requiredDocs:
       - path: .docpact/config.yaml
         mode: review_or_update

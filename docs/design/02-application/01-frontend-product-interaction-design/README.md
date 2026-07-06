@@ -1,3 +1,19 @@
+---
+docType: design-doc
+scope: repo
+status: active
+authoritative: true
+owner: identity-center
+language: zh
+whenToUse: 需要了解门户和管理后台的前端产品交互设计、页面结构或交互规范时阅读本文档。
+whenToUpdate: 前端产品交互设计、页面结构或交互规范发生变化时更新本文档。
+checkPaths:
+  - docs/design/02-application/01-frontend-product-interaction-design/README.md
+  - identity-portal/AGENTS.md
+lastReviewedAt: 2026-07-06
+lastReviewedCommit: 16f3661
+---
+
 # 06. 前端产品与交互设计
 
 ## 1. 目标

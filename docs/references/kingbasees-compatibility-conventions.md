@@ -1,3 +1,19 @@
+---
+docType: reference
+scope: repo
+status: active
+authoritative: true
+owner: identity-center
+language: zh
+whenToUse: 编写或审查 identity-portal/db/**、server/repositories/** 或任何生成 SQL 的代码前，需要确认 KingbaseES 兼容约定时阅读本文档。
+whenToUpdate: KingbaseES 兼容约定或数据层强制规范发生变化时更新本文档。
+checkPaths:
+  - docs/references/kingbasees-compatibility-conventions.md
+  - docs/references/kingbasees-environment.md
+lastReviewedAt: 2026-07-06
+lastReviewedCommit: 16f3661
+---
+
 # KingbaseES 兼容约定(数据层强制规范)
 
 > 适用:`identity-portal/db/**`、`server/repositories/**` 及一切生成 SQL 的代码。

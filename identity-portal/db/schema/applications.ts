@@ -11,7 +11,7 @@ export const applications = pgTable('applications', {
   keycloakClientId: text('keycloak_client_id').notNull(),
   /** 认证侧准入投影的 Client Role 名(如 tiangong_lca_access) */
   accessClientRole: text('access_client_role').notNull(),
-  /** active | disabled */
+  /** active | disabled | pending_deactivate(pending_deactivate 由 catalog reconcile 置,待人工确认停用) */
   status: text('status').notNull().default('active'),
   loginUrl: text('login_url'),
   adminUrl: text('admin_url'),
@@ -33,6 +33,7 @@ export const applicationRoles = pgTable(
     code: text('code').notNull(),
     name: text('name').notNull(),
     description: text('description'),
+    /** active | disabled | pending_deactivate(pending_deactivate 由 catalog reconcile 置,待人工确认停用) */
     status: text('status').notNull().default('active'),
     ...timestamps(),
   },

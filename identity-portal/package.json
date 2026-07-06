@@ -15,6 +15,7 @@
     "db:generate": "drizzle-kit generate",
     "db:migrate": "drizzle-kit migrate",
     "db:seed": "tsx scripts/seed-portal-db.ts",
+    "apply-catalog": "tsx scripts/apply-catalog.ts",
     "worker": "tsx scripts/worker.ts",
     "test:e2e": "playwright test"
   },
@@ -32,6 +33,7 @@
     "clsx": "^2.1.1",
     "drizzle-orm": "^0.45.2",
     "ioredis": "5.10.1",
+    "js-yaml": "^5.2.1",
     "lucide-react": "^1.23.0",
     "next": "16.2.10",
     "next-auth": "5.0.0-beta.31",
@@ -50,6 +52,7 @@
   "devDependencies": {
     "@playwright/test": "^1.61.1",
     "@tailwindcss/postcss": "^4",
+    "@types/js-yaml": "^4.0.9",
     "@types/node": "^20",
     "@types/pg": "^8.20.0",
     "@types/react": "^19",

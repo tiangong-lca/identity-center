@@ -1,3 +1,20 @@
+---
+docType: design-doc
+scope: repo
+status: active
+authoritative: true
+owner: identity-center
+language: zh
+whenToUse: 需要了解统一身份平台整体架构、核心组件职责或身份与权限边界划分时阅读本文档。
+whenToUpdate: 整体架构、核心组件职责或身份与权限边界发生变化时更新本文档。
+checkPaths:
+  - docs/design/01-architecture/01-overall-architecture/README.md
+  - docs/design/02-application/03-sync-event-design/README.md
+  - docs/design/02-application/04-project-structure-design/README.md
+lastReviewedAt: 2026-07-06
+lastReviewedCommit: 16f3661
+---
+
 # 统一身份平台整体设计
 
 ## 1. 背景与目标
@@ -145,6 +162,8 @@ flowchart LR
 | 这个角色具体能做什么？ | 业务应用 | 例如编辑、审核、团队管理、数据范围控制 |
 
 用户、组织、团队、租户、应用角色、管理后台权限和角色作用范围的详细模型见 [用户与权限模型设计](../04-user-permission-model/)。
+
+应用目录（哪些业务应用被接入、每个应用的准入角色和可分配业务角色）以声明式 YAML（`config/business-apps.yaml`）为唯一真源，通过应用目录服务 apply 到统一身份平台数据库，再将其中的 Keycloak 准入角色投影到 Keycloak；业务角色仍按 §8 所述经 Webhook 交付给业务应用，不在 Keycloak 中建角色。详细结构见 [项目结构设计](../../02-application/04-project-structure-design/) §4.10。
 
 ## 8. 同步与一致性
 

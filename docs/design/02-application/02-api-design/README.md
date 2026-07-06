@@ -1,3 +1,19 @@
+---
+docType: design-doc
+scope: repo
+status: active
+authoritative: true
+owner: identity-center
+language: zh
+whenToUse: 需要了解管理后台 API 的设计原则、响应信封或错误分类时阅读本文档。
+whenToUpdate: API 设计原则、响应信封或错误分类发生变化时更新本文档，并同步更新 docs/references/openapi.yaml。
+checkPaths:
+  - docs/design/02-application/02-api-design/README.md
+  - docs/references/openapi.yaml
+lastReviewedAt: 2026-07-06
+lastReviewedCommit: 16f3661
+---
+
 # 07. API 设计
 
 ## 1. 目标

@@ -1,3 +1,19 @@
+---
+docType: design-doc
+scope: repo
+status: active
+authoritative: true
+owner: identity-center
+language: zh
+whenToUse: 需要了解统一门户与管理后台项目的代码组织方式、目录分层或推荐依赖边界时阅读本文档。
+whenToUpdate: 目录结构、分层原则或推荐依赖边界发生变化时更新本文档。
+checkPaths:
+  - docs/design/02-application/04-project-structure-design/README.md
+  - docs/design/01-architecture/01-overall-architecture/README.md
+lastReviewedAt: 2026-07-06
+lastReviewedCommit: 16f3661
+---
+
 # 12. 项目结构设计
 
 ## 1. 目标
@@ -282,6 +298,7 @@ components/feedback    Toast、Dialog、Empty State
 lib/auth        Auth.js 配置、session 获取、角色解析
 lib/keycloak    Keycloak Admin API client、token client、类型转换
 lib/db          数据库连接、事务工具
+lib/catalog     业务应用目录 schema、序列化、diff（纯函数，不碰数据库/Keycloak）
 lib/audit       审计日志写入入口
 lib/permissions 通用权限辅助函数
 lib/sync        事件发布与同步工具
@@ -335,6 +352,7 @@ db/
 ├─ schema/              # Drizzle schema 定义，按模块拆分
 │  ├─ portal-users.ts
 │  ├─ applications.ts
+│  ├─ catalog-versions.ts
 │  ├─ audit-logs.ts
 │  └─ outbox-events.ts
 ├─ index.ts             # 数据库连接导出
@@ -343,6 +361,8 @@ db/
    ├─ 0002_add_app_assignments.sql
    └─ 0003_add_audit_logs.sql
 ```
+
+`db/schema/catalog-versions.ts` 定义 `catalog_versions` 表，是应用目录（见 §4.10）每次 apply 的追加式版本日志：保存完整 YAML、结构化 diff 和 `applied_by`/`source`，同时充当乐观并发的版本令牌（当前版本 = `max(version)`）。`applications`/`application_roles` 的 `status` 字段新增 `pending_deactivate` 取值，由目录 reconcile 在检测到某应用/角色不再出现于目录 YAML 时置位，等待人工确认停用，不做硬删除。
 
 `drizzle-kit` 负责根据 `db/schema/` 生成和管理迁移文件。
 
@@ -402,11 +422,14 @@ deploy/
 scripts/
 ├─ bootstrap-keycloak-realm.ts
 ├─ seed-portal-db.ts
+├─ apply-catalog.ts
 ├─ export-keycloak-config.ts
 ├─ check-env.ts
 ├─ rotate-keycloak-secret.ts
 └─ reconcile-users.ts
 ```
+
+`scripts/apply-catalog.ts` 是声明式业务应用目录的 CLI 入口（`pnpm apply-catalog` / `-- --check` 干跑），见 §4.10。
 
 原则：
 
@@ -431,6 +454,23 @@ ApiErrorCode
 ```
 
 功能局部类型放在 `features/*/types.ts`。数据库实体类型优先由 ORM 或 schema 工具生成。
+
+### 4.10 声明式业务应用目录
+
+声明式业务应用目录以 `config/business-apps.yaml` 为唯一真源，取代此前手工维护的 `seedBusinessApps` 常量方式承担应用注册职责。相关文件：
+
+```text
+config/business-apps.yaml                        # 目录 YAML(应用/角色声明式定义)
+lib/catalog/schema.ts                             # zod schema(app/role 结构与唯一性校验)
+lib/catalog/serialize.ts                          # YAML <-> CatalogApp[] 解析与渲染
+lib/catalog/diff.ts                               # 目录期望态 vs 当前态 diff 计算
+server/services/catalog-service.ts                # apply/getCurrent/listVersions/rollback(事务+乐观并发+版本)
+server/services/catalog-materialize.ts            # 纯 DB upsert(应用/角色物化,漂移置 pending_deactivate)
+server/services/catalog-reconcile-service.ts      # 提交后 Keycloak 准入角色 reconcile(逐 app 隔离)
+scripts/apply-catalog.ts                          # CLI 入口
+```
+
+`catalog-service.apply` 在一个数据库事务内完成乐观并发版本校验、经共享的 `materializeCatalog` upsert `applications`/`application_roles`、并追加 `catalog_versions` 记录；事务提交后再对 `active` 应用做 Keycloak 准入角色（`accessRole`）reconcile，最后写审计。`scripts/seed/business-apps.ts` 的 `seedBusinessApps` 现在是复用 `materializeCatalog` 的纯 DB shim，供测试和无 Keycloak 场景使用；`seed-portal-db.ts` 走完整的 `apply-catalog` 路径。
 
 ## 5. 请求调用链
 

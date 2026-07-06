@@ -1,3 +1,20 @@
+---
+docType: doc-entry
+scope: repo
+status: active
+authoritative: true
+owner: identity-center
+language: zh
+whenToUse: 需要定位统一身份平台文档集入口(设计文档集、实施方案、runbook、接入指南)时阅读本文档。
+whenToUpdate: 文档目录结构或入口链接发生变化时更新本文档。
+checkPaths:
+  - docs/README.md
+  - docs/design/README.md
+  - docs/implementation/README.md
+lastReviewedAt: 2026-07-06
+lastReviewedCommit: 16f3661
+---
+
 # Identity Platform 文档
 
 本文档目录用于沉淀统一身份平台相关资料。

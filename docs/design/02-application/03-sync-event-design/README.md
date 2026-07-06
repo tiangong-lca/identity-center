@@ -1,3 +1,19 @@
+---
+docType: design-doc
+scope: repo
+status: active
+authoritative: true
+owner: identity-center
+language: zh
+whenToUse: 需要了解 Keycloak、门户、平台权限中心与业务系统之间的事件同步机制、事件契约或 Webhook 安全验证时阅读本文档。
+whenToUpdate: 同步机制、事件类型、事件契约、重试/死信策略或 Webhook 验证方式发生变化时更新本文档。
+checkPaths:
+  - docs/design/02-application/03-sync-event-design/README.md
+  - docs/design/01-architecture/01-overall-architecture/README.md
+lastReviewedAt: 2026-07-06
+lastReviewedCommit: 16f3661
+---
+
 # 08. 同步与事件设计
 
 ## 1. 目标
@@ -319,6 +335,10 @@ projection_status = pending
 ```
 
 撤销完成必须以 Keycloak Client Role 移除成功为关键完成点。业务应用投影失败必须告警、重试和对账。
+
+### 8.0 应用目录 → Keycloak 准入角色 reconcile
+
+应用目录（`config/business-apps.yaml`）apply 到统一身份平台数据库提交后，由 `catalog-reconcile-service` 对每个 `active` 应用执行 Keycloak 准入角色（`accessRole`）reconcile：仅在已存在的 Keycloak Client 上 ensure 该 client role，不创建 Client，也不为业务角色建 Keycloak 角色。Reconcile 按应用逐一隔离执行，单个应用失败或对应 Client 缺失不阻断其它应用，失败计入报告而非抛出致命错误。业务角色分配的投影渠道不变，仍按 §8.1 经 Webhook 交付给业务应用。
 
 ## 8.1 应用角色分配同步
 
