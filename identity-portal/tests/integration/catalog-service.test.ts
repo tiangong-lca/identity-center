@@ -1,4 +1,6 @@
+import { desc, eq } from 'drizzle-orm'
 import { afterAll, beforeAll, describe, expect, it } from 'vitest'
+import * as schema from '@/db/schema'
 import { createKeycloakAdmin } from '@/lib/keycloak/admin-client'
 import { createCatalogService } from '@/server/services/catalog-service'
 import type { ServiceContext } from '@/server/services/context'
@@ -26,7 +28,7 @@ describe('catalog-service.apply(真实 PG + Keycloak)', () => {
   })
   afterAll(async () => (tdb ? tdb.destroy() : undefined))
 
-  it('首次 apply 建应用+角色+版本 1,reconcile ensured', async () => {
+  it('首次 apply 建应用+角色+版本 1,reconcile ensured,审计 afterData 含 report', async () => {
     const svc = createCatalogService(ctx)
     const r = await svc.apply({ yaml: DOC(), source: 'cli' })
     expect(r.version).toBe(1)
@@ -34,14 +36,26 @@ describe('catalog-service.apply(真实 PG + Keycloak)', () => {
     expect(r.report.ensured).toContain('tiangong-lca-business-app/tiangong_lca_access')
     const apps = await tdb.db.query.applications.findMany()
     expect(apps[0]).toMatchObject({ code: 'tiangong-lca', accessClientRole: 'tiangong_lca_access' })
+
+    const [audit] = await tdb.db
+      .select({ afterData: schema.auditLogs.afterData })
+      .from(schema.auditLogs)
+      .where(eq(schema.auditLogs.action, 'catalog.apply'))
+      .orderBy(desc(schema.auditLogs.createdAt))
+      .limit(1)
+    expect(audit).toBeDefined()
+    const afterData = audit!.afterData as { version: number; report: { ensured: string[] } }
+    expect(afterData.version).toBe(1)
+    expect(afterData.report.ensured).toContain('tiangong-lca-business-app/tiangong_lca_access')
   })
 
-  it('同内容再 apply → 无变更,版本不变', async () => {
+  it('同内容再 apply → 无变更,版本不变,reconcile 被跳过(report.ensured 为空)', async () => {
     const svc = createCatalogService(ctx)
     const r = await svc.apply({ yaml: DOC() })
     expect(r.version).toBe(1)
     expect(r.diff.created).toEqual([])
     expect(r.diff.unchanged).toEqual(['tiangong-lca'])
+    expect(r.report).toEqual({ ensured: [], clientMissing: [], errors: [] })
   })
 
   it('改名 → 版本 2 + updated', async () => {

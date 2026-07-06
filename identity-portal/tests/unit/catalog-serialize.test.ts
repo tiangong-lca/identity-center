@@ -53,4 +53,19 @@ describe('renderCatalogYaml + toCatalogApps 回环', () => {
     )
     expect(apps).toHaveLength(0)
   })
+  it('webhookUrl 有值但 webhookSecretRef 为 null → webhook 省略(不合成空 secretRef)', () => {
+    const apps = toCatalogApps(
+      [{ id: 'a1', code: 'tiangong-lca', name: 'TianGong LCA 平台', status: 'active', keycloakClientId: 'tiangong-lca-business-app', accessClientRole: 'tiangong_lca_access', webhookUrl: 'http://x/hook', webhookSecretRef: null, loginUrl: null, adminUrl: null }],
+      [],
+    )
+    expect(apps).toHaveLength(1)
+    expect(apps[0].webhook).toBeUndefined()
+  })
+  it('webhookUrl 与 webhookSecretRef 均有值 → webhook 完整输出(happy path)', () => {
+    const apps = toCatalogApps(
+      [{ id: 'a1', code: 'tiangong-lca', name: 'TianGong LCA 平台', status: 'active', keycloakClientId: 'tiangong-lca-business-app', accessClientRole: 'tiangong_lca_access', webhookUrl: 'http://x/hook', webhookSecretRef: 'TIANGONG_LCA_WEBHOOK_SECRET', loginUrl: null, adminUrl: null }],
+      [],
+    )
+    expect(apps[0].webhook).toEqual({ url: 'http://x/hook', secretRef: 'TIANGONG_LCA_WEBHOOK_SECRET' })
+  })
 })

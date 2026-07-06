@@ -78,9 +78,10 @@ export function toCatalogApps(appRows: AppRow[], roleRows: RoleRow[]): CatalogAp
       name: a.name,
       status: (a.status === 'disabled' ? 'disabled' : 'active') as 'active' | 'disabled',
       keycloak: { clientId: a.keycloakClientId, accessRole: a.accessClientRole },
-      webhook: a.webhookUrl
-        ? { url: a.webhookUrl, secretRef: a.webhookSecretRef ?? '' }
-        : undefined,
+      webhook:
+        a.webhookUrl && a.webhookSecretRef
+          ? { url: a.webhookUrl, secretRef: a.webhookSecretRef }
+          : undefined,
       loginUrl: a.loginUrl ?? undefined,
       adminUrl: a.adminUrl ?? undefined,
       roles: roleRows

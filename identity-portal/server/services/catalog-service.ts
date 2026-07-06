@@ -69,12 +69,15 @@ export function createCatalogService(ctx: ServiceContext) {
         return { version: newVersion, diff }
       })
 
-      // reconcile(事务提交后;只对 active 应用 ensure 准入 accessRole)
-      const report = await reconcile.ensureKeycloakRoles(
-        doc.applications
-          .filter((a) => a.status === 'active')
-          .map((a) => ({ code: a.code, keycloakClientId: a.keycloak.clientId, accessClientRole: a.keycloak.accessRole })),
-      )
+      // reconcile(事务提交后;只对 active 应用 ensure 准入 accessRole;无变更的 no-op re-apply 不触发 KC 往返 —
+      // 漂移修复是周期任务的职责,不是每次 no-op apply 的职责)
+      const report: ReconcileReport = hasChanges(diff)
+        ? await reconcile.ensureKeycloakRoles(
+            doc.applications
+              .filter((a) => a.status === 'active')
+              .map((a) => ({ code: a.code, keycloakClientId: a.keycloak.clientId, accessClientRole: a.keycloak.accessRole })),
+          )
+        : { ensured: [], clientMissing: [], errors: [] }
 
       if (hasChanges(diff)) {
         await audit.append({
@@ -82,7 +85,7 @@ export function createCatalogService(ctx: ServiceContext) {
           action: 'catalog.apply',
           targetType: 'catalog',
           targetId: String(version),
-          afterData: { version, diff },
+          afterData: { version, diff, report },
           result: 'success',
         })
       }
