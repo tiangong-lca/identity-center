@@ -15,6 +15,7 @@
     "db:generate": "drizzle-kit generate",
     "db:migrate": "drizzle-kit migrate",
     "db:seed": "tsx scripts/seed-portal-db.ts",
+    "apply-catalog": "tsx scripts/apply-catalog.ts",
     "worker": "tsx scripts/worker.ts",
     "test:e2e": "playwright test"
   },
