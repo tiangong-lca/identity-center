@@ -1,3 +1,19 @@
+---
+docType: design-doc
+scope: repo
+status: active
+authoritative: true
+owner: identity-center
+language: zh
+whenToUse: 需要了解统一门户与管理后台项目的代码组织方式、目录分层或推荐依赖边界时阅读本文档。
+whenToUpdate: 目录结构、分层原则或推荐依赖边界发生变化时更新本文档。
+checkPaths:
+  - docs/design/02-application/04-project-structure-design/README.md
+  - docs/design/01-architecture/01-overall-architecture/README.md
+lastReviewedAt: 2026-07-06
+lastReviewedCommit: 16f3661
+---
+
 # 12. 项目结构设计
 
 ## 1. 目标

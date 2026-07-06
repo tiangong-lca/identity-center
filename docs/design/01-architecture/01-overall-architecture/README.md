@@ -1,3 +1,20 @@
+---
+docType: design-doc
+scope: repo
+status: active
+authoritative: true
+owner: identity-center
+language: zh
+whenToUse: 需要了解统一身份平台整体架构、核心组件职责或身份与权限边界划分时阅读本文档。
+whenToUpdate: 整体架构、核心组件职责或身份与权限边界发生变化时更新本文档。
+checkPaths:
+  - docs/design/01-architecture/01-overall-architecture/README.md
+  - docs/design/02-application/03-sync-event-design/README.md
+  - docs/design/02-application/04-project-structure-design/README.md
+lastReviewedAt: 2026-07-06
+lastReviewedCommit: 16f3661
+---
+
 # 统一身份平台整体设计
 
 ## 1. 背景与目标

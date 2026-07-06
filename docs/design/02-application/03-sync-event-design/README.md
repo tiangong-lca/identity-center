@@ -1,3 +1,19 @@
+---
+docType: design-doc
+scope: repo
+status: active
+authoritative: true
+owner: identity-center
+language: zh
+whenToUse: 需要了解 Keycloak、门户、平台权限中心与业务系统之间的事件同步机制、事件契约或 Webhook 安全验证时阅读本文档。
+whenToUpdate: 同步机制、事件类型、事件契约、重试/死信策略或 Webhook 验证方式发生变化时更新本文档。
+checkPaths:
+  - docs/design/02-application/03-sync-event-design/README.md
+  - docs/design/01-architecture/01-overall-architecture/README.md
+lastReviewedAt: 2026-07-06
+lastReviewedCommit: 16f3661
+---
+
 # 08. 同步与事件设计
 
 ## 1. 目标
