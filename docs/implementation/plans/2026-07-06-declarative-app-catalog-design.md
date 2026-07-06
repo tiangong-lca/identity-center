@@ -42,7 +42,7 @@
 
 | # | 决策 | 理由 |
 |---|---|---|
-| **D1** | 范围 = IC 登记 + KC **client role**;**不建 client** | 建 confidential client 涉及 secret 生成/管理,安全敏感,且通常由 realm import/IaC 管;而 client role 创建 `@keycloak/keycloak-admin-client` 已支持(`clients.createRole`),`admin-client.ts` 已封装 `findRole`/`createRole`/`findClientByClientId`。 |
+| **D1** | 范围 = IC 登记 + KC **准入 accessRole**(client role);**不建 client、业务角色不投影 KC** | 建 confidential client 涉及 secret 生成/管理,安全敏感,通常由 realm import/IaC 管;`admin-client.ts` 的 `ensureClientRole(clientUniqueId, roleName)` 已支持在**已有** client 上 find-or-create client role。**只 ensure 准入 `accessRole`**(登录门 `resource_access` 校验用);**业务角色(admin/review-admin/review-member)不建 KC client role**——它们经 webhook 交付、在业务应用本地物化(见集成设计),只登记在 IC `application_roles` 表。 |
 | **D2** | 漂移 = upsert + 标记 `pending_deactivate`(**不自动删/停**) | 拿到声明式更新的收益,同时避免误删 YAML 条目导致线上应用被停或影响**已分配用户**;停用需人工确认另走流程。 |
 | **D3** | 密钥 = YAML 只放 `secretRef`(env 变量名),真值在 env/vault | 配置入库、进版本、可能导出到 Git,严禁明文。 |
 | **D4** | apply = `pnpm apply-catalog` 命令(部署/CI/手动)+ worker 周期 reconcile job | 命令负责变更落地;job 负责持续对账/漂移检测。复用现有 `server/jobs/reconcile.ts` 模式(`reconcileApplicationProjections` 已在做「应用投影对账」)。 |
@@ -62,7 +62,7 @@
 | OpenAPI schema 校验 | **zod schema**(存前校验) |
 | admission webhook | reconcile 前**业务校验**(client 存在、code 唯一…) |
 | `resourceVersion` 乐观并发 | **catalog 版本号**(每次 apply 递增;编辑器带走、保存比对) |
-| 控制器 reconcile loop | **catalog-reconcile-service**(表 → KC client roles 对齐 + 漂移检测) |
+| 控制器 reconcile loop | **catalog-reconcile-service**(表 → KC 准入 accessRole 对齐 + 漂移检测) |
 | `kubectl get -o yaml` / GitOps | 可选 **export/import** CLI(DB ↔ YAML 文件) |
 | Deployment rollout history | **`catalog_versions` 表**(谁/何时/改了啥 + 回滚) |
 
@@ -81,7 +81,7 @@
 ### 5.2 status 枚举扩展(D6)
 - `applications.status` / `application_roles.status` 增加取值 **`pending_deactivate`**(既有 `active`/`inactive` 之外)。
 - 语义:YAML 已移除但 DB 仍存在,待人工确认停用;**不影响已分配用户**,仅告警 + 控制台标注。
-- 落地:Drizzle 声明式 schema + migration(遵循 data-layer 契约,刷新结构设计 + KingbaseES 兼容参考)。
+- 落地:**无需迁移**——仓库约定 `status` 一律 `text(...)` + `/** union */` 注释(KES 兼容,不用 `pgEnum`,见 `db/schema/_shared.ts`),`status` 列无 CHECK 约束。只需在 `applications.ts`/`application_roles` 的注释加入 `pending_deactivate`,并在服务输入层的 TS 联合类型补该值。
 
 ### 5.3 新表 `catalog_versions`(审计 / 历史 / 回滚 / 并发令牌)
 | 列 | 类型 | 说明 |
@@ -109,7 +109,7 @@ version: 1
 applications:
   - code: tiangong-lca                       # 必填, ^[a-z0-9-]+$, 2–50, 文件内唯一
     name: TianGong LCA 平台                   # 必填, 1–100
-    status: active                           # 可选, active|inactive, 默认 active
+    status: active                           # 可选, active|disabled, 默认 active
                                              #   (pending_deactivate 为系统态,不可在 YAML 手写)
     keycloak:
       clientId: tiangong-lca-business-app    # 必填
@@ -157,7 +157,7 @@ applications:
 
 ### 7.4 `server/services/catalog-reconcile-service.ts`(controller)
 - **职责/接口:**
-  - `ensureKeycloakRoles(apps) → report`:每 app `findClientByClientId` → 缺失记 error(**不建 client**);ensure `accessRole` + 每个 `role.code` 对应 client role(`findRole` → 无则 `createRole`)。
+  - `ensureKeycloakRoles(apps) → report`:每 app `findClientByClientId` → 缺失记 error(**不建 client**);对存在的 client 调 `ensureClientRole(client.id, app.accessClientRole)`(find-or-create)。**只 ensure 准入 accessRole,不为业务角色建 KC client role**(业务角色经 webhook 交付)。
   - `detectDrift() → report`:KC 缺角色 / DB `pending_deactivate` 清单。
 - **依赖:** keycloak `admin-client`(`clients.find`/`findRole`/`createRole`)、db。逐 app try/catch,汇总报告。
 
@@ -198,7 +198,7 @@ applications:
 - **校验三层:** YAML 语法(js-yaml)→ 结构(zod)→ 业务(引用的 `clientId` 是否已在 KC;`code` / `role.code` 冲突;`secretRef` 的 env 是否存在——缺失警告或阻断,取决 `--check`)。
 - **upsert:** `applications` 按 `code`、`application_roles` 按 `(app, code)`;更新覆盖 `name`/`keycloak`/`webhook`/`loginUrl`/`adminUrl`/`status`;YAML 缺失者置 `pending_deactivate`。
 - **幂等:** 同一 YAML 重复 apply → diff 为空(见开放问题:diff 空是否 bump version)。
-- **KC:** ensure `accessRole` + `roles`;client 缺失 → 该 app 记 error 但**不阻断其它 app**(逐 app 隔离)。
+- **KC:** 只 ensure 准入 `accessRole`(client role);**业务角色不投影 KC**(经 webhook 交付)。client 缺失 → 该 app 记 error 但**不阻断其它 app**(逐 app 隔离)。
 - **并发:** `expectedVersion` 过期 → 409;前端提示「目录已被他人更新,请重载」。
 - **回滚:** 历史 yaml 走完整 apply 流程,产生新版本。
 
