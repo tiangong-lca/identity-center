@@ -71,3 +71,27 @@ describe('catalog-service.apply(真实 PG + Keycloak)', () => {
     await expect(svc.apply({ yaml: DOC('再改'), expectedVersion: 1 })).rejects.toThrow(/CONFLICT|版本冲突/)
   })
 })
+
+describe('catalog-service 版本 + 回滚', () => {
+  let tdb2: TestDb
+  let ctx2: ServiceContext
+  beforeAll(async () => {
+    const [pg] = getDbTargets()
+    tdb2 = await createMigratedTestDb(pg.adminUrl)
+    ctx2 = { db: tdb2.db, keycloak: createKeycloakAdmin(await resolveAdminApiConfig()) }
+  })
+  afterAll(async () => (tdb2 ? tdb2.destroy() : undefined))
+
+  it('listVersions 按版本倒序;rollback 到旧 yaml 产生新版本并恢复名字', async () => {
+    const svc = createCatalogService(ctx2)
+    await svc.apply({ yaml: DOC('原名') }) // v1
+    await svc.apply({ yaml: DOC('改名') }) // v2
+    const versions = await svc.listVersions()
+    expect(versions[0].version).toBe(2)
+
+    const r = await svc.rollback({ version: 1 }) // 回到"原名"
+    expect(r.version).toBe(3)
+    const apps = await tdb2.db.query.applications.findMany()
+    expect(apps[0].name).toBe('原名')
+  })
+})

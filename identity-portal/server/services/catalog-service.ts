@@ -128,5 +128,33 @@ export function createCatalogService(ctx: ServiceContext) {
       }
       return { version, diff, report }
     },
+
+    async listVersions() {
+      return ctx.db
+        .select({
+          id: schema.catalogVersions.id,
+          version: schema.catalogVersions.version,
+          appliedBy: schema.catalogVersions.appliedBy,
+          source: schema.catalogVersions.source,
+          appliedAt: schema.catalogVersions.appliedAt,
+        })
+        .from(schema.catalogVersions)
+        .orderBy(desc(schema.catalogVersions.version))
+    },
+
+    async getVersion(version: number) {
+      const [row] = await ctx.db
+        .select({ version: schema.catalogVersions.version, yaml: schema.catalogVersions.yaml, diff: schema.catalogVersions.diff })
+        .from(schema.catalogVersions)
+        .where(eq(schema.catalogVersions.version, version))
+        .limit(1)
+      return row as { version: number; yaml: string; diff: CatalogDiff | null } | undefined
+    },
+
+    async rollback(input: { version: number; expectedVersion?: number }): Promise<ApplyResult> {
+      const target = await this.getVersion(input.version)
+      if (!target) throw new ApiError('NOT_FOUND', `目录版本 ${input.version} 不存在`)
+      return this.apply({ yaml: target.yaml, expectedVersion: input.expectedVersion, source: 'import' })
+    },
   }
 }
