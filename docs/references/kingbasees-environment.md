@@ -1,3 +1,8 @@
+---
+lastReviewedAt: 2026-07-06
+lastReviewedCommit: 16f3661
+---
+
 # KingbaseES 开发环境结论(2026-07-02)
 
 > 状态:**非阻塞预留**(用户裁决,见 `docs/implementation/decisions.md` D-001)。

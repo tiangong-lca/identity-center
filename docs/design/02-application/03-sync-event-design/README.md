@@ -320,6 +320,10 @@ projection_status = pending
 
 撤销完成必须以 Keycloak Client Role 移除成功为关键完成点。业务应用投影失败必须告警、重试和对账。
 
+### 8.0 应用目录 → Keycloak 准入角色 reconcile
+
+应用目录（`config/business-apps.yaml`）apply 到统一身份平台数据库提交后，由 `catalog-reconcile-service` 对每个 `active` 应用执行 Keycloak 准入角色（`accessRole`）reconcile：仅在已存在的 Keycloak Client 上 ensure 该 client role，不创建 Client，也不为业务角色建 Keycloak 角色。Reconcile 按应用逐一隔离执行，单个应用失败或对应 Client 缺失不阻断其它应用，失败计入报告而非抛出致命错误。业务角色分配的投影渠道不变，仍按 §8.1 经 Webhook 交付给业务应用。
+
 ## 8.1 应用角色分配同步
 
 角色分配：

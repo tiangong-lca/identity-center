@@ -1,3 +1,8 @@
+---
+lastReviewedAt: 2026-07-06
+lastReviewedCommit: 16f3661
+---
+
 # 完成定义(DoD)核对 — GOAL.md §7
 
 > 核对日期 2026-07-02。逐项附证据。

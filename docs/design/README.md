@@ -1,3 +1,19 @@
+---
+docType: design-index
+scope: repo
+status: active
+authoritative: true
+owner: identity-center
+language: zh
+whenToUse: 需要定位目标态设计文档集(架构/应用/治理三类正式设计文档)的索引和评审状态时阅读本文档。
+whenToUpdate: 设计文档集目录结构、评审状态或收录范围发生变化时更新本文档。
+checkPaths:
+  - docs/design/README.md
+  - docs/README.md
+lastReviewedAt: 2026-07-06
+lastReviewedCommit: 16f3661
+---
+
 # 统一身份与用户门户设计文档集
 
 本文档集用于评审和落地以下方案：

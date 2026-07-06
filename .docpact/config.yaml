@@ -344,6 +344,14 @@ rules:
         kind: db-adapter
       - path: identity-portal/drizzle.config.ts
         kind: orm-config
+      - path: identity-portal/lib/catalog/**
+        kind: catalog-domain
+      - path: identity-portal/scripts/apply-catalog.ts
+        kind: catalog-cli
+      - path: identity-portal/scripts/seed-portal-db.ts
+        kind: seed-bootstrap
+      - path: identity-portal/scripts/seed/**
+        kind: seed-data
     requiredDocs:
       - path: .docpact/config.yaml
         mode: review_or_update

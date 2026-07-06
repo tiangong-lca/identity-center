@@ -1,3 +1,8 @@
+---
+lastReviewedAt: 2026-07-06
+lastReviewedCommit: 16f3661
+---
+
 <!-- BEGIN:nextjs-agent-rules -->
 # This is NOT the Next.js you know
 

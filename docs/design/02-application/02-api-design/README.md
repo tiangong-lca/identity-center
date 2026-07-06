@@ -1,3 +1,8 @@
+---
+lastReviewedAt: 2026-07-06
+lastReviewedCommit: 16f3661
+---
+
 # 07. API 设计
 
 ## 1. 目标

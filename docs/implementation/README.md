@@ -1,3 +1,20 @@
+---
+docType: impl-plan
+scope: repo
+status: active
+authoritative: true
+owner: identity-center
+language: zh
+whenToUse: 需要确认实施顺序、里程碑、范围裁剪或验收标准时阅读本文档。
+whenToUpdate: 实施顺序、里程碑、范围裁剪或验收标准发生变化时更新本文档。
+checkPaths:
+  - docs/implementation/README.md
+  - GOAL.md
+  - docs/design/README.md
+lastReviewedAt: 2026-07-06
+lastReviewedCommit: 16f3661
+---
+
 # 统一身份平台实施方案
 
 > 制定日期：2026-07-02（v2，按一期全量交付修订）

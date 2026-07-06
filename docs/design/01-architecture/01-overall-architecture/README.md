@@ -146,6 +146,8 @@ flowchart LR
 
 用户、组织、团队、租户、应用角色、管理后台权限和角色作用范围的详细模型见 [用户与权限模型设计](../04-user-permission-model/)。
 
+应用目录（哪些业务应用被接入、每个应用的准入角色和可分配业务角色）以声明式 YAML（`config/business-apps.yaml`）为唯一真源，通过应用目录服务 apply 到统一身份平台数据库，再将其中的 Keycloak 准入角色投影到 Keycloak；业务角色仍按 §8 所述经 Webhook 交付给业务应用，不在 Keycloak 中建角色。详细结构见 [项目结构设计](../../02-application/04-project-structure-design/) §4.10。
+
 ## 8. 同步与一致性
 
 同步原则：

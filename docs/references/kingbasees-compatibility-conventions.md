@@ -1,3 +1,8 @@
+---
+lastReviewedAt: 2026-07-06
+lastReviewedCommit: 16f3661
+---
+
 # KingbaseES 兼容约定(数据层强制规范)
 
 > 适用:`identity-portal/db/**`、`server/repositories/**` 及一切生成 SQL 的代码。

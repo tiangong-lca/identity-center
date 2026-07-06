@@ -1,3 +1,20 @@
+---
+docType: goal-contract
+scope: repo
+status: active
+authoritative: true
+owner: identity-center
+language: zh
+whenToUse: 需要确认统一身份平台一期的交付目标、范围边界或完成定义时阅读本文档。
+whenToUpdate: 交付目标、范围边界或完成定义(§7)发生变化时更新本文档。
+checkPaths:
+  - GOAL.md
+  - docs/implementation/README.md
+  - docs/implementation/definition-of-done.md
+lastReviewedAt: 2026-07-06
+lastReviewedCommit: 16f3661
+---
+
 # GOAL — 统一身份平台一期全量交付
 
 > 本文档是交给 Claude Code 的执行目标书。目标:从当前零应用代码状态出发,完整实现、测试并端到端交付统一身份平台一期(non-MVP,设计目标态全量),直至满足本文"完成定义"的全部条目。
