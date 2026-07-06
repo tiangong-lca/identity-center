@@ -5,6 +5,7 @@ import { computeCatalogDiff, hasChanges, type CatalogDiff } from '@/lib/catalog/
 import { parseCatalogYaml, renderCatalogYaml, toCatalogApps } from '@/lib/catalog/serialize'
 import { ApiError } from '@/lib/http/api-error'
 import { createAuditLogRepository } from '@/server/repositories/audit-log-repository'
+import { materializeCatalog } from './catalog-materialize'
 import { createCatalogReconcileService, type ReconcileReport } from './catalog-reconcile-service'
 import type { ServiceContext } from './context'
 
@@ -55,49 +56,8 @@ export function createCatalogService(ctx: ServiceContext) {
         const diff = computeCatalogDiff(toCatalogApps(curAppRows, curRoleRows), doc.applications)
         if (!hasChanges(diff)) return { version: curVer, diff }
 
-        for (const app of doc.applications) {
-          const existing = curAppRows.find((a) => a.code === app.code)
-          const values = {
-            code: app.code,
-            name: app.name,
-            status: app.status,
-            keycloakClientId: app.keycloak.clientId,
-            accessClientRole: app.keycloak.accessRole,
-            webhookUrl: app.webhook?.url ?? null,
-            webhookSecretRef: app.webhook?.secretRef ?? null,
-            loginUrl: app.loginUrl ?? null,
-            adminUrl: app.adminUrl ?? null,
-          }
-          let appId: string
-          if (existing) {
-            await tx.update(schema.applications).set({ ...values, updatedAt: new Date() }).where(eq(schema.applications.id, existing.id))
-            appId = existing.id
-          } else {
-            const [row] = await tx.insert(schema.applications).values(values).returning()
-            appId = row.id
-          }
-          const existingRoles = curRoleRows.filter((r) => r.applicationId === appId)
-          const desiredCodes = new Set(app.roles.map((r) => r.code))
-          for (const role of app.roles) {
-            const er = existingRoles.find((r) => r.code === role.code)
-            if (er) {
-              await tx.update(schema.applicationRoles).set({ name: role.name, description: role.description ?? null, status: 'active', updatedAt: new Date() }).where(eq(schema.applicationRoles.id, er.id))
-            } else {
-              await tx.insert(schema.applicationRoles).values({ applicationId: appId, code: role.code, name: role.name, description: role.description ?? null, status: 'active' })
-            }
-          }
-          for (const er of existingRoles) {
-            if (!desiredCodes.has(er.code) && er.status !== 'pending_deactivate') {
-              await tx.update(schema.applicationRoles).set({ status: 'pending_deactivate', updatedAt: new Date() }).where(eq(schema.applicationRoles.id, er.id))
-            }
-          }
-        }
-        const desiredAppCodes = new Set(doc.applications.map((a) => a.code))
-        for (const a of curAppRows) {
-          if (!desiredAppCodes.has(a.code) && a.status !== 'pending_deactivate') {
-            await tx.update(schema.applications).set({ status: 'pending_deactivate', updatedAt: new Date() }).where(eq(schema.applications.id, a.id))
-          }
-        }
+        await materializeCatalog(tx, doc.applications, curAppRows, curRoleRows)
+
         const newVersion = curVer + 1
         await tx.insert(schema.catalogVersions).values({
           version: newVersion,

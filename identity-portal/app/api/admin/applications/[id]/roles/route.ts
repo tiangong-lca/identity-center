@@ -11,7 +11,7 @@ export const GET = adminRoute(
 )
 
 const createRoleSchema = z.object({
-  code: z.string().min(1).max(50).regex(/^[a-z0-9_]+$/),
+  code: z.string().min(1).max(50).regex(/^[a-z0-9_-]+$/),
   name: z.string().min(1).max(100),
   description: z.string().max(300).optional(),
 })

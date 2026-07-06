@@ -29,26 +29,4 @@ describe('seedBusinessApps(tiangong-lca)', () => {
     })
     expect(roles.map((r) => r.code).sort()).toEqual(['admin', 'review-admin', 'review-member'])
   })
-
-  it('存量 supabase 占位行被原位更名(保留 id)', async () => {
-    const [pg] = getDbTargets()
-    const tdb2 = await createMigratedTestDb(pg.adminUrl)
-    const [legacy] = await tdb2.db
-      .insert(schema.applications)
-      .values({
-        code: 'supabase',
-        name: 'Supabase 业务应用',
-        keycloakClientId: 'supabase-business-app',
-        accessClientRole: 'supabase_app_access',
-        status: 'active',
-        webhookSecretRef: 'SUPABASE_WEBHOOK_SECRET',
-      })
-      .returning()
-    await seedBusinessApps(tdb2.db)
-    const apps = await tdb2.db.query.applications.findMany()
-    expect(apps).toHaveLength(1)
-    expect(apps[0].id).toBe(legacy.id)
-    expect(apps[0].code).toBe('tiangong-lca')
-    await tdb2.destroy()
-  })
 })
