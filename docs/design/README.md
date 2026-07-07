@@ -10,8 +10,8 @@ whenToUpdate: 设计文档集目录结构、评审状态或收录范围发生变
 checkPaths:
   - docs/design/README.md
   - docs/README.md
-lastReviewedAt: 2026-07-06
-lastReviewedCommit: 16f3661
+lastReviewedAt: 2026-07-07
+lastReviewedCommit: cbf5737
 ---
 
 # 统一身份与用户门户设计文档集

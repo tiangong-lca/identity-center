@@ -10,8 +10,8 @@ whenToUpdate: 前端产品交互设计、页面结构或交互规范发生变化
 checkPaths:
   - docs/design/02-application/01-frontend-product-interaction-design/README.md
   - identity-portal/AGENTS.md
-lastReviewedAt: 2026-07-06
-lastReviewedCommit: 16f3661
+lastReviewedAt: 2026-07-07
+lastReviewedCommit: cbf5737
 ---
 
 # 06. 前端产品与交互设计
@@ -94,6 +94,7 @@ lastReviewedCommit: 16f3661
 | 组织列表 | `/admin/orgs` | 组织/租户管理 |
 | 应用列表 | `/admin/apps` | 接入应用管理 |
 | 应用详情 | `/admin/apps/[id]` | Client、授权、回调地址 |
+| 应用目录 | `/admin/catalog` | 编辑应用/角色定义 YAML，Apply、版本历史、回滚（见 §8.1） |
 | 角色权限 | `/admin/roles` | 管理后台角色和权限 |
 | 审计日志 | `/admin/audit` | 操作审计查询 |
 | 系统设置 | `/admin/settings` | 安全策略、同步设置 |
@@ -218,6 +219,12 @@ Web Origins
 应用角色分配：用户在应用里是什么角色
 业务权限定义：该角色具体能做什么，由业务应用定义
 ```
+
+应用/角色定义（基础信息、角色目录）现改由 §8.1 的应用目录控制台统一编辑，应用详情页对应标签页改为只读展示并提供“在目录中编辑”跳转入口；应用准入、角色分配、同步状态、审计日志等标签页不受影响。
+
+### 8.1 应用目录控制台
+
+`/admin/catalog` 是应用/角色定义的唯一编辑入口，采用类似 `kubectl edit` 的交互：载入当前 YAML 快照 → 在 Monaco 编辑器中编辑 → 点击 Apply 提交。提交携带载入时的版本号做乐观并发校验，冲突时提示“配置已被他人更新，请重新载入”，校验失败时在编辑器旁列出逐条错误，Apply 成功后展示本次改动的结构化 diff；未产生实际变化的 Apply/回滚按 no-op 处理，不追加新版本，也不展示成功提示，避免误导。页面同时提供版本历史列表和一键回滚到历史版本的操作，回滚同样走乐观并发校验。权限要求：查看需要 `catalog:read`，Apply/回滚需要 `catalog:apply`。
 
 ## 9. 状态设计
 

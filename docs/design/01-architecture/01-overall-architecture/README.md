@@ -11,8 +11,8 @@ checkPaths:
   - docs/design/01-architecture/01-overall-architecture/README.md
   - docs/design/02-application/03-sync-event-design/README.md
   - docs/design/02-application/04-project-structure-design/README.md
-lastReviewedAt: 2026-07-06
-lastReviewedCommit: 16f3661
+lastReviewedAt: 2026-07-07
+lastReviewedCommit: cbf5737
 ---
 
 # 统一身份平台整体设计

@@ -10,8 +10,8 @@ whenToUpdate: 目录结构、分层原则或推荐依赖边界发生变化时更
 checkPaths:
   - docs/design/02-application/04-project-structure-design/README.md
   - docs/design/01-architecture/01-overall-architecture/README.md
-lastReviewedAt: 2026-07-06
-lastReviewedCommit: 16f3661
+lastReviewedAt: 2026-07-07
+lastReviewedCommit: cbf5737
 ---
 
 # 12. 项目结构设计
@@ -468,9 +468,22 @@ server/services/catalog-service.ts                # apply/getCurrent/listVersion
 server/services/catalog-materialize.ts            # 纯 DB upsert(应用/角色物化,漂移置 pending_deactivate)
 server/services/catalog-reconcile-service.ts      # 提交后 Keycloak 准入角色 reconcile(逐 app 隔离)
 scripts/apply-catalog.ts                          # CLI 入口
+app/admin/catalog/page.tsx                        # 目录控制台页面(/admin/catalog)
+app/api/admin/catalog/route.ts                    # GET 当前目录快照
+app/api/admin/catalog/apply/route.ts              # POST 提交 YAML(乐观并发)
+app/api/admin/catalog/rollback/route.ts           # POST 回滚到历史版本
+app/api/admin/catalog/versions/route.ts           # GET 版本历史列表
+app/api/admin/catalog/versions/[version]/route.ts # GET 指定版本详情
+features/catalog/catalog-view.tsx                 # 编辑器+Apply+diff 展示的容器组件
+features/catalog/catalog-editor.tsx               # Monaco YAML 编辑器封装(本地打包加载,适配 CSP)
+features/catalog/version-history.tsx              # 版本历史列表 + 回滚
+lib/catalog/schema.ts                             # 同上,供前后端共享 zod schema
+lib/http/error-codes.ts                           # 新增 CATALOG_MANAGED(409),见下
 ```
 
 `catalog-service.apply` 在一个数据库事务内完成乐观并发版本校验、经共享的 `materializeCatalog` upsert `applications`/`application_roles`、并追加 `catalog_versions` 记录；事务提交后再对 `active` 应用做 Keycloak 准入角色（`accessRole`）reconcile，最后写审计。`scripts/seed/business-apps.ts` 的 `seedBusinessApps` 现在是复用 `materializeCatalog` 的纯 DB shim，供测试和无 Keycloak 场景使用；`seed-portal-db.ts` 走完整的 `apply-catalog` 路径。
+
+在此基础上，`/admin/catalog` 控制台把应用目录变成可视化的 kubectl-edit 式编辑流程：`features/catalog` 通过 `lib/catalog/schema.ts` 与后端共享 YAML 结构定义，`catalog-editor` 用 Monaco 承载编辑（依赖本地打包，避免 CDN 加载被 CSP 拦截），Apply/回滚统一走 `lib/catalog/schema.ts` 校验 + 乐观并发（`expectedVersion`）+ `lib/http/error-codes.ts` 新增的 `CATALOG_MANAGED`（409）错误码。原有的应用/角色定义写接口（`app/api/admin/applications/**`、`app/api/admin/applications/[id]/roles/**` 的 `POST`/`PATCH`）现在统一返回 `CATALOG_MANAGED`，定义类变更只能通过本控制台完成；`features/apps` 对应的定义类标签页相应改为只读展示。
 
 ## 5. 请求调用链
 

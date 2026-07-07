@@ -11,8 +11,8 @@ checkPaths:
   - docs/references/kingbasees-environment.md
   - docs/references/kingbasees-compatibility-conventions.md
   - docs/implementation/decisions.md
-lastReviewedAt: 2026-07-06
-lastReviewedCommit: 16f3661
+lastReviewedAt: 2026-07-07
+lastReviewedCommit: cbf5737
 ---
 
 # KingbaseES 开发环境结论(2026-07-02)
