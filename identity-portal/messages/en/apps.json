@@ -1,8 +1,11 @@
 {
   "apps": {
     "title": "Applications",
-    "subtitle": "Register business applications, manage access assignments and app roles",
-    "register": "Register application",
+    "subtitle": "View business applications, manage access assignments and app roles",
+    "catalogManaged": {
+      "notice": "Applications and roles are managed by the catalog. To add or change one, use the catalog editor.",
+      "link": "Edit in catalog"
+    },
     "table": {
       "app": "Application",
       "clientId": "Keycloak Client",
@@ -10,7 +13,7 @@
       "createdAt": "Created at",
       "actions": "Actions",
       "detail": "Details",
-      "empty": "No applications yet; register one from the top right",
+      "empty": "No applications yet; register one in the catalog editor",
       "loadFailed": "Failed to load the list",
       "retry": "Retry"
     },
@@ -24,52 +27,18 @@
       "prev": "Previous",
       "next": "Next"
     },
-    "form": {
-      "createTitle": "Register application",
-      "createDescription": "Register a business application in the platform catalog; the Keycloak client must already exist",
-      "editTitle": "Edit basic info",
-      "editDescription": "Application code and the Keycloak client cannot be changed after registration",
-      "code": "Application code",
-      "codePlaceholder": "e.g. crm-web",
-      "codeHint": "Lowercase letters, digits and hyphens (2-50 chars); immutable after registration",
-      "codeInvalid": "Code allows only 2-50 lowercase letters, digits and hyphens",
-      "name": "Application name",
-      "namePlaceholder": "e.g. CRM Web",
-      "keycloakClientId": "Keycloak Client ID",
-      "keycloakClientIdPlaceholder": "e.g. crm-web",
-      "keycloakClientIdHint": "Must be an existing client in Keycloak; validated at registration",
-      "accessClientRole": "Access client role",
-      "accessClientRolePlaceholder": "Optional; auto-generated as code_access when blank",
-      "accessClientRoleHint": "The client role used for the access projection on the identity provider",
-      "status": "Status",
-      "loginUrl": "Login URL",
-      "adminUrl": "Admin URL",
-      "webhookUrl": "Webhook URL",
-      "webhookUrlHint": "Callback endpoint that receives access and role change events",
-      "webhookSecretRef": "Webhook secret reference",
-      "webhookSecretRefHint": "The env key name of the deployment (e.g. APP_CRM_WEBHOOK_SECRET); the platform stores the key reference only, never the plaintext secret",
-      "optional": "Optional",
-      "requiredMissing": "Please fill in all required fields",
-      "create": "Register",
-      "save": "Save",
-      "cancel": "Cancel"
-    },
     "toast": {
-      "created": "Application {name} registered",
-      "updated": "Basic info saved",
       "grantProjected": "Access granted and synced to the identity provider",
       "grantPending": "Access granted; identity provider projection is syncing",
       "revoked": "Access revoked",
       "revokeRetry": "Revoked; identity provider projection is retrying",
-      "roleCreated": "Role {code} created",
-      "roleUpdated": "Role updated",
       "roleAssigned": "Role assigned",
       "roleRevoked": "Role assignment revoked",
       "failed": "Operation failed: {message}"
     },
     "detail": {
       "back": "Back to applications",
-      "edit": "Edit",
+      "editInCatalog": "Edit in catalog",
       "loadFailed": "Failed to load the application",
       "notFound": "Application does not exist or has been removed",
       "retry": "Retry",
@@ -91,8 +60,7 @@
         "webhookUrl": "Webhook URL",
         "webhookSecretRef": "Webhook secret reference",
         "createdAt": "Created at",
-        "updatedAt": "Updated at",
-        "clearHint": "Filled URL fields cannot be cleared from the UI yet; they can only be overwritten"
+        "updatedAt": "Updated at"
       },
       "keycloak": {
         "title": "Keycloak binding",
@@ -139,30 +107,13 @@
         "selected": "Selected"
       },
       "roles": {
-        "create": "New role",
-        "edit": "Edit",
+        "editInCatalog": "Edit in catalog",
         "code": "Role code",
         "name": "Name",
         "description": "Description",
         "status": "Status",
-        "actions": "Actions",
         "empty": "No roles yet; register roles in the catalog first",
-        "loadFailed": "Failed to load roles",
-        "createTitle": "New application role",
-        "createDescription": "Register an assignable role; the semantics of the role are defined by the business application",
-        "editTitle": "Edit application role",
-        "editDescription": "Role code cannot be changed after creation",
-        "codePlaceholder": "e.g. admin",
-        "codeHint": "Lowercase letters, digits and underscores",
-        "codeInvalid": "Code allows only lowercase letters, digits and underscores",
-        "requiredMissing": "Please fill in all required fields",
-        "statusValue": {
-          "active": "Active",
-          "disabled": "Disabled"
-        },
-        "submitCreate": "Create",
-        "submitSave": "Save",
-        "cancel": "Cancel"
+        "loadFailed": "Failed to load roles"
       },
       "roleAssignments": {
         "assign": "Assign role",
