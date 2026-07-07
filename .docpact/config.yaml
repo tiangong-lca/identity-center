@@ -1,7 +1,7 @@
 version: 1
 layout: repo
-lastReviewedAt: "2026-07-06"
-lastReviewedCommit: "16f3661"
+lastReviewedAt: "2026-07-07"
+lastReviewedCommit: "3cba77d"
 
 # Repo-local docpact governance for identity-center.
 # The workspace root config governs the submodule pointer and cross-repo view;
@@ -350,6 +350,8 @@ rules:
         kind: api-error-contract
       - path: identity-portal/scripts/apply-catalog.ts
         kind: catalog-cli
+      - path: identity-portal/scripts/export-catalog.ts
+        kind: catalog-cli
       - path: identity-portal/scripts/seed-portal-db.ts
         kind: seed-bootstrap
       - path: identity-portal/scripts/seed/**
@@ -378,6 +380,8 @@ rules:
         kind: mq-adapter
       - path: identity-portal/lib/sync/**
         kind: sync-runtime
+      - path: identity-portal/scripts/worker.ts
+        kind: job-runtime-entrypoint
     requiredDocs:
       - path: .docpact/config.yaml
         mode: review_or_update
@@ -385,7 +389,7 @@ rules:
         mode: review_or_update
       - path: docs/design/01-architecture/01-overall-architecture/README.md
         mode: review_or_update
-    reason: Service, policy, background-job, MQ, and sync changes alter the event and reconciliation pipeline and should refresh the sync-event design and the overall architecture.
+    reason: Service, policy, background-job, MQ, sync, and worker-entrypoint changes alter the event and reconciliation pipeline and should refresh the sync-event design and the overall architecture.
   - id: identity-security-and-audit-contract
     scope: repo
     repo: identity-center

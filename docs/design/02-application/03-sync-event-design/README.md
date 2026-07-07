@@ -11,7 +11,7 @@ checkPaths:
   - docs/design/02-application/03-sync-event-design/README.md
   - docs/design/01-architecture/01-overall-architecture/README.md
 lastReviewedAt: 2026-07-07
-lastReviewedCommit: cbf5737
+lastReviewedCommit: 3cba77d
 ---
 
 # 08. 同步与事件设计
