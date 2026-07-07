@@ -64,8 +64,8 @@ export function PendingDeactivatePanel() {
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel>{t('cancel')}</AlertDialogCancel>
-            <AlertDialogAction onClick={onConfirm} disabled={confirm.isPending}>
+            <AlertDialogCancel disabled={confirm.isPending}>{t('cancel')}</AlertDialogCancel>
+            <AlertDialogAction variant="destructive" onClick={onConfirm} disabled={confirm.isPending}>
               {t('pendingDeactivate.confirm')}
             </AlertDialogAction>
           </AlertDialogFooter>
