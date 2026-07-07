@@ -8,6 +8,7 @@ import { Card } from '@/components/ui/card'
 import { ApiClientError } from '@/features/shared/api'
 import { CatalogEditor } from './catalog-editor'
 import { useApplyCatalog, useCatalog } from './queries'
+import { VersionHistory } from './version-history'
 
 type Issue = { path: string; message: string }
 
@@ -87,6 +88,13 @@ export function CatalogView() {
           <pre className="overflow-x-auto text-xs">{JSON.stringify(diff, null, 2)}</pre>
         </Card>
       )}
+      <VersionHistory
+        currentVersion={version}
+        onRolledBack={(v) => {
+          setVersion(v)
+          refetch()
+        }}
+      />
     </div>
   )
 }

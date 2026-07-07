@@ -10,6 +10,7 @@
     "validationTitle": "校验错误(服务端)",
     "diffTitle": "本次变更",
     "nav": "目录",
+    "cancel": "取消",
     "versions": {
       "title": "版本历史",
       "version": "版本",
@@ -19,7 +20,8 @@
       "view": "查看",
       "rollback": "回滚",
       "rollbackConfirm": "回滚到版本 {version}?会生成新版本",
-      "empty": "暂无版本"
+      "empty": "暂无版本",
+      "loadFailed": "版本历史加载失败"
     }
   }
 }

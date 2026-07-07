@@ -10,6 +10,7 @@
     "validationTitle": "Validation errors (server)",
     "diffTitle": "Changes applied",
     "nav": "Catalog",
+    "cancel": "Cancel",
     "versions": {
       "title": "Version history",
       "version": "Version",
@@ -19,7 +20,8 @@
       "view": "View",
       "rollback": "Roll back",
       "rollbackConfirm": "Roll back to version {version}? This creates a new version.",
-      "empty": "No versions yet"
+      "empty": "No versions yet",
+      "loadFailed": "Failed to load version history"
     }
   }
 }
