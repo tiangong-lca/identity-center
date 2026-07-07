@@ -11,7 +11,7 @@ checkPaths:
   - docs/design/02-application/01-frontend-product-interaction-design/README.md
   - identity-portal/AGENTS.md
 lastReviewedAt: 2026-07-07
-lastReviewedCommit: 3cba77d
+lastReviewedCommit: a376b16
 ---
 
 # 06. 前端产品与交互设计
@@ -92,9 +92,9 @@ lastReviewedCommit: 3cba77d
 | 用户详情 | `/admin/users/[id]` | 用户资料、角色、应用、日志 |
 | 创建用户 | `/admin/users/new` | 创建 Keycloak 用户 |
 | 组织列表 | `/admin/orgs` | 组织/租户管理 |
-| 应用列表 | `/admin/apps` | 接入应用管理 |
+| 应用列表 | `/admin/apps` | 接入应用管理；「应用」区段内 tab 之一（见 §8） |
 | 应用详情 | `/admin/apps/[id]` | Client、授权、回调地址 |
-| 应用目录 | `/admin/catalog` | 编辑应用/角色定义 YAML，Apply、版本历史、回滚（见 §8.1） |
+| 应用注册表 | `/admin/apps/registry` | 「应用」区段内另一 tab；编辑应用/角色定义 YAML，Apply、版本历史、回滚（见 §8.1）。旧路径 `/admin/catalog` 307 重定向至此 |
 | 角色权限 | `/admin/roles` | 管理后台角色和权限 |
 | 审计日志 | `/admin/audit` | 操作审计查询 |
 | 系统设置 | `/admin/settings` | 安全策略、同步设置 |
@@ -220,11 +220,13 @@ Web Origins
 业务权限定义：该角色具体能做什么，由业务应用定义
 ```
 
-应用/角色定义（基础信息、角色目录）现改由 §8.1 的应用目录控制台统一编辑，应用详情页对应标签页改为只读展示并提供“在目录中编辑”跳转入口；应用准入、角色分配、同步状态、审计日志等标签页不受影响。
+应用/角色定义（基础信息、角色目录）现改由 §8.1 的应用注册表统一编辑，应用详情页对应标签页改为只读展示并提供“在注册表中编辑”跳转入口；应用准入、角色分配、同步状态、审计日志等标签页不受影响。
 
-### 8.1 应用目录控制台
+「应用」区段（`/admin/apps`）内以段内 tab 组织两个子视图：**应用列表**（`/admin/apps`，接入应用清单/详情入口）与**应用注册表**（`/admin/apps/registry`，见 §8.1）；顶级侧边栏不再单列“目录”入口。旧路径 `/admin/catalog` 保留 307 重定向到 `/admin/apps/registry`，避免外部书签或历史链接 404。此次调整仅涉及导航结构与用户可见文案（含 `apps.json` 的“catalog”相关提示语改为“registry”措辞、i18n `nav.catalog` 拆分为 `nav.appsList`/`nav.appsRegistry`），后端 `/api/admin/catalog/*` 端点路径、权限码（`catalog:read`/`catalog:apply`）与行为均未变更。
 
-`/admin/catalog` 是应用/角色定义的唯一编辑入口，采用类似 `kubectl edit` 的交互：载入当前 YAML 快照 → 在 Monaco 编辑器中编辑 → 点击 Apply 提交。提交携带载入时的版本号做乐观并发校验，冲突时提示”配置已被他人更新，请重新载入”，校验失败时在编辑器旁列出逐条错误，Apply 成功后展示本次改动的结构化 diff；未产生实际变化的 Apply/回滚按 no-op 处理，不追加新版本，也不展示成功提示，避免误导。页面同时提供版本历史列表和一键回滚到历史版本的操作，回滚同样走乐观并发校验。权限要求：查看需要 `catalog:read`，Apply/回滚需要 `catalog:apply`。
+### 8.1 应用注册表
+
+`/admin/apps/registry`（原 `/admin/catalog`）是应用/角色定义的唯一编辑入口，采用类似 `kubectl edit` 的交互：载入当前 YAML 快照 → 在 Monaco 编辑器中编辑 → 点击 Apply 提交。提交携带载入时的版本号做乐观并发校验，冲突时提示”配置已被他人更新，请重新载入”，校验失败时在编辑器旁列出逐条错误，Apply 成功后展示本次改动的结构化 diff；未产生实际变化的 Apply/回滚按 no-op 处理，不追加新版本，也不展示成功提示，避免误导。页面同时提供版本历史列表和一键回滚到历史版本的操作，回滚同样走乐观并发校验。权限要求：查看需要 `catalog:read`，Apply/回滚需要 `catalog:apply`。
 
 页面新增”待停用”面板：列出当前处于 `pending_deactivate` 的应用/角色（即目录 reconcile 检测到已从 YAML 中移除、但尚未终态处理的项）。管理员对单项发起”确认停用”时弹出二次确认对话框（AlertDialog，destructive 样式，取消按钮禁用态与其他危险操作一致），确认后调用停用接口将状态推进为 `deactivated` 终态；该操作不可逆，面板不提供撤销或恢复入口。
 

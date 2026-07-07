@@ -11,7 +11,7 @@ checkPaths:
   - identity-portal/AGENTS.md
   - identity-portal/CLAUDE.md
 lastReviewedAt: 2026-07-07
-lastReviewedCommit: 3cba77d
+lastReviewedCommit: a376b16
 ---
 
 <!-- BEGIN:nextjs-agent-rules -->
