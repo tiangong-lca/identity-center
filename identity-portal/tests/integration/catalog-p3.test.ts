@@ -1,5 +1,6 @@
 import { randomUUID } from 'node:crypto'
 import { eq } from 'drizzle-orm'
+import { NextRequest } from 'next/server'
 import { afterAll, beforeAll, describe, expect, it, vi } from 'vitest'
 import * as schema from '@/db/schema'
 import { createKeycloakAdmin } from '@/lib/keycloak/admin-client'
@@ -24,10 +25,22 @@ import { exportCatalogYaml } from '@/scripts/export-catalog'
 import { parseCatalogYaml } from '@/lib/catalog/serialize'
 import { computeCatalogDiff, hasChanges } from '@/lib/catalog/diff'
 import { toCatalogApps } from '@/lib/catalog/serialize'
+import { GET as pendingList } from '@/app/api/admin/catalog/pending-deactivate/route'
+import { POST as deactivate } from '@/app/api/admin/catalog/deactivate/route'
+import { POST as applyCatalog } from '@/app/api/admin/catalog/apply/route'
 
 const pg = getDbTargets()[0]
 const suffix = randomUUID().slice(0, 8)
 const ADMIN_SUB = `catalog-p3-admin-${suffix}`
+const adminSession = { user: { keycloakSub: ADMIN_SUB, email: 'cat-p3@test.local', roles: ['admin_console_access'], isAdmin: true } }
+
+function req(method: string, path: string, body?: unknown): NextRequest {
+  return new NextRequest(`http://localhost:3000${path}`, {
+    method,
+    headers: body !== undefined ? { 'content-type': 'application/json' } : {},
+    body: body !== undefined ? JSON.stringify(body) : undefined,
+  })
+}
 
 describe('catalog P3(detectDrift 周期对账;mock 会话 + 真实 PG/KC)', () => {
   let tdb: TestDb
@@ -78,6 +91,45 @@ describe('catalog P3(detectDrift 周期对账;mock 会话 + 真实 PG/KC)', () =
       const curRoles = await ctx.db.query.applicationRoles.findMany()
       const diff = computeCatalogDiff(toCatalogApps(curApps, curRoles), doc.applications)
       expect(hasChanges(diff)).toBe(false)
+    })
+  })
+
+  describe('confirmDeactivate + 端点', () => {
+    it('确认停用 pending_deactivate 应用 → deactivated + 从 getCurrent 消失', async () => {
+      mockSession.current = adminSession
+      await createCatalogService(ctx).apply({ yaml: `version: 1\napplications:\n  - code: dz\n    name: DZ\n    keycloak: { clientId: dz-client, accessRole: dz_access }\n    roles: []\n`, source: 'cli' })
+      await createCatalogService(ctx).apply({ yaml: `version: 1\napplications: []\n`, source: 'cli' }) // dz → pending_deactivate
+
+      const listRes = await pendingList(req('GET', '/api/admin/catalog/pending-deactivate'))
+      expect(listRes.status).toBe(200)
+      const listed = (await listRes.json()).data.items.map((i: { appCode: string }) => i.appCode)
+      expect(listed).toContain('dz')
+
+      const res = await deactivate(req('POST', '/api/admin/catalog/deactivate', { appCode: 'dz' }))
+      expect(res.status).toBe(200)
+      expect((await res.json()).data.status).toBe('deactivated')
+
+      const row = await ctx.db.query.applications.findFirst({ where: eq(schema.applications.code, 'dz') })
+      expect(row?.status).toBe('deactivated')
+      const { yaml } = await createCatalogService(ctx).getCurrent()
+      expect(yaml).not.toContain('code: dz')
+    })
+
+    it('对非 pending_deactivate 目标 → 409 CONFLICT', async () => {
+      mockSession.current = adminSession
+      await createCatalogService(ctx).apply({ yaml: `version: 1\napplications:\n  - code: live\n    name: Live\n    keycloak: { clientId: live-client, accessRole: live_access }\n    roles: []\n`, source: 'cli' })
+      const res = await deactivate(req('POST', '/api/admin/catalog/deactivate', { appCode: 'live' }))
+      expect(res.status).toBe(409)
+    })
+
+    it('apply 含明文密钥 → 400 VALIDATION_ERROR(details 只出路径)', async () => {
+      mockSession.current = adminSession
+      const res = await applyCatalog(req('POST', '/api/admin/catalog/apply', {
+        yaml: `version: 1\napplications:\n  - code: leak\n    name: Leak\n    keycloak: { clientId: leak-client, accessRole: leak_access }\n    loginUrl: https://x/h?token=supersecretplaintext\n    roles: []\n`,
+      }))
+      expect(res.status).toBe(400)
+      const body = await res.json()
+      expect(JSON.stringify(body)).not.toContain('supersecretplaintext')
     })
   })
 })
