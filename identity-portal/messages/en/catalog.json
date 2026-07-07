@@ -1,0 +1,25 @@
+{
+  "catalog": {
+    "title": "App Catalog",
+    "subtitle": "Declaratively edit the business-app registry (YAML). The server validates on apply.",
+    "apply": "Apply",
+    "reload": "Reload",
+    "applying": "Applying…",
+    "applied": "Applied — version {version}",
+    "conflict": "The catalog was updated by someone else. Reload and retry.",
+    "validationTitle": "Validation errors (server)",
+    "diffTitle": "Changes applied",
+    "nav": "Catalog",
+    "versions": {
+      "title": "Version history",
+      "version": "Version",
+      "appliedBy": "By",
+      "source": "Source",
+      "appliedAt": "At",
+      "view": "View",
+      "rollback": "Roll back",
+      "rollbackConfirm": "Roll back to version {version}? This creates a new version.",
+      "empty": "No versions yet"
+    }
+  }
+}

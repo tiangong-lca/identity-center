@@ -11,6 +11,7 @@ const NAV_ITEMS = [
   { href: '/admin/users', key: 'users', exact: false },
   { href: '/admin/registration-requests', key: 'registrations', exact: false },
   { href: '/admin/apps', key: 'apps', exact: false },
+  { href: '/admin/catalog', key: 'catalog', exact: false },
   { href: '/admin/orgs', key: 'orgs', exact: false },
   { href: '/admin/roles', key: 'roles', exact: false },
   { href: '/admin/audit', key: 'audit', exact: false },
