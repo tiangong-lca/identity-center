@@ -62,3 +62,6 @@ export const catalogDocSchema = z
 export type CatalogRole = z.infer<typeof catalogRoleSchema>
 export type CatalogApp = z.infer<typeof catalogAppSchema>
 export type CatalogDoc = z.infer<typeof catalogDocSchema>
+
+/** JSON Schema(喂前端 Monaco 做结构级校验/补全;唯一性等 superRefine 不在内,由服务端 apply 兜底) */
+export const catalogJsonSchema = z.toJSONSchema(catalogDocSchema)
