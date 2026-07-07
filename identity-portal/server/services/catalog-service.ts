@@ -3,6 +3,7 @@ import { ZodError } from 'zod'
 import * as schema from '@/db/schema'
 import { getAuditContext } from '@/lib/audit/context'
 import { computeCatalogDiff, hasChanges, type CatalogDiff } from '@/lib/catalog/diff'
+import { scanForPlaintextSecrets } from '@/lib/catalog/secret-scan'
 import { parseCatalogYaml, renderCatalogYaml, toCatalogApps } from '@/lib/catalog/serialize'
 import type { CatalogDoc } from '@/lib/catalog/schema'
 import { ApiError } from '@/lib/http/api-error'
@@ -63,6 +64,12 @@ export function createCatalogService(ctx: ServiceContext) {
 
     async apply(input: ApplyInput): Promise<ApplyResult> {
       const doc = parseCatalogYamlOrThrow(input.yaml) // 语法/schema/业务(唯一性)校验;失败 → ApiError('VALIDATION_ERROR')
+      const secretFindings = scanForPlaintextSecrets(doc)
+      if (secretFindings.length > 0) {
+        throw new ApiError('VALIDATION_ERROR', 'catalog YAML 疑似含明文密钥(应改用 secretRef)', {
+          issues: secretFindings.map((f) => ({ path: f.path, message: `疑似明文密钥(${f.hint})` })),
+        })
+      }
       const { version, diff } = await ctx.db.transaction(async (tx) => {
         const curVer = await currentVersion(tx)
         if (input.expectedVersion !== undefined && input.expectedVersion !== curVer) {
