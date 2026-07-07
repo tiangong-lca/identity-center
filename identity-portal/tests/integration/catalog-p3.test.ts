@@ -1,5 +1,5 @@
 import { randomUUID } from 'node:crypto'
-import { eq } from 'drizzle-orm'
+import { and, eq } from 'drizzle-orm'
 import { NextRequest } from 'next/server'
 import { afterAll, beforeAll, describe, expect, it, vi } from 'vitest'
 import * as schema from '@/db/schema'
@@ -130,6 +130,54 @@ describe('catalog P3(detectDrift 周期对账;mock 会话 + 真实 PG/KC)', () =
       expect(res.status).toBe(400)
       const body = await res.json()
       expect(JSON.stringify(body)).not.toContain('supersecretplaintext')
+    })
+  })
+
+  describe('materialize 不回翻 deactivated', () => {
+    it('app 已 deactivated 后,apply 不相关目录不应把它翻回 pending_deactivate', async () => {
+      // 建 app term → 移除(pending_deactivate)→ 确认停用(deactivated)
+      await createCatalogService(ctx).apply({
+        yaml: `version: 1\napplications:\n  - code: term\n    name: Term\n    keycloak: { clientId: term-client, accessRole: term_access }\n    roles: []\n`,
+        source: 'cli',
+      })
+      await createCatalogService(ctx).apply({ yaml: `version: 1\napplications: []\n`, source: 'cli' }) // term → pending_deactivate
+      await createCatalogService(ctx).confirmDeactivate({ appCode: 'term' }) // term → deactivated
+
+      // apply 一个完全不相关的目录(只含 other,不含 term)
+      await createCatalogService(ctx).apply({
+        yaml: `version: 1\napplications:\n  - code: other\n    name: Other\n    keycloak: { clientId: other-client, accessRole: other_access }\n    roles: []\n`,
+        source: 'cli',
+      })
+
+      const row = await ctx.db.query.applications.findFirst({ where: eq(schema.applications.code, 'term') })
+      expect(row?.status).toBe('deactivated')
+    })
+
+    it('role 已 deactivated 后,再次 apply 同应用不应把它翻回 pending_deactivate', async () => {
+      // 建 app rapp,角色 keep + drop
+      await createCatalogService(ctx).apply({
+        yaml: `version: 1\napplications:\n  - code: rapp\n    name: RApp\n    keycloak: { clientId: rapp-client, accessRole: rapp_access }\n    roles: [{ code: keep, name: Keep }, { code: drop, name: Drop }]\n`,
+        source: 'cli',
+      })
+      // 移除 drop → pending_deactivate
+      await createCatalogService(ctx).apply({
+        yaml: `version: 1\napplications:\n  - code: rapp\n    name: RApp\n    keycloak: { clientId: rapp-client, accessRole: rapp_access }\n    roles: [{ code: keep, name: Keep }]\n`,
+        source: 'cli',
+      })
+      // 确认停用 drop 角色 → deactivated
+      await createCatalogService(ctx).confirmDeactivate({ appCode: 'rapp', roleCode: 'drop' })
+
+      // 再次 apply(新增角色 bump,制造真实 diff,确保 materializeCatalog 真正执行,而不是被 hasChanges 短路跳过)
+      await createCatalogService(ctx).apply({
+        yaml: `version: 1\napplications:\n  - code: rapp\n    name: RApp\n    keycloak: { clientId: rapp-client, accessRole: rapp_access }\n    roles: [{ code: keep, name: Keep }, { code: bump, name: Bump }]\n`,
+        source: 'cli',
+      })
+
+      const app = await ctx.db.query.applications.findFirst({ where: eq(schema.applications.code, 'rapp') })
+      const dropRole = await ctx.db.query.applicationRoles.findFirst({
+        where: and(eq(schema.applicationRoles.applicationId, app!.id), eq(schema.applicationRoles.code, 'drop')),
+      })
+      expect(dropRole?.status).toBe('deactivated')
     })
   })
 })
