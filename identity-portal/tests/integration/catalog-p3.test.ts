@@ -20,6 +20,9 @@ vi.mock('@/lib/auth', () => ({
 
 import { createCatalogReconcileService } from '@/server/services/catalog-reconcile-service'
 import { createCatalogService } from '@/server/services/catalog-service'
+import { parseCatalogYaml } from '@/lib/catalog/serialize'
+import { computeCatalogDiff, hasChanges } from '@/lib/catalog/diff'
+import { toCatalogApps } from '@/lib/catalog/serialize'
 
 const pg = getDbTargets()[0]
 const suffix = randomUUID().slice(0, 8)
@@ -59,6 +62,21 @@ describe('catalog P3(detectDrift 周期对账;mock 会话 + 真实 PG/KC)', () =
       expect(codes).toContain('p3app')
       const item = drift.pendingDeactivate.find((x) => x.appCode === 'p3app')
       expect(item?.affectedAssignments).toBe(0)
+    })
+  })
+
+  describe('export round-trip', () => {
+    it('getCurrent().yaml 再 apply(check)diff 空', async () => {
+      await createCatalogService(ctx).apply({
+        yaml: `version: 1\napplications:\n  - code: exp\n    name: Exp\n    keycloak: { clientId: exp-client, accessRole: exp_access }\n    roles: [{ code: admin, name: 管理员 }]\n`,
+        source: 'cli',
+      })
+      const { yaml } = await createCatalogService(ctx).getCurrent()
+      const doc = parseCatalogYaml(yaml)
+      const curApps = await ctx.db.query.applications.findMany()
+      const curRoles = await ctx.db.query.applicationRoles.findMany()
+      const diff = computeCatalogDiff(toCatalogApps(curApps, curRoles), doc.applications)
+      expect(hasChanges(diff)).toBe(false)
     })
   })
 })
