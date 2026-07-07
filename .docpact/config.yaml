@@ -346,6 +346,8 @@ rules:
         kind: orm-config
       - path: identity-portal/lib/catalog/**
         kind: catalog-domain
+      - path: identity-portal/lib/http/**
+        kind: api-error-contract
       - path: identity-portal/scripts/apply-catalog.ts
         kind: catalog-cli
       - path: identity-portal/scripts/seed-portal-db.ts

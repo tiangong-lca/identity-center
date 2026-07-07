@@ -1,6 +1,5 @@
 'use client'
 
-import { PlusIcon } from 'lucide-react'
 import { useFormatter, useTranslations } from 'next-intl'
 import Link from 'next/link'
 import { useState } from 'react'
@@ -14,7 +13,6 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table'
-import { CreateAppDialog } from './app-form-dialogs'
 import { useApplications } from './queries'
 import { AppStatusBadge } from './status-badges'
 
@@ -25,16 +23,15 @@ export function AppsView() {
   const t = useTranslations('apps')
   const format = useFormatter()
   const [page, setPage] = useState(1)
-  const [createOpen, setCreateOpen] = useState(false)
   const { data, isPending, isError, refetch } = useApplications({ page, pageSize: PAGE_SIZE })
   const totalPages = data ? Math.max(1, Math.ceil(data.total / data.pageSize)) : 1
 
   return (
     <div className="flex flex-col gap-4">
-      <div className="flex justify-end">
-        <Button onClick={() => setCreateOpen(true)}>
-          <PlusIcon data-icon="inline-start" />
-          {t('register')}
+      <div className="flex items-center justify-between gap-3 rounded-lg bg-muted/50 p-3 text-sm text-muted-foreground">
+        <span>{t('catalogManaged.notice')}</span>
+        <Button asChild variant="outline" size="sm">
+          <Link href="/admin/catalog">{t('catalogManaged.link')}</Link>
         </Button>
       </div>
 
@@ -142,8 +139,6 @@ export function AppsView() {
           </div>
         </div>
       ) : null}
-
-      <CreateAppDialog open={createOpen} onOpenChange={setCreateOpen} />
     </div>
   )
 }
