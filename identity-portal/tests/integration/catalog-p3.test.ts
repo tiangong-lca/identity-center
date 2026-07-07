@@ -20,6 +20,7 @@ vi.mock('@/lib/auth', () => ({
 
 import { createCatalogReconcileService } from '@/server/services/catalog-reconcile-service'
 import { createCatalogService } from '@/server/services/catalog-service'
+import { exportCatalogYaml } from '@/scripts/export-catalog'
 import { parseCatalogYaml } from '@/lib/catalog/serialize'
 import { computeCatalogDiff, hasChanges } from '@/lib/catalog/diff'
 import { toCatalogApps } from '@/lib/catalog/serialize'
@@ -71,7 +72,7 @@ describe('catalog P3(detectDrift 周期对账;mock 会话 + 真实 PG/KC)', () =
         yaml: `version: 1\napplications:\n  - code: exp\n    name: Exp\n    keycloak: { clientId: exp-client, accessRole: exp_access }\n    roles: [{ code: admin, name: 管理员 }]\n`,
         source: 'cli',
       })
-      const { yaml } = await createCatalogService(ctx).getCurrent()
+      const { yaml } = await exportCatalogYaml(ctx)
       const doc = parseCatalogYaml(yaml)
       const curApps = await ctx.db.query.applications.findMany()
       const curRoles = await ctx.db.query.applicationRoles.findMany()

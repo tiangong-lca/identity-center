@@ -9,10 +9,18 @@ import 'dotenv/config'
 import { writeFile } from 'node:fs/promises'
 import { createDbClient } from '@/lib/db/client'
 import { parseCatalogYaml } from '@/lib/catalog/serialize'
-import { scanForPlaintextSecrets } from '@/lib/catalog/secret-scan'
+import { scanForPlaintextSecrets, type SecretFinding } from '@/lib/catalog/secret-scan'
 import { createKeycloakAdmin, keycloakConfigFromEnv } from '@/lib/keycloak/admin-client'
 import { createCatalogService } from '@/server/services/catalog-service'
 import type { ServiceContext } from '@/server/services/context'
+
+export async function exportCatalogYaml(
+  ctx: ServiceContext,
+): Promise<{ yaml: string; findings: SecretFinding[] }> {
+  const { yaml } = await createCatalogService(ctx).getCurrent()
+  const findings = scanForPlaintextSecrets(parseCatalogYaml(yaml))
+  return { yaml, findings }
+}
 
 function argValue(flag: string): string | undefined {
   const i = process.argv.indexOf(flag)
@@ -26,8 +34,7 @@ async function main() {
   const client = createDbClient(url)
   try {
     const ctx: ServiceContext = { db: client.db, keycloak: createKeycloakAdmin(keycloakConfigFromEnv()) }
-    const { yaml } = await createCatalogService(ctx).getCurrent()
-    const findings = scanForPlaintextSecrets(parseCatalogYaml(yaml))
+    const { yaml, findings } = await exportCatalogYaml(ctx)
     if (findings.length > 0) console.error(`[export-catalog] ⚠️ 疑似明文(仅路径): ${findings.map((f) => f.path).join(', ')}`)
     if (out) {
       await writeFile(out, yaml, 'utf8')
