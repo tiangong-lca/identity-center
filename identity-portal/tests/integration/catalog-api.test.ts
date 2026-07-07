@@ -20,6 +20,8 @@ vi.mock('@/lib/auth', () => ({
 }))
 
 import { GET as getCatalog } from '@/app/api/admin/catalog/route'
+import { POST as applyCatalog } from '@/app/api/admin/catalog/apply/route'
+import { POST as rollbackCatalog } from '@/app/api/admin/catalog/rollback/route'
 import { GET as listVersions } from '@/app/api/admin/catalog/versions/route'
 import { GET as getVersion } from '@/app/api/admin/catalog/versions/[version]/route'
 
@@ -97,5 +99,32 @@ describe('catalog API(mock 会话 + 真实 PG/KC)', () => {
     expect((await v1res.json()).data.version).toBe(1)
     const vMissing = await getVersion(req('GET', '/api/admin/catalog/versions/999'), p({ version: '999' }))
     expect(vMissing.status).toBe(404)
+  })
+
+  it('POST /apply 首次 → 200 版本 1 + diff.created', async () => {
+    mockSession.current = adminSession
+    const res = await applyCatalog(req('POST', '/api/admin/catalog/apply', { yaml: DOC('新平台名') }))
+    expect(res.status).toBe(200)
+    const body = await res.json()
+    expect(body.data.version).toBeGreaterThanOrEqual(1)
+    expect(body.data).toHaveProperty('diff')
+    expect(body.data).toHaveProperty('report')
+  })
+  it('expectedVersion 过期 → 409 CONFLICT', async () => {
+    mockSession.current = adminSession
+    const res = await applyCatalog(req('POST', '/api/admin/catalog/apply', { yaml: DOC('再改'), expectedVersion: 0 }))
+    expect(res.status).toBe(409)
+    expect((await res.json()).error.code).toBe('CONFLICT')
+  })
+  it('坏 YAML → 400 VALIDATION_ERROR', async () => {
+    mockSession.current = adminSession
+    const res = await applyCatalog(req('POST', '/api/admin/catalog/apply', { yaml: '::: not yaml :::' }))
+    expect(res.status).toBe(400)
+    expect((await res.json()).error.code).toBe('VALIDATION_ERROR')
+  })
+  it('POST /rollback 不存在的版本 → 404', async () => {
+    mockSession.current = adminSession
+    const res = await rollbackCatalog(req('POST', '/api/admin/catalog/rollback', { version: 999 }))
+    expect(res.status).toBe(404)
   })
 })

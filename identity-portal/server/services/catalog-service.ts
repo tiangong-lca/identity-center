@@ -1,13 +1,30 @@
 import { desc, eq } from 'drizzle-orm'
+import { ZodError } from 'zod'
 import * as schema from '@/db/schema'
 import { getAuditContext } from '@/lib/audit/context'
 import { computeCatalogDiff, hasChanges, type CatalogDiff } from '@/lib/catalog/diff'
 import { parseCatalogYaml, renderCatalogYaml, toCatalogApps } from '@/lib/catalog/serialize'
+import type { CatalogDoc } from '@/lib/catalog/schema'
 import { ApiError } from '@/lib/http/api-error'
 import { createAuditLogRepository } from '@/server/repositories/audit-log-repository'
 import { materializeCatalog } from './catalog-materialize'
 import { createCatalogReconcileService, type ReconcileReport } from './catalog-reconcile-service'
 import type { ServiceContext } from './context'
+
+/** parseCatalogYaml 的语法/schema 错误 → ApiError('VALIDATION_ERROR')(YAMLException/ZodError 不应以 500 兜底透出) */
+function parseCatalogYamlOrThrow(yaml: string): CatalogDoc {
+  try {
+    return parseCatalogYaml(yaml)
+  } catch (error) {
+    if (error instanceof ZodError) {
+      throw new ApiError('VALIDATION_ERROR', 'catalog YAML 校验失败', {
+        issues: error.issues.map((i) => ({ path: i.path.join('.'), message: i.message })),
+      })
+    }
+    const message = error instanceof Error ? error.message : String(error)
+    throw new ApiError('VALIDATION_ERROR', `catalog YAML 解析失败: ${message}`)
+  }
+}
 
 function actorOf() {
   const c = getAuditContext()
@@ -45,7 +62,7 @@ export function createCatalogService(ctx: ServiceContext) {
     },
 
     async apply(input: ApplyInput): Promise<ApplyResult> {
-      const doc = parseCatalogYaml(input.yaml) // 语法/schema/业务(唯一性)校验;失败即抛
+      const doc = parseCatalogYamlOrThrow(input.yaml) // 语法/schema/业务(唯一性)校验;失败 → ApiError('VALIDATION_ERROR')
       const { version, diff } = await ctx.db.transaction(async (tx) => {
         const curVer = await currentVersion(tx)
         if (input.expectedVersion !== undefined && input.expectedVersion !== curVer) {
