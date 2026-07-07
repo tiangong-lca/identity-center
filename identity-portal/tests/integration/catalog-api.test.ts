@@ -24,6 +24,10 @@ import { POST as applyCatalog } from '@/app/api/admin/catalog/apply/route'
 import { POST as rollbackCatalog } from '@/app/api/admin/catalog/rollback/route'
 import { GET as listVersions } from '@/app/api/admin/catalog/versions/route'
 import { GET as getVersion } from '@/app/api/admin/catalog/versions/[version]/route'
+import { POST as createApp } from '@/app/api/admin/applications/route'
+import { PATCH as patchApp } from '@/app/api/admin/applications/[id]/route'
+import { POST as createRole } from '@/app/api/admin/applications/[id]/roles/route'
+import { PATCH as patchRole } from '@/app/api/admin/applications/[id]/roles/[roleId]/route'
 
 const pg = getDbTargets()[0]
 const suffix = randomUUID().slice(0, 8)
@@ -126,5 +130,27 @@ describe('catalog API(mock 会话 + 真实 PG/KC)', () => {
     mockSession.current = adminSession
     const res = await rollbackCatalog(req('POST', '/api/admin/catalog/rollback', { version: 999 }))
     expect(res.status).toBe(404)
+  })
+
+  describe('旧命令式写端点被禁用', () => {
+    it('POST /applications → 409 CATALOG_MANAGED', async () => {
+      mockSession.current = adminSession
+      const res = await createApp(req('POST', '/api/admin/applications', { code: 'x-app', name: 'X', keycloakClientId: 'x' }))
+      expect(res.status).toBe(409)
+      expect((await res.json()).error.code).toBe('CATALOG_MANAGED')
+    })
+    it('PATCH /applications/[id] → 409 CATALOG_MANAGED', async () => {
+      mockSession.current = adminSession
+      const res = await patchApp(req('PATCH', '/api/admin/applications/abc', { name: 'Y' }), p({ id: 'abc' }))
+      expect(res.status).toBe(409)
+      expect((await res.json()).error.code).toBe('CATALOG_MANAGED')
+    })
+    it('POST /applications/[id]/roles → 409;PATCH roles/[roleId] → 409', async () => {
+      mockSession.current = adminSession
+      const r1 = await createRole(req('POST', '/api/admin/applications/abc/roles', { code: 'r', name: 'R' }), p({ id: 'abc' }))
+      expect(r1.status).toBe(409)
+      const r2 = await patchRole(req('PATCH', '/api/admin/applications/abc/roles/rid', { name: 'R2' }), p({ id: 'abc', roleId: 'rid' }))
+      expect(r2.status).toBe(409)
+    })
   })
 })

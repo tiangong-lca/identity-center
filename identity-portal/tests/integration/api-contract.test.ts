@@ -23,7 +23,7 @@ vi.mock('@/lib/auth', () => ({
 import { GET as listUsers, POST as createUser } from '@/app/api/admin/users/route'
 import { POST as disableUser } from '@/app/api/admin/users/[id]/disable/route'
 import { GET as listAudit } from '@/app/api/admin/audit-logs/route'
-import { POST as createApp } from '@/app/api/admin/applications/route'
+import { createApplicationService } from '@/server/services/application-service'
 import { POST as grantAssignment } from '@/app/api/admin/applications/[id]/assignments/route'
 import { DELETE as revokeAssignment } from '@/app/api/admin/applications/[id]/assignments/[assignmentId]/route'
 import { POST as submitRegistration } from '@/app/api/public/registration-requests/route'
@@ -192,15 +192,11 @@ describe('L4 API 契约(mock 会话 + 真实 PG/KC/Redis)', () => {
 
   it('应用创建 → 准入授予(201/202)→ 撤销 200;审计链完整', async () => {
     mockSession.current = adminSession
-    const appRes = await createApp(
-      req('POST', '/api/admin/applications', {
-        code: `contract-app-${suffix}`,
-        name: '契约应用',
-        keycloakClientId: 'user-portal',
-      }),
-    )
-    expect(appRes.status).toBe(201)
-    const app = (await appRes.json()).data
+    const app = await createApplicationService(ctx).create({
+      code: `contract-app-${suffix}`,
+      name: '契约应用',
+      keycloakClientId: 'user-portal',
+    })
 
     const userRes = await createUser(
       req('POST', '/api/admin/users', {
