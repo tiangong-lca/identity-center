@@ -52,3 +52,6 @@ tmp/
 temp/
 .tmp/
 deploy/env/.env.production
+
+# Docpact Run files
+.docpact/runs/*
