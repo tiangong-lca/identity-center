@@ -6,6 +6,7 @@
     "reload": "重载",
     "applying": "应用中…",
     "applied": "已应用 —— 版本 {version}",
+    "noChanges": "无变更可应用",
     "conflict": "目录已被他人更新,请重载后重试",
     "validationTitle": "校验错误(服务端)",
     "diffTitle": "本次变更",

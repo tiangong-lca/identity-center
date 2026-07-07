@@ -16,10 +16,11 @@ test('目录控制台:载入 → 编辑器渲染 → Apply → 结果反馈', as
   await expect(applyButton).toBeEnabled()
   await applyButton.click()
 
-  // 结果反馈:成功 toast(已应用/Applied)或 diff 卡(本次变更/Changes applied)二者其一即可;
+  // 结果反馈:成功 toast(已应用/Applied)、diff 卡(本次变更/Changes applied),或(未改动内容时)
+  // no-op 提示(无变更可应用/No changes to apply)三者其一即可;
   // 无论走哪条分支,按钮都应恢复为可点击(不应卡在 pending / 崩溃)。
   await expect(
-    page.getByText(/已应用|Applied|本次变更|Changes applied/).first(),
+    page.getByText(/已应用|Applied|本次变更|Changes applied|无变更|No changes/).first(),
   ).toBeVisible({ timeout: 15_000 })
   await expect(applyButton).toBeEnabled({ timeout: 15_000 })
 

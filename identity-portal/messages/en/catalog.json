@@ -6,6 +6,7 @@
     "reload": "Reload",
     "applying": "Applying…",
     "applied": "Applied — version {version}",
+    "noChanges": "No changes to apply",
     "conflict": "The catalog was updated by someone else. Reload and retry.",
     "validationTitle": "Validation errors (server)",
     "diffTitle": "Changes applied",

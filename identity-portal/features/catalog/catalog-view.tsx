@@ -37,6 +37,13 @@ export function CatalogView() {
       { yaml, expectedVersion: version },
       {
         onSuccess: (r) => {
+          // catalog-service.apply 在 !hasChanges(diff) 时是 no-op:返回原封不动的当前版本
+          // (无新版本行、无 audit)。此时 r.version === 应用前的 version(尚未被下面覆盖)——
+          // 用它判断是否真的发生了版本递增,避免对 no-op 展示与真实 apply 相同的成功提示。
+          if (r.version === version) {
+            toast.info(t('noChanges'))
+            return
+          }
           setVersion(r.version)
           setDiff(r.diff)
           toast.success(t('applied', { version: r.version }))
