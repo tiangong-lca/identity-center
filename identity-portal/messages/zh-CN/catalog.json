@@ -1,6 +1,6 @@
 {
   "catalog": {
-    "title": "应用目录",
+    "title": "应用注册表",
     "subtitle": "以 YAML 声明式编辑业务应用注册表;保存时服务端校验",
     "apply": "应用",
     "reload": "重载",

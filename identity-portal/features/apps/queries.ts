@@ -102,7 +102,7 @@ export function useApplication(id: string) {
   })
 }
 
-// 应用/角色定义的创建与编辑已收敛至目录编辑器(/admin/catalog),
+// 应用/角色定义的创建与编辑已收敛至应用注册表(/admin/apps/registry),
 // 命令式写端点(POST /applications、PATCH /applications/[id]、
 // POST/PATCH .../roles[/roleId])统一返回 409 CATALOG_MANAGED——
 // 此处不再提供 useCreateApplication/useUpdateApplication。
@@ -155,7 +155,7 @@ export function useAppRoles(appId: string) {
   })
 }
 
-// 角色定义的创建与编辑同样收敛至目录编辑器,不再提供
+// 角色定义的创建与编辑同样收敛至应用注册表,不再提供
 // useCreateAppRole/useUpdateAppRole——本 tab 仅保留只读的 useAppRoles。
 
 // ---- 角色分配 ----

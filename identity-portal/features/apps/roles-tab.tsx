@@ -24,7 +24,7 @@ export function RolesTab({ appId }: { appId: string }) {
     <div className="flex flex-col gap-4">
       <div className="flex justify-end">
         <Button asChild variant="outline" size="sm">
-          <Link href="/admin/catalog">{t('editInCatalog')}</Link>
+          <Link href="/admin/apps/registry">{t('editInCatalog')}</Link>
         </Button>
       </div>
 

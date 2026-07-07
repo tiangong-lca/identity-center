@@ -3,8 +3,8 @@
     "title": "Applications",
     "subtitle": "View business applications, manage access assignments and app roles",
     "catalogManaged": {
-      "notice": "Applications and roles are managed by the catalog. To add or change one, use the catalog editor.",
-      "link": "Edit in catalog"
+      "notice": "Applications and roles are managed by the registry. To add or change one, use the registry editor.",
+      "link": "Edit in registry"
     },
     "table": {
       "app": "Application",
@@ -13,7 +13,7 @@
       "createdAt": "Created at",
       "actions": "Actions",
       "detail": "Details",
-      "empty": "No applications yet; register one in the catalog editor",
+      "empty": "No applications yet; register one in the registry editor",
       "loadFailed": "Failed to load the list",
       "retry": "Retry"
     },
@@ -38,7 +38,7 @@
     },
     "detail": {
       "back": "Back to applications",
-      "editInCatalog": "Edit in catalog",
+      "editInCatalog": "Edit in registry",
       "loadFailed": "Failed to load the application",
       "notFound": "Application does not exist or has been removed",
       "retry": "Retry",
@@ -107,12 +107,12 @@
         "selected": "Selected"
       },
       "roles": {
-        "editInCatalog": "Edit in catalog",
+        "editInCatalog": "Edit in registry",
         "code": "Role code",
         "name": "Name",
         "description": "Description",
         "status": "Status",
-        "empty": "No roles yet; register roles in the catalog first",
+        "empty": "No roles yet; register roles in the registry first",
         "loadFailed": "Failed to load roles"
       },
       "roleAssignments": {

@@ -12,7 +12,7 @@ checkPaths:
   - docs/design/README.md
   - docs/implementation/README.md
 lastReviewedAt: 2026-07-07
-lastReviewedCommit: 3cba77d
+lastReviewedCommit: a376b16
 ---
 
 # Identity Platform 文档

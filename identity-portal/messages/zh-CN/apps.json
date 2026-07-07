@@ -3,8 +3,8 @@
     "title": "应用管理",
     "subtitle": "查看业务应用,管理准入用户与应用角色分配",
     "catalogManaged": {
-      "notice": "应用与角色定义由目录管理,如需新增或修改请前往目录编辑器",
-      "link": "前往目录编辑"
+      "notice": "应用与角色定义由应用注册表管理,如需新增或修改请前往应用注册表编辑器",
+      "link": "前往应用注册表编辑"
     },
     "table": {
       "app": "应用",
@@ -13,7 +13,7 @@
       "createdAt": "创建时间",
       "actions": "操作",
       "detail": "详情",
-      "empty": "暂无应用,请前往目录编辑器登记",
+      "empty": "暂无应用,请前往应用注册表编辑器登记",
       "loadFailed": "列表加载失败",
       "retry": "重试"
     },
@@ -38,7 +38,7 @@
     },
     "detail": {
       "back": "返回应用列表",
-      "editInCatalog": "去目录编辑",
+      "editInCatalog": "去应用注册表编辑",
       "loadFailed": "应用信息加载失败",
       "notFound": "应用不存在或已被删除",
       "retry": "重试",
@@ -107,12 +107,12 @@
         "selected": "已选择"
       },
       "roles": {
-        "editInCatalog": "去目录编辑",
+        "editInCatalog": "去应用注册表编辑",
         "code": "角色 Code",
         "name": "名称",
         "description": "描述",
         "status": "状态",
-        "empty": "暂无角色,先在目录登记角色",
+        "empty": "暂无角色,先在应用注册表登记角色",
         "loadFailed": "角色列表加载失败"
       },
       "roleAssignments": {

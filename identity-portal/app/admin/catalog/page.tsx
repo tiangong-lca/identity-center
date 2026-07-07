@@ -1,16 +1,6 @@
-// app/admin/catalog/page.tsx
-import { getTranslations } from 'next-intl/server'
-import { CatalogView } from '@/features/catalog/catalog-view'
+// app/admin/catalog/page.tsx —— 旧路由,P3 后已并入「应用 › 应用注册表」;307 重定向保住旧链接不 404。
+import { redirect } from 'next/navigation'
 
-export default async function CatalogPage() {
-  const t = await getTranslations('catalog')
-  return (
-    <div className="flex flex-col gap-6">
-      <div>
-        <h1 className="text-xl font-semibold text-foreground">{t('title')}</h1>
-        <p className="mt-1 text-sm text-muted-foreground">{t('subtitle')}</p>
-      </div>
-      <CatalogView />
-    </div>
-  )
+export default function CatalogRedirect() {
+  redirect('/admin/apps/registry')
 }

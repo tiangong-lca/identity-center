@@ -11,7 +11,7 @@ checkPaths:
   - docs/design/README.md
   - docs/README.md
 lastReviewedAt: 2026-07-07
-lastReviewedCommit: 3cba77d
+lastReviewedCommit: a376b16
 ---
 
 # 统一身份与用户门户设计文档集

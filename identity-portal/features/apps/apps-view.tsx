@@ -31,7 +31,7 @@ export function AppsView() {
       <div className="flex items-center justify-between gap-3 rounded-lg bg-muted/50 p-3 text-sm text-muted-foreground">
         <span>{t('catalogManaged.notice')}</span>
         <Button asChild variant="outline" size="sm">
-          <Link href="/admin/catalog">{t('catalogManaged.link')}</Link>
+          <Link href="/admin/apps/registry">{t('catalogManaged.link')}</Link>
         </Button>
       </div>
 

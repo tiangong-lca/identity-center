@@ -11,7 +11,7 @@ checkPaths:
   - docs/design/02-application/02-api-design/README.md
   - docs/references/openapi.yaml
 lastReviewedAt: 2026-07-07
-lastReviewedCommit: 3cba77d
+lastReviewedCommit: a376b16
 ---
 
 # 07. API 设计
