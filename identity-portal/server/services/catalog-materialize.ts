@@ -53,14 +53,14 @@ export async function materializeCatalog(
       }
     }
     for (const er of existingRoles) {
-      if (!desiredCodes.has(er.code) && er.status !== 'pending_deactivate') {
+      if (!desiredCodes.has(er.code) && er.status !== 'pending_deactivate' && er.status !== 'deactivated') {
         await tx.update(schema.applicationRoles).set({ status: 'pending_deactivate', updatedAt: new Date() }).where(eq(schema.applicationRoles.id, er.id))
       }
     }
   }
   const desiredAppCodes = new Set(desired.map((a) => a.code))
   for (const a of curAppRows) {
-    if (!desiredAppCodes.has(a.code) && a.status !== 'pending_deactivate') {
+    if (!desiredAppCodes.has(a.code) && a.status !== 'pending_deactivate' && a.status !== 'deactivated') {
       await tx.update(schema.applications).set({ status: 'pending_deactivate', updatedAt: new Date() }).where(eq(schema.applications.id, a.id))
     }
   }

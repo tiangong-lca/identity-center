@@ -1,14 +1,15 @@
-import { desc, eq } from 'drizzle-orm'
+import { and, desc, eq, ne } from 'drizzle-orm'
 import { ZodError } from 'zod'
 import * as schema from '@/db/schema'
 import { getAuditContext } from '@/lib/audit/context'
 import { computeCatalogDiff, hasChanges, type CatalogDiff } from '@/lib/catalog/diff'
+import { scanForPlaintextSecrets } from '@/lib/catalog/secret-scan'
 import { parseCatalogYaml, renderCatalogYaml, toCatalogApps } from '@/lib/catalog/serialize'
 import type { CatalogDoc } from '@/lib/catalog/schema'
 import { ApiError } from '@/lib/http/api-error'
 import { createAuditLogRepository } from '@/server/repositories/audit-log-repository'
 import { materializeCatalog } from './catalog-materialize'
-import { createCatalogReconcileService, type ReconcileReport } from './catalog-reconcile-service'
+import { createCatalogReconcileService, countActiveAssignments, type ReconcileReport } from './catalog-reconcile-service'
 import type { ServiceContext } from './context'
 
 /** parseCatalogYaml 的语法/schema 错误 → ApiError('VALIDATION_ERROR')(YAMLException/ZodError 不应以 500 兜底透出) */
@@ -63,6 +64,12 @@ export function createCatalogService(ctx: ServiceContext) {
 
     async apply(input: ApplyInput): Promise<ApplyResult> {
       const doc = parseCatalogYamlOrThrow(input.yaml) // 语法/schema/业务(唯一性)校验;失败 → ApiError('VALIDATION_ERROR')
+      const secretFindings = scanForPlaintextSecrets(doc)
+      if (secretFindings.length > 0) {
+        throw new ApiError('VALIDATION_ERROR', 'catalog YAML 疑似含明文密钥(应改用 secretRef)', {
+          issues: secretFindings.map((f) => ({ path: f.path, message: `疑似明文密钥(${f.hint})` })),
+        })
+      }
       const { version, diff } = await ctx.db.transaction(async (tx) => {
         const curVer = await currentVersion(tx)
         if (input.expectedVersion !== undefined && input.expectedVersion !== curVer) {
@@ -135,6 +142,44 @@ export function createCatalogService(ctx: ServiceContext) {
       const target = await this.getVersion(input.version)
       if (!target) throw new ApiError('NOT_FOUND', `目录版本 ${input.version} 不存在`)
       return this.apply({ yaml: target.yaml, expectedVersion: input.expectedVersion, source: 'import' })
+    },
+
+    async confirmDeactivate(input: { appCode: string; roleCode?: string }): Promise<{
+      kind: 'app' | 'role'; appCode: string; roleCode?: string; status: 'deactivated'; affectedAssignments: number
+    }> {
+      const flipped = await ctx.db.transaction(async (tx) => {
+        const app = await tx.query.applications.findFirst({ where: eq(schema.applications.code, input.appCode) })
+        if (!app) throw new ApiError('NOT_FOUND', `应用 ${input.appCode} 不存在`)
+        if (input.roleCode) {
+          const role = await tx.query.applicationRoles.findFirst({
+            where: and(eq(schema.applicationRoles.applicationId, app.id), eq(schema.applicationRoles.code, input.roleCode)),
+          })
+          if (!role) throw new ApiError('NOT_FOUND', `角色 ${input.appCode}/${input.roleCode} 不存在`)
+          if (role.status !== 'pending_deactivate') throw new ApiError('CONFLICT', `角色 ${input.roleCode} 非待停用态`)
+          await tx.update(schema.applicationRoles).set({ status: 'deactivated', updatedAt: new Date() }).where(eq(schema.applicationRoles.id, role.id))
+          return { kind: 'role' as const, appId: app.id, roleId: role.id }
+        }
+        if (app.status !== 'pending_deactivate') throw new ApiError('CONFLICT', `应用 ${input.appCode} 非待停用态`)
+        await tx.update(schema.applications).set({ status: 'deactivated', updatedAt: new Date() }).where(eq(schema.applications.id, app.id))
+        // 级联:该应用下所有非 deactivated 角色 → deactivated(应用已终态,角色随之)
+        await tx.update(schema.applicationRoles).set({ status: 'deactivated', updatedAt: new Date() })
+          .where(and(eq(schema.applicationRoles.applicationId, app.id), ne(schema.applicationRoles.status, 'deactivated')))
+        return { kind: 'app' as const, appId: app.id }
+      })
+
+      const affected = flipped.kind === 'app'
+        ? await countActiveAssignments(ctx.db, { appId: flipped.appId })
+        : await countActiveAssignments(ctx.db, { roleId: flipped.roleId })
+
+      await audit.append({
+        ...actorOf(),
+        action: 'catalog.deactivate',
+        targetType: flipped.kind === 'app' ? 'application' : 'application_role',
+        targetId: flipped.kind === 'app' ? flipped.appId : flipped.roleId,
+        afterData: { appCode: input.appCode, roleCode: input.roleCode, status: 'deactivated', affectedAssignments: affected },
+        result: 'success',
+      })
+      return { kind: flipped.kind, appCode: input.appCode, roleCode: input.roleCode, status: 'deactivated', affectedAssignments: affected }
     },
   }
 }

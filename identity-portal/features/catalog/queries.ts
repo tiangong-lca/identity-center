@@ -12,6 +12,7 @@ export const catalogKeys = {
   current: () => [...catalogKeys.all, 'current'] as const,
   versions: () => [...catalogKeys.all, 'versions'] as const,
   version: (v: number) => [...catalogKeys.all, 'version', v] as const,
+  pendingDeactivate: () => [...catalogKeys.all, 'pending-deactivate'] as const,
 }
 
 export function useCatalog() {
@@ -47,6 +48,24 @@ export function useRollback() {
   return useMutation({
     mutationFn: (input: { version: number; expectedVersion: number }) =>
       apiFetch<ApplyResult>('/api/admin/catalog/rollback', { method: 'POST', json: input }),
+    onSuccess: () => qc.invalidateQueries({ queryKey: catalogKeys.all }),
+  })
+}
+
+export type PendingDeactivateItem = { kind: 'app' | 'role'; appCode: string; roleCode?: string; name: string; affectedAssignments: number }
+
+export function usePendingDeactivate() {
+  return useQuery({
+    queryKey: catalogKeys.pendingDeactivate(),
+    queryFn: () => apiFetch<{ items: PendingDeactivateItem[] }>('/api/admin/catalog/pending-deactivate'),
+  })
+}
+
+export function useConfirmDeactivate() {
+  const qc = useQueryClient()
+  return useMutation({
+    mutationFn: (input: { appCode: string; roleCode?: string }) =>
+      apiFetch<{ affectedAssignments: number }>('/api/admin/catalog/deactivate', { method: 'POST', json: input }),
     onSuccess: () => qc.invalidateQueries({ queryKey: catalogKeys.all }),
   })
 }

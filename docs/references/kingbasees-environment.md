@@ -12,7 +12,7 @@ checkPaths:
   - docs/references/kingbasees-compatibility-conventions.md
   - docs/implementation/decisions.md
 lastReviewedAt: 2026-07-07
-lastReviewedCommit: cbf5737
+lastReviewedCommit: 3cba77d
 ---
 
 # KingbaseES 开发环境结论(2026-07-02)

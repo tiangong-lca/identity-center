@@ -23,6 +23,18 @@
       "rollbackConfirm": "回滚到版本 {version}?会生成新版本",
       "empty": "暂无版本",
       "loadFailed": "版本历史加载失败"
+    },
+    "pendingDeactivate": {
+      "title": "待停用",
+      "empty": "暂无待停用项",
+      "app": "应用",
+      "role": "角色",
+      "affected": "影响 {count} 个生效分配",
+      "confirm": "确认停用",
+      "confirmTitle": "确认停用",
+      "confirmBody": "停用 {name}?不会改动 Keycloak 角色,也不会撤销 {count} 个生效分配——它将变为 deactivated 墓碑态。",
+      "done": "已停用 {name}",
+      "loadFailed": "待停用列表加载失败"
     }
   }
 }

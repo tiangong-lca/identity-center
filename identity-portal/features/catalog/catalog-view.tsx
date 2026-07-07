@@ -7,6 +7,7 @@ import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
 import { ApiClientError } from '@/features/shared/api'
 import { CatalogEditor } from './catalog-editor'
+import { PendingDeactivatePanel } from './pending-deactivate-panel'
 import { useApplyCatalog, useCatalog } from './queries'
 import { VersionHistory } from './version-history'
 
@@ -102,6 +103,7 @@ export function CatalogView() {
           refetch()
         }}
       />
+      <PendingDeactivatePanel />
     </div>
   )
 }

@@ -11,7 +11,7 @@ checkPaths:
   - docs/references/kingbasees-compatibility-conventions.md
   - docs/references/kingbasees-environment.md
 lastReviewedAt: 2026-07-07
-lastReviewedCommit: cbf5737
+lastReviewedCommit: 3cba77d
 ---
 
 # KingbaseES 兼容约定(数据层强制规范)

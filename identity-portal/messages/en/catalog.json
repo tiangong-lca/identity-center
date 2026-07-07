@@ -23,6 +23,18 @@
       "rollbackConfirm": "Roll back to version {version}? This creates a new version.",
       "empty": "No versions yet",
       "loadFailed": "Failed to load version history"
+    },
+    "pendingDeactivate": {
+      "title": "Pending deactivation",
+      "empty": "Nothing awaiting deactivation",
+      "app": "App",
+      "role": "Role",
+      "affected": "{count} active assignment(s) affected",
+      "confirm": "Confirm deactivate",
+      "confirmTitle": "Confirm deactivation",
+      "confirmBody": "Deactivate {name}? Keycloak roles are left untouched and {count} active assignment(s) are NOT revoked — it becomes a deactivated tombstone.",
+      "done": "Deactivated {name}",
+      "loadFailed": "Failed to load pending list"
     }
   }
 }

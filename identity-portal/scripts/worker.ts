@@ -14,6 +14,7 @@ import { dispatchOutboxEvents } from '@/server/jobs/dispatch-outbox-events'
 import { deliverDueWebhooks, enqueueWebhookDeliveries } from '@/server/jobs/deliver-webhooks'
 import { projectKeycloakAssignments } from '@/server/jobs/project-assignments'
 import { reconcileApplicationProjections, reconcileKeycloakUsers } from '@/server/jobs/reconcile'
+import { reconcileCatalog } from '@/server/jobs/reconcile-catalog'
 import { retryDeadLetterEvents } from '@/server/jobs/retry-dead-letters'
 import type { JobContext } from '@/server/jobs/types'
 
@@ -26,6 +27,7 @@ const SCHEDULES: Array<{ name: string; everyMs: number }> = [
   { name: 'retry-dead-letter-events', everyMs: Number(process.env.JOB_DLQ_INTERVAL_MS ?? 300_000) },
   { name: 'reconcile-keycloak-users', everyMs: Number(process.env.JOB_RECONCILE_USERS_MS ?? 3_600_000) },
   { name: 'reconcile-application-projections', everyMs: Number(process.env.JOB_RECONCILE_PROJ_MS ?? 3_600_000) },
+  { name: 'reconcile-catalog', everyMs: Number(process.env.JOB_RECONCILE_CATALOG_MS ?? 3_600_000) },
 ]
 
 async function main() {
@@ -59,6 +61,7 @@ async function main() {
     'retry-dead-letter-events': retryDeadLetterEvents,
     'reconcile-keycloak-users': reconcileKeycloakUsers,
     'reconcile-application-projections': reconcileApplicationProjections,
+    'reconcile-catalog': reconcileCatalog,
   }
 
   const worker = new Worker(

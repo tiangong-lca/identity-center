@@ -11,7 +11,7 @@ checkPaths:
   - docs/design/02-application/01-frontend-product-interaction-design/README.md
   - identity-portal/AGENTS.md
 lastReviewedAt: 2026-07-07
-lastReviewedCommit: cbf5737
+lastReviewedCommit: 3cba77d
 ---
 
 # 06. 前端产品与交互设计
@@ -224,7 +224,9 @@ Web Origins
 
 ### 8.1 应用目录控制台
 
-`/admin/catalog` 是应用/角色定义的唯一编辑入口，采用类似 `kubectl edit` 的交互：载入当前 YAML 快照 → 在 Monaco 编辑器中编辑 → 点击 Apply 提交。提交携带载入时的版本号做乐观并发校验，冲突时提示“配置已被他人更新，请重新载入”，校验失败时在编辑器旁列出逐条错误，Apply 成功后展示本次改动的结构化 diff；未产生实际变化的 Apply/回滚按 no-op 处理，不追加新版本，也不展示成功提示，避免误导。页面同时提供版本历史列表和一键回滚到历史版本的操作，回滚同样走乐观并发校验。权限要求：查看需要 `catalog:read`，Apply/回滚需要 `catalog:apply`。
+`/admin/catalog` 是应用/角色定义的唯一编辑入口，采用类似 `kubectl edit` 的交互：载入当前 YAML 快照 → 在 Monaco 编辑器中编辑 → 点击 Apply 提交。提交携带载入时的版本号做乐观并发校验，冲突时提示”配置已被他人更新，请重新载入”，校验失败时在编辑器旁列出逐条错误，Apply 成功后展示本次改动的结构化 diff；未产生实际变化的 Apply/回滚按 no-op 处理，不追加新版本，也不展示成功提示，避免误导。页面同时提供版本历史列表和一键回滚到历史版本的操作，回滚同样走乐观并发校验。权限要求：查看需要 `catalog:read`，Apply/回滚需要 `catalog:apply`。
+
+页面新增”待停用”面板：列出当前处于 `pending_deactivate` 的应用/角色（即目录 reconcile 检测到已从 YAML 中移除、但尚未终态处理的项）。管理员对单项发起”确认停用”时弹出二次确认对话框（AlertDialog，destructive 样式，取消按钮禁用态与其他危险操作一致），确认后调用停用接口将状态推进为 `deactivated` 终态；该操作不可逆，面板不提供撤销或恢复入口。
 
 ## 9. 状态设计
 
