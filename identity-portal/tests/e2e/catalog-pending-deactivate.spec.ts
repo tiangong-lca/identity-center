@@ -7,7 +7,7 @@ const BASE_URL = 'http://localhost:3000'
 // 用 exact 精确匹配面板标题(「待停用」/"Pending deactivation"),避免与空态文案
 // (「暂无待停用项」内含「待停用」子串)在 strict mode 下产生多元素匹配歧义。
 test('待停用面板渲染', async ({ page }) => {
-  await page.goto('/admin/catalog')
+  await page.goto('/admin/apps/registry')
   await expect(page.getByText(/^待停用$|^Pending deactivation$/)).toBeVisible()
 })
 
@@ -51,7 +51,7 @@ test('临时 app 移除后进入待停用 → 控制台确认停用 → 成功',
     expect(items.map((i) => i.appCode)).toContain(appCode)
 
     // 5) 真实 UI:面板列出该 app → 点击确认 → AlertDialog 复述影响数 → 确认停用 → 成功 toast
-    await page.goto('/admin/catalog')
+    await page.goto('/admin/apps/registry')
     await expect(page.getByText(new RegExp(appCode))).toBeVisible({ timeout: 15_000 })
 
     const confirmButton = page

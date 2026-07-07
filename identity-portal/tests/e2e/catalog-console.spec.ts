@@ -3,10 +3,10 @@ import { expect, test } from '@playwright/test'
 // Monaco 在 e2e 里是脆的一环(contenteditable,异步加载):这里只做「渲染 + 可交互 + 有反馈」的
 // 冒烟验证,不做逐字符编辑。更细的编辑器行为(YAML 高亮/schema 补全/内容变更)靠组件层 + 手验覆盖。
 test('目录控制台:载入 → 编辑器渲染 → Apply → 结果反馈', async ({ page }) => {
-  await page.goto('/admin/catalog')
+  await page.goto('/admin/apps/registry')
 
-  // 页面 + 标题
-  await expect(page.getByRole('heading', { name: /应用目录|App Catalog/ })).toBeVisible()
+  // 段内标签页:应用注册表 tab 存在(确认在新的「应用 › 应用注册表」IA 下)
+  await expect(page.getByRole('link', { name: /应用注册表|Registry/ })).toBeVisible()
 
   // 编辑器载入(Monaco 异步渲染 .monaco-editor,给足超时)
   await expect(page.locator('.monaco-editor').first()).toBeVisible({ timeout: 20_000 })

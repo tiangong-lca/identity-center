@@ -1,6 +1,6 @@
 {
   "catalog": {
-    "title": "App Catalog",
+    "title": "Application Registry",
     "subtitle": "Declaratively edit the business-app registry (YAML). The server validates on apply.",
     "apply": "Apply",
     "reload": "Reload",

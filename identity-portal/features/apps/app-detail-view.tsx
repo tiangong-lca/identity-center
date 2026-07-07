@@ -19,7 +19,7 @@ function EditInCatalogLink() {
   const t = useTranslations('apps.detail')
   return (
     <Button asChild variant="outline" size="sm">
-      <Link href="/admin/catalog">{t('editInCatalog')}</Link>
+      <Link href="/admin/apps/registry">{t('editInCatalog')}</Link>
     </Button>
   )
 }
