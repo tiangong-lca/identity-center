@@ -11,8 +11,8 @@ checkPaths:
   - docs/implementation/README.md
   - GOAL.md
   - docs/design/README.md
-lastReviewedAt: 2026-07-07
-lastReviewedCommit: a376b16
+lastReviewedAt: 2026-07-08
+lastReviewedCommit: 01067284a33e5ae22f79009dc451d7fe91de0fc6
 ---
 
 # 统一身份平台实施方案

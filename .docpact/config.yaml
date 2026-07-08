@@ -1,7 +1,7 @@
 version: 1
 layout: repo
-lastReviewedAt: "2026-07-07"
-lastReviewedCommit: "a376b16"
+lastReviewedAt: "2026-07-08"
+lastReviewedCommit: "0106728"
 
 # Repo-local docpact governance for identity-center.
 # The workspace root config governs the submodule pointer and cross-repo view;
@@ -258,6 +258,8 @@ rules:
         kind: doc-ai-layer
       - path: docs/implementation/README.md
         kind: impl-plan
+      - path: docs/implementation/definition-of-done.md
+        kind: dod-checklist
       - path: identity-portal/AGENTS.md
         kind: agent-entry
     requiredDocs:
@@ -416,6 +418,8 @@ rules:
     triggers:
       - path: identity-portal/deploy/**
         kind: deploy-asset
+      - path: identity-portal/lib/config/**
+        kind: runtime-config
       - path: .github/workflows/ci.yml
         kind: ci
     requiredDocs:
@@ -425,7 +429,7 @@ rules:
         mode: review_or_update
       - path: identity-portal/deploy/runbooks/README.md
         mode: review_or_update
-    reason: Compose, Keycloak realm, monitoring, and CI changes alter the operational surface and should refresh the deployment/operations design and the runbooks index.
+    reason: Compose, runtime environment schema, Keycloak realm, monitoring, and CI changes alter the operational surface and should refresh the deployment/operations design and the runbooks index.
   - id: identity-business-app-onboarding-contract
     scope: repo
     repo: identity-center

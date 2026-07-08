@@ -10,8 +10,8 @@ whenToUpdate: 完成定义条目、验收标准或核对证据发生变化时更
 checkPaths:
   - docs/implementation/definition-of-done.md
   - GOAL.md
-lastReviewedAt: 2026-07-07
-lastReviewedCommit: a376b16
+lastReviewedAt: 2026-07-08
+lastReviewedCommit: 01067284a33e5ae22f79009dc451d7fe91de0fc6
 ---
 
 # 完成定义(DoD)核对 — GOAL.md §7

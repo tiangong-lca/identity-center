@@ -2,7 +2,7 @@ import Redis from 'ioredis'
 import { afterAll, describe, expect, it } from 'vitest'
 import { checkRateLimit, hashDim, rateLimitKey } from '@/lib/rate-limit/sliding-window'
 
-const redis = new Redis(process.env.REDIS_URL ?? 'redis://localhost:6379')
+const redis = new Redis(process.env.REDIS_URL ?? 'redis://:identity-dev-redis@localhost:16379')
 
 afterAll(async () => {
   await redis.quit()

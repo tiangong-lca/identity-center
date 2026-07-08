@@ -35,7 +35,7 @@ lastReviewedCommit: 3cba77d
 
 ```bash
 pnpm test:integration                 # PG(必跑)
-KES_ENABLED=1 KINGBASE_ADMIN_URL=postgres://kingbase:kingbase@localhost:54321/test \
+KES_ENABLED=1 KINGBASE_ADMIN_URL=postgres://kingbase:kingbase@localhost:15433/test \
   pnpm test:integration               # KES 环境可得后补验(D-001)
 ```
 

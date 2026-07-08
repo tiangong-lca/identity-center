@@ -1,3 +1,20 @@
+---
+docType: operations-runbook
+scope: repo
+status: active
+authoritative: true
+owner: identity-center
+language: zh
+whenToUse: 需要从零启动、部署、验证或巡检统一身份平台运行环境时阅读本文档。
+whenToUpdate: compose 端口、环境变量、启动步骤、生产部署要求或运维验证步骤变化时更新本文档。
+checkPaths:
+  - identity-portal/deploy/runbooks/README.md
+  - identity-portal/deploy/docker/**
+  - identity-portal/deploy/runbooks/**
+lastReviewedAt: 2026-07-08
+lastReviewedCommit: 0106728
+---
+
 # 统一身份平台 · 部署/启动/运行 Runbook
 
 > 从零到运行的完整操作手册。专项手册:[部署](./deployment.md) · [回滚](./rollback.md) · [Secret 轮换](./keycloak-client-secret-rotation.md) · [备份恢复](./database-backup-restore.md) · [故障响应](./incident-response.md) · [监控告警](../monitoring/alerts.md) · [业务应用接入](../../../docs/guides/business-app-onboarding.md)
@@ -18,12 +35,12 @@
 | 服务 | 端口 | 用途 |
 |---|---|---|
 | Portal(Next.js) | 3000 | 门户 + 管理后台 + API |
-| Keycloak | 8080(管理探针 9000) | 统一身份中心,realm `company-dev` |
-| PostgreSQL | 5432 | 库 `identity_platform`(用户 identity)+ `keycloak`(用户 keycloak) |
-| Redis | 6379 | BullMQ 任务队列 + 速率限制 |
+| Keycloak | 8080(管理探针 127.0.0.1:19000 dev only) | 统一身份中心,realm `company-dev`;容器内管理探针仍为 9000 |
+| PostgreSQL | 127.0.0.1:15432(dev only) | 库 `identity_platform`(用户 identity)+ `keycloak`(用户 keycloak);容器内仍为 5432 |
+| Redis | 127.0.0.1:16379(dev only) | BullMQ 任务队列 + 速率限制;容器内仍为 6379;生产不发布宿主机端口 |
 | RabbitMQ | 5672(UI 15672,identity/identity) | 事件分发(exchange `identity.events`) |
 | Mailpit(仅 dev,可选) | SMTP 1025 / UI 8025 | 开发邮件收件箱(默认不启用邮件验证,仅 `KC_VERIFY_EMAIL=true` 时需要) |
-| KingbaseES(可选 profile `kes`) | 54321 | 双库兼容验证(D-001) |
+| KingbaseES(可选 profile `kes`) | 127.0.0.1:15433(dev only) | 双库兼容验证(D-001);容器内仍为 54321 |
 
 ---
 
@@ -46,7 +63,10 @@ cp deploy/env/.env.example .env
 echo "AUTH_SECRET=$(openssl rand -base64 32)" >> .env
 #    b. 读取两个 client secret 并粘贴进 .env(输出即 env 行)
 pnpm tsx scripts/print-client-secret.ts
-#    c. 校验
+#    c. Redis dev 默认口令由 compose 注入为 identity-dev-redis
+#       .env 中 DATABASE_URL 应为 postgres://identity:identity@localhost:15432/identity_platform
+#       .env 中 REDIS_URL 应为 redis://:identity-dev-redis@localhost:16379
+#    d. 校验
 pnpm check-env
 
 # 4) 数据库迁移 + 种子(内置角色/权限、种子管理员、业务应用目录;均幂等)
@@ -87,10 +107,12 @@ KES_ENABLED=1 pnpm test:integration   # KES 双库补验(需 profile kes 环境,
 vi deploy/env/.env.production
 #   必填:DATABASE_URL、POSTGRES_USER/PASSWORD、KC_DB_* 、KC_BOOTSTRAP_ADMIN_*、
 #        AUTH_SECRET、KEYCLOAK_BASE_URL(公网 https)、KEYCLOAK_CLIENT_SECRET、
-#        KEYCLOAK_ADMIN_API_CLIENT_SECRET、REDIS_URL、RABBITMQ_URL、
+#        KEYCLOAK_ADMIN_API_CLIENT_SECRET、REDIS_PASSWORD、REDIS_URL、RABBITMQ_URL、
 #        PII_ENCRYPTION_KEY(openssl rand -base64 32)、
 #        (可选)KC_VERIFY_EMAIL=true + KC_SMTP_HOST/KC_SMTP_PORT(启用邮箱验证时)、
 #        CAPTCHA_PROVIDER/CAPTCHA_SECRET(启用人机验证)、各业务应用 Webhook secret
+#        REDIS_PASSWORD 用 openssl rand -base64 32 生成;REDIS_URL 使用
+#        redis://:<REDIS_PASSWORD>@redis:6379,不要把 Redis 发布到公网。
 
 # 2) 起基础设施
 docker compose -f deploy/docker/docker-compose.prod.yml up -d postgres keycloak redis rabbitmq --wait
@@ -165,7 +187,7 @@ SELECT count(*) FROM application_assignments WHERE projection_status='failed';  
 ```bash
 docker compose --profile kes -f deploy/docker/docker-compose.dev.yml up -d kingbase
 # 首次:容器内创建 identity 用户与 identity_platform 库(镜像口径见 docs/references/kingbasees-environment.md)
-KES_ENABLED=1 KINGBASE_ADMIN_URL=postgres://kingbase:kingbase@localhost:54321/test pnpm test:integration
+KES_ENABLED=1 KINGBASE_ADMIN_URL=postgres://kingbase:kingbase@localhost:15433/test pnpm test:integration
 ```
 
 当前状态:开发机(arm64)无可用 KES 镜像,兼容三件套(约定/adapter/矩阵)已就绪,详见 [kingbasees-environment.md](../../../docs/references/kingbasees-environment.md)。

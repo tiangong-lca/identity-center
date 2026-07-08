@@ -1,3 +1,20 @@
+---
+docType: deployment-operations-design
+scope: repo
+status: active
+authoritative: true
+owner: identity-center
+language: zh
+whenToUse: 需要确认统一身份平台部署拓扑、运行依赖、Redis/RabbitMQ/数据库运维约束或生产配置原则时阅读本文档。
+whenToUpdate: 部署拓扑、运行依赖、运维安全约束、备份恢复或发布策略发生变化时更新本文档。
+checkPaths:
+  - docs/design/03-governance/02-deployment-operations-design/README.md
+  - identity-portal/deploy/**
+  - identity-portal/lib/config/**
+lastReviewedAt: 2026-07-08
+lastReviewedCommit: 0106728
+---
+
 # 10. 部署与运维设计
 
 ## 1. 目标
@@ -96,6 +113,7 @@ Redis（BullMQ 任务队列 + 速率限制）
 - 平台 migration 不管理 Keycloak 内部 schema，平台服务不得直接读写 Keycloak DB。
 - KingbaseES 兼容要求只适用于统一身份平台数据库。Keycloak DB 是否使用 KingbaseES 必须以 Keycloak 实际支持和 POC 验证为准。
 - Redis 用于 BullMQ 任务队列调度和速率限制计数，不存储持久化业务数据。Redis 重启后 BullMQ 任务状态和速率限制计数会丢失：任务由对账兜底重新触发，速率限制计数重置后短期内可能多允许几次请求，影响可接受。如果任务量较大或对任务丢失零容忍，建议启用 Redis AOF 持久化。
+- Redis 必须启用密码认证。生产环境不得向宿主机公网发布 Redis 端口；开发环境如需宿主机访问，只允许绑定 `127.0.0.1:16379`。
 - 业务系统 DB 自治。
 - 生产备份。
 - 定期恢复演练。

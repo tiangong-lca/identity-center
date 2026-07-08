@@ -31,7 +31,7 @@ const SCHEDULES: Array<{ name: string; everyMs: number }> = [
 ]
 
 async function main() {
-  const connection = new IORedis(process.env.REDIS_URL ?? 'redis://localhost:6379', {
+  const connection = new IORedis(process.env.REDIS_URL ?? 'redis://:identity-dev-redis@localhost:16379', {
     maxRetriesPerRequest: null,
   })
   const dbClient = createDbClient(process.env.DATABASE_URL ?? '')

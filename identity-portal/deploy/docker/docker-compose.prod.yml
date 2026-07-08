@@ -79,12 +79,22 @@ services:
 
   redis:
     image: redis:7-alpine
-    command: ["redis-server", "--appendonly", "yes"]
+    env_file: ../env/.env.production
+    command:
+      [
+        "sh",
+        "-c",
+        ": \"$${REDIS_PASSWORD:?REDIS_PASSWORD is required}\"; exec redis-server --appendonly yes --requirepass \"$${REDIS_PASSWORD}\"",
+      ]
     volumes:
       - redis-data:/data
     restart: unless-stopped
     healthcheck:
-      test: ["CMD", "redis-cli", "ping"]
+      test:
+        [
+          "CMD-SHELL",
+          "REDISCLI_AUTH=\"$${REDIS_PASSWORD}\" redis-cli ping | grep -q PONG",
+        ]
       interval: 10s
       timeout: 3s
       retries: 12

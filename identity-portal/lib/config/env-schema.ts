@@ -1,10 +1,14 @@
 import { z } from 'zod'
 
+const redisUrlSchema = z.url().refine((value) => new URL(value).password.length > 0, {
+  message: 'REDIS_URL must include a password',
+})
+
 export const envSchema = z.object({
   DATABASE_URL: z.url(),
   KEYCLOAK_BASE_URL: z.url(),
   KEYCLOAK_REALM: z.string().min(1),
-  REDIS_URL: z.url(),
+  REDIS_URL: redisUrlSchema,
   RABBITMQ_URL: z.url(),
   AUTH_SECRET: z.string().min(32),
   KEYCLOAK_CLIENT_ID: z.string().min(1),

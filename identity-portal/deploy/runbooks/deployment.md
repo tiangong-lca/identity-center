@@ -1,7 +1,7 @@
 # Runbook:部署
 
 ## 前置
-- 配置 `deploy/env/.env.production`(参考 `.env.example`;AUTH_SECRET、DB/Keycloak/Redis/RabbitMQ 口令、KEYCLOAK_CLIENT_SECRET、KEYCLOAK_ADMIN_API_CLIENT_SECRET、PII_ENCRYPTION_KEY、各 Webhook secret)。
+- 配置 `deploy/env/.env.production`(参考 `.env.example`;AUTH_SECRET、DB/Keycloak/Redis/RabbitMQ 口令、KEYCLOAK_CLIENT_SECRET、KEYCLOAK_ADMIN_API_CLIENT_SECRET、PII_ENCRYPTION_KEY、各 Webhook secret)。Redis 必须设置 `REDIS_PASSWORD`，且 `REDIS_URL` 使用 `redis://:<REDIS_PASSWORD>@redis:6379`。
 - HTTPS 由外层反代(Nginx/Caddy)终止,转发到 portal:3000,设置 `X-Forwarded-Proto/Host`。
 
 ## 首次部署
