@@ -12,7 +12,7 @@ checkPaths:
   - identity-portal/deploy/**
   - identity-portal/lib/config/**
 lastReviewedAt: 2026-07-08
-lastReviewedCommit: 0106728
+lastReviewedCommit: ed67b5a3db5f34250b5e4bf43eb6965fad5da945
 ---
 
 # 10. 部署与运维设计

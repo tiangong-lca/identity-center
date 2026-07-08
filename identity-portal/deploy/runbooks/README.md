@@ -39,7 +39,7 @@ lastReviewedCommit: 0106728
 | PostgreSQL | 127.0.0.1:15432(dev only) | 库 `identity_platform`(用户 identity)+ `keycloak`(用户 keycloak);容器内仍为 5432 |
 | Redis | 127.0.0.1:16379(dev only) | BullMQ 任务队列 + 速率限制;容器内仍为 6379;生产不发布宿主机端口 |
 | RabbitMQ | 5672(UI 15672,identity/identity) | 事件分发(exchange `identity.events`) |
-| Mailpit(仅 dev,可选) | SMTP 1025 / UI 8025 | 开发邮件收件箱(默认不启用邮件验证,仅 `KC_VERIFY_EMAIL=true` 时需要) |
+| Mailpit(仅 dev,可选) | SMTP 11025 / UI 8025 | 开发邮件收件箱(默认不启用邮件验证,仅 `KC_VERIFY_EMAIL=true` 时需要);容器内 SMTP 仍为 1025 |
 | KingbaseES(可选 profile `kes`) | 127.0.0.1:15433(dev only) | 双库兼容验证(D-001);容器内仍为 54321 |
 
 ---
@@ -53,7 +53,7 @@ lastReviewedCommit: 0106728
 docker compose -f deploy/docker/docker-compose.dev.yml up -d --wait
 
 # 2) 引导 Keycloak(幂等):realm/clients/角色/策略/双语/登录主题,并导出配置留档
-#    邮箱验证默认关闭(无需 SMTP);如需开启:KC_VERIFY_EMAIL=true + KC_SMTP_HOST=mailpit 后重跑本步
+#    邮箱验证默认关闭(无需 SMTP);如需开启:KC_VERIFY_EMAIL=true + KC_SMTP_HOST=localhost + KC_SMTP_PORT=11025 后重跑本步
 pnpm bootstrap:keycloak
 pnpm bootstrap:keycloak -- --export     # 产物: deploy/keycloak/realm-company-dev.json
 

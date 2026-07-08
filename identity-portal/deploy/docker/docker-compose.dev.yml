@@ -87,7 +87,7 @@ services:
   mailpit:
     image: axllent/mailpit:latest
     ports:
-      - "1025:1025"
+      - "127.0.0.1:11025:1025"
       - "8025:8025"
 
   # KingbaseES V8R6(arm64 社区镜像,双库兼容验证用):
