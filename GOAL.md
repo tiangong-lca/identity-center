@@ -12,7 +12,7 @@ checkPaths:
   - docs/implementation/README.md
   - docs/implementation/definition-of-done.md
 lastReviewedAt: 2026-07-08
-lastReviewedCommit: ed67b5a3db5f34250b5e4bf43eb6965fad5da945
+lastReviewedCommit: 8687ad4f6cda360a7f0336d9137a592d7e022987
 ---
 
 # GOAL — 统一身份平台一期全量交付

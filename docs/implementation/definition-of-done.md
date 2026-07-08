@@ -11,7 +11,7 @@ checkPaths:
   - docs/implementation/definition-of-done.md
   - GOAL.md
 lastReviewedAt: 2026-07-08
-lastReviewedCommit: 01067284a33e5ae22f79009dc451d7fe91de0fc6
+lastReviewedCommit: 8687ad4f6cda360a7f0336d9137a592d7e022987
 ---
 
 # 完成定义(DoD)核对 — GOAL.md §7

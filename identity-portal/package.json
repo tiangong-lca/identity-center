@@ -20,11 +20,6 @@
     "worker": "tsx scripts/worker.ts",
     "test:e2e": "playwright test"
   },
-  "pnpm": {
-    "onlyBuiltDependencies": [
-      "esbuild"
-    ]
-  },
   "dependencies": {
     "@keycloak/keycloak-admin-client": "^26.6.4",
     "@monaco-editor/react": "^4.7.0",
