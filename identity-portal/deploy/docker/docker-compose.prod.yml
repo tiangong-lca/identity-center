@@ -79,12 +79,13 @@ services:
 
   redis:
     image: redis:7-alpine
-    command: ["redis-server", "--appendonly", "yes"]
+    command: ["sh", "-c", "exec redis-server --appendonly yes --protected-mode yes --requirepass \"$$REDIS_PASSWORD\" --rename-command CONFIG \"\" --rename-command FLUSHDB \"\" --rename-command FLUSHALL \"\""]
+    env_file: ../env/.env.production
     volumes:
       - redis-data:/data
     restart: unless-stopped
     healthcheck:
-      test: ["CMD", "redis-cli", "ping"]
+      test: ["CMD-SHELL", "redis-cli -a \"$$REDIS_PASSWORD\" ping"]
       interval: 10s
       timeout: 3s
       retries: 12
