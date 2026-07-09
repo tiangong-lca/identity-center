@@ -1,6 +1,7 @@
 import type { NextAuthConfig } from 'next-auth'
 import Keycloak from 'next-auth/providers/keycloak'
 import { terminateKeycloakSession } from './end-session'
+import { getRedis } from '@/lib/rate-limit/redis'
 
 const BASE_URL = process.env.KEYCLOAK_BASE_URL ?? 'http://localhost:8080'
 const REALM = process.env.KEYCLOAK_REALM ?? 'company-dev'
@@ -41,11 +42,25 @@ export const authConfig: NextAuthConfig = {
     },
   },
   callbacks: {
-    jwt({ token, account, profile }) {
+    async jwt({ token, account, profile }) {
       if (account) {
         token.keycloakSub = (profile?.sub as string) ?? token.sub
         token.roles = parseRealmRoles(account.access_token)
         token.idToken = account.id_token
+        // 新登录:清除可能残留的历史吊销标记(上一次 backchannel logout 的遗留)
+        const sub = token.keycloakSub
+        if (sub) {
+          await getRedis().del(`oidc:revoked:${sub}`)
+        }
+        return token
+      }
+      // 会话轮询:检查 Keycloak 是否已通过 backchannel logout 吊销该会话
+      const keycloakSub = token.keycloakSub
+      if (keycloakSub) {
+        const revoked = await getRedis().exists(`oidc:revoked:${keycloakSub}`)
+        if (revoked) {
+          return null
+        }
       }
       return token
     },

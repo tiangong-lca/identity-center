@@ -17,6 +17,7 @@ import { remediateEmailState } from './keycloak/remediate-email-state'
 const BASE_URL = process.env.KEYCLOAK_BASE_URL ?? 'http://localhost:8080'
 const REALM = process.env.KEYCLOAK_REALM ?? 'company-dev'
 const PORTAL_ORIGIN = process.env.PORTAL_ORIGIN ?? 'http://localhost:3000'
+const KC_BACKCHANNEL_HOST = process.env.KC_BACKCHANNEL_HOST ?? 'host.docker.internal'
 
 const REALM_ROLES: Record<string, string> = {
   admin_console_access: '管理后台入口准入(不表达具体权限)',
@@ -105,6 +106,9 @@ async function main() {
     attributes: {
       'post.logout.redirect.uris': `${PORTAL_ORIGIN}/*`,
       'pkce.code.challenge.method': 'S256',
+      'backchannel.logout.url': `${PORTAL_ORIGIN.replace('localhost', KC_BACKCHANNEL_HOST)}/api/auth/backchannel-logout`,
+      'backchannel.logout.session.required': 'true',
+      'backchannel.logout.revoke.offline.tokens': 'false',
     },
   })
 
@@ -151,6 +155,9 @@ async function main() {
     attributes: {
       'pkce.code.challenge.method': 'S256',
       'post.logout.redirect.uris': `${cmsAppOrigin}/ms/login.do`,
+      'backchannel.logout.url': `${cmsAppOrigin.replace('localhost', KC_BACKCHANNEL_HOST)}/ms/oidc/backchannel-logout`,
+      'backchannel.logout.session.required': 'true',
+      'backchannel.logout.revoke.offline.tokens': 'false',
     },
   })
   // 准入投影角色 cms_access
