@@ -135,6 +135,32 @@ async function main() {
     await kc.clients.createRole({ id: lcaClient.id, name: 'tiangong_lca_access' })
   }
 
+  // 第二个业务应用:CMS(铭飞 CMS,Apache Shiro;OIDC 回调直接指向 CMS 后端)
+  const cmsAppOrigin = process.env.CMS_APP_ORIGIN ?? 'http://localhost:8081'
+  const cmsClient = await ensureClient(kc, {
+    clientId: 'cms-business-app',
+    name: 'CMS 平台',
+    description: '内容管理系统(铭飞 CMS 6.2.0,OIDC 桥接)',
+    publicClient: false,
+    standardFlowEnabled: true,
+    implicitFlowEnabled: false,
+    directAccessGrantsEnabled: false,
+    serviceAccountsEnabled: false,
+    redirectUris: [`${cmsAppOrigin}/ms/oidc/callback`],
+    webOrigins: [cmsAppOrigin],
+    attributes: {
+      'pkce.code.challenge.method': 'S256',
+      'post.logout.redirect.uris': `${cmsAppOrigin}/ms/login.do`,
+    },
+  })
+  // 准入投影角色 cms_access
+  const existingCmsRole = await kc.clients
+    .findRole({ id: cmsClient.id, roleName: 'cms_access' })
+    .catch(() => null)
+  if (!existingCmsRole) {
+    await kc.clients.createRole({ id: cmsClient.id, name: 'cms_access' })
+  }
+
   const legacySupabaseClient = (await kc.clients.find({ clientId: 'supabase-business-app' }))[0]
   if (legacySupabaseClient?.id) {
     await kc.clients.del({ id: legacySupabaseClient.id })
