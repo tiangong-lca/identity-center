@@ -154,7 +154,7 @@ async function main() {
     webOrigins: [cmsAppOrigin],
     attributes: {
       'pkce.code.challenge.method': 'S256',
-      'post.logout.redirect.uris': `${cmsAppOrigin}/ms/login.do`,
+      'post.logout.redirect.uris': `${cmsAppOrigin}/ms/oidc/login`,
       'backchannel.logout.url': `${cmsAppOrigin.replace('localhost', KC_BACKCHANNEL_HOST)}/ms/oidc/backchannel-logout`,
       'backchannel.logout.session.required': 'true',
       'backchannel.logout.revoke.offline.tokens': 'false',
