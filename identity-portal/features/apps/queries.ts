@@ -102,43 +102,10 @@ export function useApplication(id: string) {
   })
 }
 
-export type CreateApplicationInput = {
-  code: string
-  name: string
-  keycloakClientId: string
-  accessClientRole?: string
-  loginUrl?: string
-  adminUrl?: string
-  webhookUrl?: string
-  webhookSecretRef?: string
-}
-
-export function useCreateApplication() {
-  const queryClient = useQueryClient()
-  return useMutation({
-    mutationFn: (input: CreateApplicationInput) =>
-      apiFetch<Application>('/api/admin/applications', { method: 'POST', json: input }),
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: appKeys.all }),
-  })
-}
-
-export type UpdateApplicationInput = {
-  name?: string
-  status?: ApplicationStatus
-  loginUrl?: string
-  adminUrl?: string
-  webhookUrl?: string
-  webhookSecretRef?: string
-}
-
-export function useUpdateApplication(id: string) {
-  const queryClient = useQueryClient()
-  return useMutation({
-    mutationFn: (input: UpdateApplicationInput) =>
-      apiFetch<Application>(`/api/admin/applications/${id}`, { method: 'PATCH', json: input }),
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: appKeys.all }),
-  })
-}
+// 应用/角色定义的创建与编辑已收敛至应用注册表(/admin/apps/registry),
+// 命令式写端点(POST /applications、PATCH /applications/[id]、
+// POST/PATCH .../roles[/roleId])统一返回 409 CATALOG_MANAGED——
+// 此处不再提供 useCreateApplication/useUpdateApplication。
 
 // ---- 准入 ----
 
@@ -188,37 +155,8 @@ export function useAppRoles(appId: string) {
   })
 }
 
-export function useCreateAppRole(appId: string) {
-  const queryClient = useQueryClient()
-  return useMutation({
-    mutationFn: (input: { code: string; name: string; description?: string }) =>
-      apiFetch<ApplicationRole>(`/api/admin/applications/${appId}/roles`, {
-        method: 'POST',
-        json: input,
-      }),
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: appKeys.roles(appId) }),
-  })
-}
-
-export function useUpdateAppRole(appId: string) {
-  const queryClient = useQueryClient()
-  return useMutation({
-    mutationFn: ({
-      roleId,
-      ...input
-    }: {
-      roleId: string
-      name?: string
-      description?: string
-      status?: ApplicationStatus
-    }) =>
-      apiFetch<ApplicationRole>(`/api/admin/applications/${appId}/roles/${roleId}`, {
-        method: 'PATCH',
-        json: input,
-      }),
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: appKeys.roles(appId) }),
-  })
-}
+// 角色定义的创建与编辑同样收敛至应用注册表,不再提供
+// useCreateAppRole/useUpdateAppRole——本 tab 仅保留只读的 useAppRoles。
 
 // ---- 角色分配 ----
 

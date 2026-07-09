@@ -1,5 +1,4 @@
-import { z } from 'zod'
-import { adminRoute, ApiError, ok, parseBody } from '@/app/api/_helpers'
+import { adminRoute, ApiError, ok } from '@/app/api/_helpers'
 import { createApplicationService } from '@/server/services/application-service'
 
 export const GET = adminRoute(
@@ -11,27 +10,9 @@ export const GET = adminRoute(
   },
 )
 
-const updateSchema = z.object({
-  name: z.string().min(1).max(100).optional(),
-  status: z.enum(['active', 'disabled']).optional(),
-  loginUrl: z.url().nullable().optional(),
-  adminUrl: z.url().nullable().optional(),
-  webhookUrl: z.url().nullable().optional(),
-  webhookSecretRef: z.string().min(1).nullable().optional(),
-})
-
 export const PATCH = adminRoute(
   { permission: 'app:update', scope: (p) => ({ type: 'app', id: p.id }) },
-  async (request, { requestId, ctx, params }) => {
-    const body = await parseBody(request, updateSchema)
-    const app = await createApplicationService(ctx).update(params.id, {
-      name: body.name,
-      status: body.status,
-      loginUrl: body.loginUrl ?? undefined,
-      adminUrl: body.adminUrl ?? undefined,
-      webhookUrl: body.webhookUrl ?? undefined,
-      webhookSecretRef: body.webhookSecretRef ?? undefined,
-    })
-    return ok(app, requestId)
+  async () => {
+    throw new ApiError('CATALOG_MANAGED', '应用/角色定义由应用注册表管理,请用应用注册表 /admin/apps/registry')
   },
 )

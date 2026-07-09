@@ -1,0 +1,40 @@
+{
+  "catalog": {
+    "title": "Application Registry",
+    "subtitle": "Declaratively edit the business-app registry (YAML). The server validates on apply.",
+    "apply": "Apply",
+    "reload": "Reload",
+    "applying": "Applying…",
+    "applied": "Applied — version {version}",
+    "noChanges": "No changes to apply",
+    "conflict": "The catalog was updated by someone else. Reload and retry.",
+    "validationTitle": "Validation errors (server)",
+    "diffTitle": "Changes applied",
+    "nav": "Catalog",
+    "cancel": "Cancel",
+    "versions": {
+      "title": "Version history",
+      "version": "Version",
+      "appliedBy": "By",
+      "source": "Source",
+      "appliedAt": "At",
+      "view": "View",
+      "rollback": "Roll back",
+      "rollbackConfirm": "Roll back to version {version}? This creates a new version.",
+      "empty": "No versions yet",
+      "loadFailed": "Failed to load version history"
+    },
+    "pendingDeactivate": {
+      "title": "Pending deactivation",
+      "empty": "Nothing awaiting deactivation",
+      "app": "App",
+      "role": "Role",
+      "affected": "{count} active assignment(s) affected",
+      "confirm": "Confirm deactivate",
+      "confirmTitle": "Confirm deactivation",
+      "confirmBody": "Deactivate {name}? Keycloak roles are left untouched and {count} active assignment(s) are NOT revoked — it becomes a deactivated tombstone.",
+      "done": "Deactivated {name}",
+      "loadFailed": "Failed to load pending list"
+    }
+  }
+}

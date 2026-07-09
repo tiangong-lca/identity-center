@@ -1,18 +1,8 @@
-import { z } from 'zod'
-import { adminRoute, ok, parseBody } from '@/app/api/_helpers'
-import { createApplicationService } from '@/server/services/application-service'
-
-const updateRoleSchema = z.object({
-  name: z.string().min(1).max(100).optional(),
-  description: z.string().max(300).optional(),
-  status: z.enum(['active', 'disabled']).optional(),
-})
+import { adminRoute, ApiError } from '@/app/api/_helpers'
 
 export const PATCH = adminRoute(
   { permission: 'role:manage', scope: (p) => ({ type: 'app', id: p.id }) },
-  async (request, { requestId, ctx, params }) => {
-    const body = await parseBody(request, updateRoleSchema)
-    const role = await createApplicationService(ctx).updateRole(params.roleId, body)
-    return ok(role, requestId)
+  async () => {
+    throw new ApiError('CATALOG_MANAGED', '应用/角色定义由应用注册表管理,请用应用注册表 /admin/apps/registry')
   },
 )

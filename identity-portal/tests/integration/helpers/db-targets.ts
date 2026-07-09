@@ -14,7 +14,7 @@ export function getDbTargets(): DbTarget[] {
     {
       name: 'pg',
       adminUrl:
-        process.env.PG_ADMIN_URL ?? 'postgres://postgres:postgres@localhost:5432/postgres',
+        process.env.PG_ADMIN_URL ?? 'postgres://postgres:postgres@localhost:15432/postgres',
     },
   ]
   if (process.env.KES_ENABLED === '1') {
@@ -22,7 +22,7 @@ export function getDbTargets(): DbTarget[] {
       name: 'kes',
       adminUrl:
         process.env.KINGBASE_ADMIN_URL ??
-        'postgres://kingbase:kingbase@localhost:54321/test',
+        'postgres://kingbase:kingbase@localhost:15433/test',
     })
   }
   return targets

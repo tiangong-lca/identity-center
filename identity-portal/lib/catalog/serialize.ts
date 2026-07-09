@@ -69,10 +69,10 @@ type RoleRow = {
   status: string
 }
 
-/** DB 行 → CatalogApp[](排除 pending_deactivate 的应用与角色;这些是待停用墓碑,不进可编辑 YAML) */
+/** DB 行 → CatalogApp[](排除 pending_deactivate 和 deactivated 的应用与角色;这些是待停用/已停用墓碑,不进可编辑 YAML) */
 export function toCatalogApps(appRows: AppRow[], roleRows: RoleRow[]): CatalogApp[] {
   return appRows
-    .filter((a) => a.status !== 'pending_deactivate')
+    .filter((a) => a.status !== 'pending_deactivate' && a.status !== 'deactivated')
     .map((a) => ({
       code: a.code,
       name: a.name,
@@ -85,7 +85,7 @@ export function toCatalogApps(appRows: AppRow[], roleRows: RoleRow[]): CatalogAp
       loginUrl: a.loginUrl ?? undefined,
       adminUrl: a.adminUrl ?? undefined,
       roles: roleRows
-        .filter((r) => r.applicationId === a.id && r.status !== 'pending_deactivate')
+        .filter((r) => r.applicationId === a.id && r.status !== 'pending_deactivate' && r.status !== 'deactivated')
         .map((r) => ({ code: r.code, name: r.name, description: r.description ?? undefined })),
     }))
 }

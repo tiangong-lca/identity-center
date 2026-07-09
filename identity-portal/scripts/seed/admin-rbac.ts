@@ -27,6 +27,8 @@ export const PERMISSIONS = [
   { code: 'app:revoke', name: '撤销应用准入/角色' },
   { code: 'role:read', name: '查看应用角色' },
   { code: 'role:manage', name: '管理应用角色' },
+  { code: 'catalog:read', name: '查看目录' },
+  { code: 'catalog:apply', name: '应用目录' },
   { code: 'org:read', name: '查看组织' },
   { code: 'org:manage', name: '管理组织' },
   { code: 'registration:read', name: '查看注册申请' },
@@ -46,7 +48,7 @@ export const ROLE_PERMISSION_MAP: Record<string, string[]> = {
     'user:read', 'user:create', 'user:update', 'user:disable', 'user:enable',
     'user:reset-password', 'user:reset-mfa', 'registration:read', 'registration:review',
   ],
-  app_admin: ['app:read', 'app:create', 'app:update', 'app:assign', 'app:revoke', 'role:read', 'role:manage'],
+  app_admin: ['app:read', 'app:create', 'app:update', 'app:assign', 'app:revoke', 'role:read', 'role:manage', 'catalog:read', 'catalog:apply'],
   auditor: [...new Set(['audit:read', ...ALL_READ])],
   support: ['user:read', 'user:reset-password', 'user:reset-mfa'],
 }

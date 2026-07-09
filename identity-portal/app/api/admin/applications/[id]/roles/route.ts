@@ -1,5 +1,4 @@
-import { z } from 'zod'
-import { adminRoute, ok, parseBody } from '@/app/api/_helpers'
+import { adminRoute, ApiError, ok } from '@/app/api/_helpers'
 import { createApplicationService } from '@/server/services/application-service'
 
 export const GET = adminRoute(
@@ -10,17 +9,9 @@ export const GET = adminRoute(
   },
 )
 
-const createRoleSchema = z.object({
-  code: z.string().min(1).max(50).regex(/^[a-z0-9_-]+$/),
-  name: z.string().min(1).max(100),
-  description: z.string().max(300).optional(),
-})
-
 export const POST = adminRoute(
   { permission: 'role:manage', scope: (p) => ({ type: 'app', id: p.id }) },
-  async (request, { requestId, ctx, params }) => {
-    const body = await parseBody(request, createRoleSchema)
-    const role = await createApplicationService(ctx).createRole(params.id, body)
-    return ok(role, requestId, 201)
+  async () => {
+    throw new ApiError('CATALOG_MANAGED', '应用/角色定义由应用注册表管理,请用应用注册表 /admin/apps/registry')
   },
 )

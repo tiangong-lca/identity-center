@@ -10,8 +10,8 @@ whenToUpdate: Update when the managed nextjs-agent-rules block changes or portal
 checkPaths:
   - identity-portal/AGENTS.md
   - identity-portal/CLAUDE.md
-lastReviewedAt: 2026-07-06
-lastReviewedCommit: 16f3661
+lastReviewedAt: 2026-07-07
+lastReviewedCommit: a376b16
 ---
 
 <!-- BEGIN:nextjs-agent-rules -->

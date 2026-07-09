@@ -33,6 +33,8 @@
     "users": "Users",
     "registrations": "Registrations",
     "apps": "Applications",
+    "appsList": "Application list",
+    "appsRegistry": "Registry",
     "orgs": "Organizations",
     "roles": "Roles",
     "audit": "Audit Logs",

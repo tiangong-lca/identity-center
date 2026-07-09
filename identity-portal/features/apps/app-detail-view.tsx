@@ -1,21 +1,28 @@
 'use client'
 
-import { ArrowLeftIcon, PencilIcon } from 'lucide-react'
+import { ArrowLeftIcon } from 'lucide-react'
 import { useFormatter, useTranslations } from 'next-intl'
 import Link from 'next/link'
-import { useState } from 'react'
 import { Button } from '@/components/ui/button'
 import { Skeleton } from '@/components/ui/skeleton'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { ApiClientError } from '@/features/shared/api'
 import { Descriptions } from '@/features/shared/descriptions'
-import { EditAppDialog } from './app-form-dialogs'
 import { AssignmentsTab } from './assignments-tab'
 import { useApplication, type Application } from './queries'
 import { RoleAssignmentsTab } from './role-assignments-tab'
 import { RolesTab } from './roles-tab'
 import { AppStatusBadge } from './status-badges'
 import { SyncTab } from './sync-tab'
+
+function EditInCatalogLink() {
+  const t = useTranslations('apps.detail')
+  return (
+    <Button asChild variant="outline" size="sm">
+      <Link href="/admin/apps/registry">{t('editInCatalog')}</Link>
+    </Button>
+  )
+}
 
 const TAB_VALUES = [
   'basic',
@@ -38,7 +45,6 @@ function BasicTab({ app }: { app: Application }) {
   const t = useTranslations('apps.detail.basic')
   const tDetail = useTranslations('apps.detail')
   const format = useFormatter()
-  const [editOpen, setEditOpen] = useState(false)
   const none = tDetail('none')
 
   const link = (url: string | null) =>
@@ -53,10 +59,7 @@ function BasicTab({ app }: { app: Application }) {
   return (
     <div className="flex flex-col gap-4">
       <div className="flex justify-end">
-        <Button variant="outline" onClick={() => setEditOpen(true)}>
-          <PencilIcon data-icon="inline-start" />
-          {tDetail('edit')}
-        </Button>
+        <EditInCatalogLink />
       </div>
       <div className="rounded-lg border border-border bg-card p-6">
         <Descriptions
@@ -91,7 +94,6 @@ function BasicTab({ app }: { app: Application }) {
           ]}
         />
       </div>
-      <EditAppDialog app={app} open={editOpen} onOpenChange={setEditOpen} />
     </div>
   )
 }
@@ -99,25 +101,32 @@ function BasicTab({ app }: { app: Application }) {
 function KeycloakTab({ app }: { app: Application }) {
   const t = useTranslations('apps.detail.keycloak')
   return (
-    <div className="rounded-lg border border-border bg-card p-6">
-      <h2 className="text-base font-medium text-foreground">{t('title')}</h2>
-      <p className="mt-1 text-sm text-muted-foreground">{t('description')}</p>
-      <Descriptions
-        className="mt-5"
-        items={[
-          {
-            key: 'clientId',
-            label: t('clientId'),
-            value: <CodeChip>{app.keycloakClientId}</CodeChip>,
-          },
-          {
-            key: 'accessClientRole',
-            label: t('accessClientRole'),
-            value: <CodeChip>{app.accessClientRole}</CodeChip>,
-          },
-        ]}
-      />
-      <p className="mt-5 rounded-lg bg-muted/50 p-3 text-xs text-muted-foreground">{t('hint')}</p>
+    <div className="flex flex-col gap-4">
+      <div className="flex justify-end">
+        <EditInCatalogLink />
+      </div>
+      <div className="rounded-lg border border-border bg-card p-6">
+        <h2 className="text-base font-medium text-foreground">{t('title')}</h2>
+        <p className="mt-1 text-sm text-muted-foreground">{t('description')}</p>
+        <Descriptions
+          className="mt-5"
+          items={[
+            {
+              key: 'clientId',
+              label: t('clientId'),
+              value: <CodeChip>{app.keycloakClientId}</CodeChip>,
+            },
+            {
+              key: 'accessClientRole',
+              label: t('accessClientRole'),
+              value: <CodeChip>{app.accessClientRole}</CodeChip>,
+            },
+          ]}
+        />
+        <p className="mt-5 rounded-lg bg-muted/50 p-3 text-xs text-muted-foreground">
+          {t('hint')}
+        </p>
+      </div>
     </div>
   )
 }

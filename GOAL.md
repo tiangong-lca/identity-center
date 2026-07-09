@@ -11,8 +11,8 @@ checkPaths:
   - GOAL.md
   - docs/implementation/README.md
   - docs/implementation/definition-of-done.md
-lastReviewedAt: 2026-07-06
-lastReviewedCommit: 16f3661
+lastReviewedAt: 2026-07-08
+lastReviewedCommit: 8687ad4f6cda360a7f0336d9137a592d7e022987
 ---
 
 # GOAL — 统一身份平台一期全量交付

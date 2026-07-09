@@ -1,8 +1,11 @@
 {
   "apps": {
     "title": "应用管理",
-    "subtitle": "登记业务应用,管理准入用户与应用角色分配",
-    "register": "登记应用",
+    "subtitle": "查看业务应用,管理准入用户与应用角色分配",
+    "catalogManaged": {
+      "notice": "应用与角色定义由应用注册表管理,如需新增或修改请前往应用注册表编辑器",
+      "link": "前往应用注册表编辑"
+    },
     "table": {
       "app": "应用",
       "clientId": "Keycloak Client",
@@ -10,7 +13,7 @@
       "createdAt": "创建时间",
       "actions": "操作",
       "detail": "详情",
-      "empty": "暂无应用,点击右上角登记应用",
+      "empty": "暂无应用,请前往应用注册表编辑器登记",
       "loadFailed": "列表加载失败",
       "retry": "重试"
     },
@@ -24,52 +27,18 @@
       "prev": "上一页",
       "next": "下一页"
     },
-    "form": {
-      "createTitle": "登记应用",
-      "createDescription": "在平台目录登记业务应用,对应 Keycloak client 须已存在",
-      "editTitle": "编辑基础信息",
-      "editDescription": "应用 Code 与 Keycloak client 登记后不可修改",
-      "code": "应用 Code",
-      "codePlaceholder": "如 crm-web",
-      "codeHint": "小写字母、数字与连字符(2-50 位),登记后不可修改",
-      "codeInvalid": "Code 仅允许 2-50 位小写字母、数字和连字符",
-      "name": "应用名称",
-      "namePlaceholder": "如 CRM 网站",
-      "keycloakClientId": "Keycloak Client ID",
-      "keycloakClientIdPlaceholder": "如 crm-web",
-      "keycloakClientIdHint": "须为 Keycloak 中已存在的 client,登记时校验",
-      "accessClientRole": "准入 Client Role",
-      "accessClientRolePlaceholder": "选填,留空自动生成 code_access 形式",
-      "accessClientRoleHint": "认证侧准入投影使用的 Client Role 名称",
-      "status": "状态",
-      "loginUrl": "登录地址",
-      "adminUrl": "管理后台地址",
-      "webhookUrl": "Webhook 地址",
-      "webhookUrlHint": "接收准入与角色变更事件的回调地址",
-      "webhookSecretRef": "Webhook Secret 引用",
-      "webhookSecretRefHint": "填写部署环境变量的键名(如 APP_CRM_WEBHOOK_SECRET),平台只存键名引用,不保存明文密钥",
-      "optional": "选填",
-      "requiredMissing": "请填写完整必填项",
-      "create": "登记",
-      "save": "保存",
-      "cancel": "取消"
-    },
     "toast": {
-      "created": "应用 {name} 已登记",
-      "updated": "基础信息已保存",
       "grantProjected": "准入已分配,认证侧已同步",
       "grantPending": "准入已分配,认证侧投影同步中",
       "revoked": "准入已撤销",
       "revokeRetry": "已撤销,认证侧投影重试中",
-      "roleCreated": "角色 {code} 已创建",
-      "roleUpdated": "角色已更新",
       "roleAssigned": "角色已分配",
       "roleRevoked": "角色分配已撤销",
       "failed": "操作失败:{message}"
     },
     "detail": {
       "back": "返回应用列表",
-      "edit": "编辑",
+      "editInCatalog": "去应用注册表编辑",
       "loadFailed": "应用信息加载失败",
       "notFound": "应用不存在或已被删除",
       "retry": "重试",
@@ -91,8 +60,7 @@
         "webhookUrl": "Webhook 地址",
         "webhookSecretRef": "Webhook Secret 引用",
         "createdAt": "创建时间",
-        "updatedAt": "更新时间",
-        "clearHint": "已填写的地址字段暂不支持在界面清空,仅可覆盖更新"
+        "updatedAt": "更新时间"
       },
       "keycloak": {
         "title": "Keycloak 关联",
@@ -139,30 +107,13 @@
         "selected": "已选择"
       },
       "roles": {
-        "create": "新建角色",
-        "edit": "编辑",
+        "editInCatalog": "去应用注册表编辑",
         "code": "角色 Code",
         "name": "名称",
         "description": "描述",
         "status": "状态",
-        "actions": "操作",
-        "empty": "暂无角色,先在目录登记角色",
-        "loadFailed": "角色列表加载失败",
-        "createTitle": "新建应用角色",
-        "createDescription": "登记应用可分配的角色,角色的权限含义由业务应用定义",
-        "editTitle": "编辑应用角色",
-        "editDescription": "角色 Code 创建后不可修改",
-        "codePlaceholder": "如 admin",
-        "codeHint": "小写字母、数字与下划线",
-        "codeInvalid": "Code 仅允许小写字母、数字和下划线",
-        "requiredMissing": "请填写完整必填项",
-        "statusValue": {
-          "active": "启用",
-          "disabled": "停用"
-        },
-        "submitCreate": "创建",
-        "submitSave": "保存",
-        "cancel": "取消"
+        "empty": "暂无角色,先在应用注册表登记角色",
+        "loadFailed": "角色列表加载失败"
       },
       "roleAssignments": {
         "assign": "分配角色",

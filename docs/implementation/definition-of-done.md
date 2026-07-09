@@ -10,8 +10,8 @@ whenToUpdate: 完成定义条目、验收标准或核对证据发生变化时更
 checkPaths:
   - docs/implementation/definition-of-done.md
   - GOAL.md
-lastReviewedAt: 2026-07-06
-lastReviewedCommit: 16f3661
+lastReviewedAt: 2026-07-08
+lastReviewedCommit: 8687ad4f6cda360a7f0336d9137a592d7e022987
 ---
 
 # 完成定义(DoD)核对 — GOAL.md §7
@@ -22,7 +22,7 @@ lastReviewedCommit: 16f3661
 |---|---|---|---|
 | 1 | compose 一键起全部服务健康;bootstrap 可从零重建 realm | ✅ | `docker-compose.dev.yml` 五服务 healthy;`bootstrap-keycloak-realm.ts` 幂等重建 + `--export`(`keycloak-bootstrap.test.ts` 验证 OIDC discovery + PKCE) |
 | 2 | 迁移在 PostgreSQL 从零成功 + 集成全绿;KES 交付约定+adapter+矩阵(D-001) | ✅(KES 实测待环境) | PG:`migrations.test.ts` 从零建库 20 表 + 约束;KES 三件套就绪,环境不可得记于 `kingbasees-environment.md` |
-| 3 | lint/typecheck/unit/integration + Playwright e2e 全绿 | ✅ | 37 unit + 63 integration + 8 e2e(登录/禁用/准入授予撤销/注册审批/语言/主题切换) |
+| 3 | lint/typecheck/unit/integration + Playwright e2e 全绿 | ✅ | 37 unit + 63 integration + 8 e2e(登录/禁用/准入授予撤销/注册审批/语言/主题切换);目录待停用能力补充 unit(secret-scan、serialize-deactivated)+ integration(catalog-p3)+ e2e(catalog-pending-deactivate) |
 | 4 | 端到端:注册→审批→开通→准入→角色→同步→登录 Supabase;撤权后拒绝、对账无差异 | ✅ | `e2e-onboarding.test.ts` 全链路 + business-app-kit verifier 放行/拒绝 + 对账 drift=0 |
 | 5 | 全 UI zh-CN/en + light/dark 无硬编码文案/主题遗漏 | ✅ | next-intl 目录合并制 + messages-parity 测试(键一致/无空串);next-themes data-theme;e2e 切换用例;设计库 token 桥接 |
 | 6 | OpenAPI 契约与实现一致;每写操作产审计 | ✅ | `docs/references/openapi.yaml`(全端点 + 错误码 components);契约测试断言审计行 |

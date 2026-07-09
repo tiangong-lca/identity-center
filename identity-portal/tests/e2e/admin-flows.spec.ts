@@ -41,17 +41,15 @@ test('注册审批:提交(API)→ 列表审批通过', async ({ page, request })
   await expect(page.getByText(/已通过|approved/i).first()).toBeVisible({ timeout: 15_000 })
 })
 
-test('应用管理:登记 → 列表可见', async ({ page }) => {
-  const code = `e2e-app-${stamp}`
+test('应用管理:定义由应用注册表管理(只读,无登记入口)', async ({ page }) => {
   await page.goto('/admin/apps')
-  await page.getByRole('button', { name: /登记应用|Register/ }).click()
-  const dialog = page.getByRole('dialog')
-  await dialog.locator('#app-code').fill(code)
-  await dialog.locator('#app-name').fill('E2E 应用')
-  await dialog.locator('#app-client-id').fill('user-portal')
-  await dialog.getByRole('button', { name: /^登记$|^Register$|^Create$/ }).click()
 
-  await expect(page.getByText(code).first()).toBeVisible({ timeout: 15_000 })
+  // 应用定义(创建/编辑)已收敛至应用注册表,列表页不再提供登记入口,
+  // 取而代之的是指向 /admin/apps/registry 的提示条。
+  await expect(page.getByRole('button', { name: /登记应用|Register/ })).toHaveCount(0)
+  const catalogLink = page.getByRole('link', { name: /前往应用注册表编辑|Edit in registry/ })
+  await expect(catalogLink).toBeVisible({ timeout: 15_000 })
+  await expect(catalogLink).toHaveAttribute('href', '/admin/apps/registry')
 })
 
 test('审计日志:上述操作有记录', async ({ page }) => {

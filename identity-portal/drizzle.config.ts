@@ -8,6 +8,6 @@ export default defineConfig({
   dbCredentials: {
     url:
       process.env.DATABASE_URL ??
-      'postgres://identity:identity@localhost:5432/identity_platform',
+      'postgres://identity:identity@localhost:15432/identity_platform',
   },
 })

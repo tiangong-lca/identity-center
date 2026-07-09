@@ -1,7 +1,7 @@
 version: 1
 layout: repo
-lastReviewedAt: "2026-07-06"
-lastReviewedCommit: "16f3661"
+lastReviewedAt: "2026-07-08"
+lastReviewedCommit: "8687ad4f6cda360a7f0336d9137a592d7e022987"
 
 # Repo-local docpact governance for identity-center.
 # The workspace root config governs the submodule pointer and cross-repo view;
@@ -258,6 +258,8 @@ rules:
         kind: doc-ai-layer
       - path: docs/implementation/README.md
         kind: impl-plan
+      - path: docs/implementation/definition-of-done.md
+        kind: dod-checklist
       - path: identity-portal/AGENTS.md
         kind: agent-entry
     requiredDocs:
@@ -346,7 +348,11 @@ rules:
         kind: orm-config
       - path: identity-portal/lib/catalog/**
         kind: catalog-domain
+      - path: identity-portal/lib/http/**
+        kind: api-error-contract
       - path: identity-portal/scripts/apply-catalog.ts
+        kind: catalog-cli
+      - path: identity-portal/scripts/export-catalog.ts
         kind: catalog-cli
       - path: identity-portal/scripts/seed-portal-db.ts
         kind: seed-bootstrap
@@ -376,6 +382,8 @@ rules:
         kind: mq-adapter
       - path: identity-portal/lib/sync/**
         kind: sync-runtime
+      - path: identity-portal/scripts/worker.ts
+        kind: job-runtime-entrypoint
     requiredDocs:
       - path: .docpact/config.yaml
         mode: review_or_update
@@ -383,7 +391,7 @@ rules:
         mode: review_or_update
       - path: docs/design/01-architecture/01-overall-architecture/README.md
         mode: review_or_update
-    reason: Service, policy, background-job, MQ, and sync changes alter the event and reconciliation pipeline and should refresh the sync-event design and the overall architecture.
+    reason: Service, policy, background-job, MQ, sync, and worker-entrypoint changes alter the event and reconciliation pipeline and should refresh the sync-event design and the overall architecture.
   - id: identity-security-and-audit-contract
     scope: repo
     repo: identity-center
@@ -410,6 +418,8 @@ rules:
     triggers:
       - path: identity-portal/deploy/**
         kind: deploy-asset
+      - path: identity-portal/lib/config/**
+        kind: runtime-config
       - path: .github/workflows/ci.yml
         kind: ci
     requiredDocs:
@@ -419,7 +429,7 @@ rules:
         mode: review_or_update
       - path: identity-portal/deploy/runbooks/README.md
         mode: review_or_update
-    reason: Compose, Keycloak realm, monitoring, and CI changes alter the operational surface and should refresh the deployment/operations design and the runbooks index.
+    reason: Compose, runtime environment schema, Keycloak realm, monitoring, and CI changes alter the operational surface and should refresh the deployment/operations design and the runbooks index.
   - id: identity-business-app-onboarding-contract
     scope: repo
     repo: identity-center
