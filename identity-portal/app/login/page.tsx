@@ -3,6 +3,7 @@ import { redirect } from "next/navigation";
 import { auth, signIn } from "@/lib/auth";
 import { LocaleToggle } from "@/components/layout/locale-toggle";
 import { ThemeToggle } from "@/components/layout/theme-toggle";
+import { AutoSubmit } from "@/components/auth/auto-submit";
 
 export default async function LoginPage() {
   const session = await auth();
@@ -28,6 +29,7 @@ export default async function LoginPage() {
           >
             {t("signIn")}
           </button>
+          <AutoSubmit />
         </form>
       </div>
       <div className="flex items-center gap-6">

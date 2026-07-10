@@ -1,4 +1,5 @@
 import { getTranslations } from "next-intl/server";
+import { redirect } from "next/navigation";
 import Link from "next/link";
 import { auth } from "@/lib/auth";
 import { logoutAndRedirectToKeycloak } from "@/lib/auth/logout-action";
@@ -15,18 +16,7 @@ export default async function HomePage() {
   const session = await auth();
 
   if (!session?.user) {
-    return (
-      <main className="flex flex-1 flex-col items-center justify-center gap-6 p-8">
-        <h1 className="text-2xl font-semibold text-primary">{t("title")}</h1>
-        <p className="text-sm text-secondary-foreground">{t("description")}</p>
-        <Link
-          href="/login"
-          className="rounded bg-primary px-4 py-2 text-sm font-medium text-white hover:bg-primary-hover"
-        >
-          {ta("signIn")}
-        </Link>
-      </main>
-    );
+    redirect("/login");
   }
 
   const isAdmin = session.user.isAdmin;
