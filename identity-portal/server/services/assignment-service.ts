@@ -72,13 +72,26 @@ export function createAssignmentService(ctx: ServiceContext) {
             eq(schema.applicationAssignments.status, params.status),
           )
         : eq(schema.applicationAssignments.applicationId, applicationId)
-      const items = await ctx.db
-        .select()
+      const rows = await ctx.db
+        .select({
+          assignment: schema.applicationAssignments,
+          userEmail: schema.portalUsers.email,
+          userDisplayName: schema.portalUsers.displayName,
+        })
         .from(schema.applicationAssignments)
+        .leftJoin(
+          schema.portalUsers,
+          eq(schema.applicationAssignments.portalUserId, schema.portalUsers.id),
+        )
         .where(where)
         .orderBy(desc(schema.applicationAssignments.createdAt))
         .limit(limit)
         .offset(offset)
+      const items = rows.map((r) => ({
+        ...r.assignment,
+        userEmail: r.userEmail,
+        userDisplayName: r.userDisplayName,
+      }))
       const [{ n: total }] = await ctx.db
         .select({ n: count() })
         .from(schema.applicationAssignments)

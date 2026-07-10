@@ -73,6 +73,7 @@
       },
       "assignments": {
         "grant": "分配准入",
+        "user": "用户",
         "keycloakSub": "Keycloak Sub",
         "status": "状态",
         "kcProjection": "认证投影",

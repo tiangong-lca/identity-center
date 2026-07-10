@@ -73,6 +73,7 @@
       },
       "assignments": {
         "grant": "Grant access",
+        "user": "User",
         "keycloakSub": "Keycloak Sub",
         "status": "Status",
         "kcProjection": "IdP projection",
