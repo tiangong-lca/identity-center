@@ -31,7 +31,7 @@ services:
       KC_HTTP_ENABLED: "true"
       KC_PROXY_HEADERS: xforwarded
     ports:
-      - "8080:8080"
+      - "127.0.0.1:8080:8080"
       - "127.0.0.1:19000:9000"
     volumes:
       - ../keycloak/themes:/opt/keycloak/themes:ro
@@ -76,8 +76,8 @@ services:
       RABBITMQ_DEFAULT_USER: identity
       RABBITMQ_DEFAULT_PASS: identity
     ports:
-      - "5672:5672"
-      - "15672:15672"
+      - "127.0.0.1:5672:5672"
+      - "127.0.0.1:15672:15672"
     healthcheck:
       test: ["CMD", "rabbitmq-diagnostics", "-q", "ping"]
       interval: 10s
@@ -88,7 +88,7 @@ services:
     image: axllent/mailpit:latest
     ports:
       - "127.0.0.1:11025:1025"
-      - "8025:8025"
+      - "127.0.0.1:8025:8025"
 
   # KingbaseES V8R6(arm64 社区镜像,双库兼容验证用):
   #   docker compose --profile kes -f deploy/docker/docker-compose.dev.yml up -d kingbase
