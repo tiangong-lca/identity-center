@@ -101,7 +101,17 @@
       "confirm": "分配",
       "assigning": "分配中…",
       "successProjected": "已分配应用准入",
-      "successPending": "分配已提交,同步进行中"
+      "successPending": "分配已提交,同步进行中",
+      "appName": "应用名称",
+      "appStatus": "状态",
+      "appLoginUrl": "登录地址",
+      "openApp": "打开应用",
+      "statusActive": "已启用",
+      "statusRevoked": "已撤销",
+      "statusExpired": "已过期",
+      "loading": "加载中…",
+      "noAssignments": "暂无应用准入",
+      "alreadyAssigned": "已分配"
     },
     "audit": {
       "hint": "最近 20 条与该用户相关的操作记录",

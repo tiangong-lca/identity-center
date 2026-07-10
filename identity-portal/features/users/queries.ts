@@ -20,11 +20,28 @@ export type UsersListParams = {
   status?: PortalUserStatus
 }
 
+export type UserAssignment = {
+  id: string
+  applicationId: string
+  portalUserId: string
+  keycloakSub: string
+  status: 'active' | 'revoked' | 'expired'
+  source: string
+  projectionStatus: string
+  businessProjectionStatus: string
+  createdAt: string
+  appName: string | null
+  appCode: string | null
+  appStatus: string | null
+  appLoginUrl: string | null
+}
+
 export const usersKeys = {
   all: ['users'] as const,
   list: (params: UsersListParams) => [...usersKeys.all, 'list', params] as const,
   detail: (id: string) => [...usersKeys.all, 'detail', id] as const,
   audit: (id: string) => [...usersKeys.all, 'audit', id] as const,
+  assignments: (id: string) => [...usersKeys.all, 'assignments', id] as const,
 }
 
 export const applicationsKeys = {
@@ -53,6 +70,15 @@ export function useUserAuditLogsQuery(id: string) {
       apiFetch<PageResult<AuditLogEntry>>(
         `/api/admin/audit-logs${listQuery({ targetType: 'user', targetId: id, pageSize: 20 })}`,
       ),
+  })
+}
+
+export function useUserAssignmentsQuery(id: string, enabled = true) {
+  return useQuery({
+    queryKey: usersKeys.assignments(id),
+    queryFn: () =>
+      apiFetch<{ items: UserAssignment[] }>(`/api/admin/users/${id}/assignments`),
+    enabled,
   })
 }
 
@@ -128,6 +154,7 @@ export function useAssignApplicationMutation() {
       }),
     onSuccess: (_data, { portalUserId }) => {
       void queryClient.invalidateQueries({ queryKey: usersKeys.audit(portalUserId) })
+      void queryClient.invalidateQueries({ queryKey: usersKeys.assignments(portalUserId) })
     },
   })
 }

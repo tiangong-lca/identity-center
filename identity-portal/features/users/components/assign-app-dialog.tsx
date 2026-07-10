@@ -27,7 +27,13 @@ import { useApplicationsQuery, useAssignApplicationMutation } from '@/features/u
 import type { PortalUser } from '@/features/users/types'
 
 /** 分配应用准入:选应用 → POST assignments(201 已投影 / 202 同步中) */
-export function AssignAppDialog({ user }: { user: PortalUser }) {
+export function AssignAppDialog({
+  user,
+  assignedAppIds = [],
+}: {
+  user: PortalUser
+  assignedAppIds?: string[]
+}) {
   const t = useTranslations('users.assign')
   const tc = useTranslations('users.common')
   const [open, setOpen] = useState(false)
@@ -86,12 +92,17 @@ export function AssignAppDialog({ user }: { user: PortalUser }) {
               />
             </SelectTrigger>
             <SelectContent>
-              {apps.map((app) => (
-                <SelectItem key={app.id} value={app.id}>
-                  {app.name}
-                  <span className="text-xs text-muted-foreground">{app.code}</span>
-                </SelectItem>
-              ))}
+              {apps.map((app) => {
+                const assigned = assignedAppIds.includes(app.id)
+                return (
+                  <SelectItem key={app.id} value={app.id} disabled={assigned}>
+                    {app.name}
+                    <span className="text-xs text-muted-foreground">
+                      {assigned ? t('alreadyAssigned') : app.code}
+                    </span>
+                  </SelectItem>
+                )
+              })}
             </SelectContent>
           </Select>
           {applications.isError ? (

@@ -6,15 +6,18 @@ import Link from 'next/link'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Skeleton } from '@/components/ui/skeleton'
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { ApiClientError } from '@/features/shared/api'
 import { formatDateTime } from '@/features/users/format'
-import { useUserQuery } from '@/features/users/queries'
+import { useUserAssignmentsQuery, useUserQuery } from '@/features/users/queries'
 import type { PortalUser } from '@/features/users/types'
 import { AssignAppDialog } from './assign-app-dialog'
 import { UserAuditLog } from './user-audit-log'
 import { UserStatusBadge, UserSyncStatusBadge } from './user-badges'
 import { UserDangerZone } from './user-danger-zone'
+import { AssignmentStatusBadge } from '@/features/apps/status-badges'
+import { ExternalLinkIcon } from 'lucide-react'
 
 function DetailSkeleton() {
   return (
@@ -74,6 +77,9 @@ function OverviewCard({ user }: { user: PortalUser }) {
 
 function AppsCard({ user }: { user: PortalUser }) {
   const t = useTranslations('users.assign')
+  const assignments = useUserAssignmentsQuery(user.id)
+  const items = assignments.data?.items ?? []
+
   return (
     <Card>
       <CardHeader>
@@ -84,8 +90,56 @@ function AppsCard({ user }: { user: PortalUser }) {
         {user.status !== 'active' ? (
           <p className="text-xs text-warning">{t('disabledUserHint')}</p>
         ) : null}
+
+        {assignments.isPending ? (
+          <p className="text-xs text-muted-foreground">{t('loading')}</p>
+        ) : items.length > 0 ? (
+          <div className="overflow-hidden rounded-lg border border-border">
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>{t('appName')}</TableHead>
+                  <TableHead>{t('appStatus')}</TableHead>
+                  <TableHead>{t('appLoginUrl')}</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {items.map((a) => (
+                  <TableRow key={a.id}>
+                    <TableCell className="font-medium">{a.appName ?? a.appCode}</TableCell>
+                    <TableCell>
+                      <AssignmentStatusBadge status={a.status} labels={{
+                        active: t('statusActive'),
+                        revoked: t('statusRevoked'),
+                        expired: t('statusExpired'),
+                      }} />
+                    </TableCell>
+                    <TableCell>
+                      {a.appLoginUrl ? (
+                        <a
+                          href={a.appLoginUrl}
+                          target="_blank"
+                          rel="noreferrer noopener"
+                          className="inline-flex items-center gap-1 text-xs text-primary hover:underline"
+                        >
+                          {t('openApp')}
+                          <ExternalLinkIcon className="size-3" />
+                        </a>
+                      ) : (
+                        <span className="text-xs text-muted-foreground">—</span>
+                      )}
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </div>
+        ) : (
+          <p className="text-xs text-muted-foreground">{t('noAssignments')}</p>
+        )}
+
         <div>
-          <AssignAppDialog user={user} />
+          <AssignAppDialog user={user} assignedAppIds={items.filter((a) => a.status === 'active').map((a) => a.applicationId)} />
         </div>
       </CardContent>
     </Card>

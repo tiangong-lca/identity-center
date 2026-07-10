@@ -100,9 +100,28 @@ export function createAssignmentService(ctx: ServiceContext) {
     },
 
     async listByUser(portalUserId: string) {
-      return ctx.db.query.applicationAssignments.findMany({
-        where: eq(schema.applicationAssignments.portalUserId, portalUserId),
-      })
+      const rows = await ctx.db
+        .select({
+          assignment: schema.applicationAssignments,
+          appName: schema.applications.name,
+          appCode: schema.applications.code,
+          appStatus: schema.applications.status,
+          appLoginUrl: schema.applications.loginUrl,
+        })
+        .from(schema.applicationAssignments)
+        .leftJoin(
+          schema.applications,
+          eq(schema.applicationAssignments.applicationId, schema.applications.id),
+        )
+        .where(eq(schema.applicationAssignments.portalUserId, portalUserId))
+        .orderBy(desc(schema.applicationAssignments.createdAt))
+      return rows.map((r) => ({
+        ...r.assignment,
+        appName: r.appName,
+        appCode: r.appCode,
+        appStatus: r.appStatus,
+        appLoginUrl: r.appLoginUrl,
+      }))
     },
 
     async getById(assignmentId: string) {

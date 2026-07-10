@@ -101,7 +101,17 @@
       "confirm": "Assign",
       "assigning": "Assigning…",
       "successProjected": "App access assigned",
-      "successPending": "Assignment submitted, sync in progress"
+      "successPending": "Assignment submitted, sync in progress",
+      "appName": "Application",
+      "appStatus": "Status",
+      "appLoginUrl": "Login URL",
+      "openApp": "Open app",
+      "statusActive": "Active",
+      "statusRevoked": "Revoked",
+      "statusExpired": "Expired",
+      "loading": "Loading…",
+      "noAssignments": "No app access assigned",
+      "alreadyAssigned": "Already assigned"
     },
     "audit": {
       "hint": "Latest 20 operations related to this user",
