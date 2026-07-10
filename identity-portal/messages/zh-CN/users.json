@@ -111,7 +111,14 @@
       "statusExpired": "已过期",
       "loading": "加载中…",
       "noAssignments": "暂无应用准入",
-      "alreadyAssigned": "已分配"
+      "alreadyAssigned": "已分配",
+      "revoke": "取消准入",
+      "revokeConfirmTitle": "确认取消准入",
+      "revokeConfirmDescription": "取消后用户将无法通过该应用登录,确定继续?",
+      "revokeConfirm": "确认取消",
+      "revoked": "已取消该应用准入",
+      "revokeRetry": "准入已取消,认证投影正在重试",
+      "actions": "操作"
     },
     "audit": {
       "hint": "最近 20 条与该用户相关的操作记录",

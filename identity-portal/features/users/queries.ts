@@ -158,3 +158,17 @@ export function useAssignApplicationMutation() {
     },
   })
 }
+
+export function useRevokeAssignmentMutation(portalUserId: string) {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: ({ applicationId, assignmentId }: { applicationId: string; assignmentId: string }) =>
+      apiFetch<unknown>(`/api/admin/applications/${applicationId}/assignments/${assignmentId}`, {
+        method: 'DELETE',
+      }),
+    onSettled: () => {
+      void queryClient.invalidateQueries({ queryKey: usersKeys.assignments(portalUserId) })
+      void queryClient.invalidateQueries({ queryKey: usersKeys.audit(portalUserId) })
+    },
+  })
+}

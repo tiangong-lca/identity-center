@@ -1,8 +1,20 @@
 'use client'
 
-import { ArrowLeftIcon } from 'lucide-react'
+import { ArrowLeftIcon, ExternalLinkIcon } from 'lucide-react'
 import { useLocale, useTranslations } from 'next-intl'
 import Link from 'next/link'
+import { useState } from 'react'
+import { toast } from 'sonner'
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@/components/ui/alert-dialog'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Skeleton } from '@/components/ui/skeleton'
@@ -10,14 +22,14 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { ApiClientError } from '@/features/shared/api'
 import { formatDateTime } from '@/features/users/format'
-import { useUserAssignmentsQuery, useUserQuery } from '@/features/users/queries'
+import { useRevokeAssignmentMutation, useUserAssignmentsQuery, useUserQuery } from '@/features/users/queries'
 import type { PortalUser } from '@/features/users/types'
 import { AssignAppDialog } from './assign-app-dialog'
 import { UserAuditLog } from './user-audit-log'
 import { UserStatusBadge, UserSyncStatusBadge } from './user-badges'
 import { UserDangerZone } from './user-danger-zone'
 import { AssignmentStatusBadge } from '@/features/apps/status-badges'
-import { ExternalLinkIcon } from 'lucide-react'
+import type { UserAssignment } from '@/features/users/queries'
 
 function DetailSkeleton() {
   return (
@@ -77,8 +89,37 @@ function OverviewCard({ user }: { user: PortalUser }) {
 
 function AppsCard({ user }: { user: PortalUser }) {
   const t = useTranslations('users.assign')
+  const tToast = useTranslations('apps.toast')
   const assignments = useUserAssignmentsQuery(user.id)
+  const revoke = useRevokeAssignmentMutation(user.id)
   const items = assignments.data?.items ?? []
+  const [revokeTarget, setRevokeTarget] = useState<UserAssignment | null>(null)
+
+  const statusLabels = {
+    active: t('statusActive'),
+    revoked: t('statusRevoked'),
+    expired: t('statusExpired'),
+  }
+
+  const handleRevoke = () => {
+    if (!revokeTarget) return
+    revoke.mutate(
+      { applicationId: revokeTarget.applicationId, assignmentId: revokeTarget.id },
+      {
+        onSuccess: () => toast.success(t('revoked')),
+        onError: (error) => {
+          if (error instanceof ApiClientError && error.code === 'KEYCLOAK_ERROR') {
+            toast.warning(t('revokeRetry'))
+            return
+          }
+          toast.error(tToast('failed', {
+            message: error instanceof ApiClientError ? error.message : String(error),
+          }))
+        },
+      },
+    )
+    setRevokeTarget(null)
+  }
 
   return (
     <Card>
@@ -101,6 +142,7 @@ function AppsCard({ user }: { user: PortalUser }) {
                   <TableHead>{t('appName')}</TableHead>
                   <TableHead>{t('appStatus')}</TableHead>
                   <TableHead>{t('appLoginUrl')}</TableHead>
+                  <TableHead className="text-right">{t('actions')}</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -108,11 +150,7 @@ function AppsCard({ user }: { user: PortalUser }) {
                   <TableRow key={a.id}>
                     <TableCell className="font-medium">{a.appName ?? a.appCode}</TableCell>
                     <TableCell>
-                      <AssignmentStatusBadge status={a.status} labels={{
-                        active: t('statusActive'),
-                        revoked: t('statusRevoked'),
-                        expired: t('statusExpired'),
-                      }} />
+                      <AssignmentStatusBadge status={a.status} labels={statusLabels} />
                     </TableCell>
                     <TableCell>
                       {a.appLoginUrl ? (
@@ -129,6 +167,19 @@ function AppsCard({ user }: { user: PortalUser }) {
                         <span className="text-xs text-muted-foreground">—</span>
                       )}
                     </TableCell>
+                    <TableCell className="text-right">
+                      {a.status === 'active' ? (
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          className="text-danger hover:text-danger"
+                          disabled={revoke.isPending}
+                          onClick={() => setRevokeTarget(a)}
+                        >
+                          {t('revoke')}
+                        </Button>
+                      ) : null}
+                    </TableCell>
                   </TableRow>
                 ))}
               </TableBody>
@@ -142,6 +193,24 @@ function AppsCard({ user }: { user: PortalUser }) {
           <AssignAppDialog user={user} assignedAppIds={items.filter((a) => a.status === 'active').map((a) => a.applicationId)} />
         </div>
       </CardContent>
+
+      <AlertDialog
+        open={revokeTarget !== null}
+        onOpenChange={(open) => !open && setRevokeTarget(null)}
+      >
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>{t('revokeConfirmTitle')}</AlertDialogTitle>
+            <AlertDialogDescription>{t('revokeConfirmDescription')}</AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>{t('cancel')}</AlertDialogCancel>
+            <AlertDialogAction variant="destructive" onClick={handleRevoke}>
+              {t('revokeConfirm')}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </Card>
   )
 }

@@ -111,7 +111,14 @@
       "statusExpired": "Expired",
       "loading": "Loading…",
       "noAssignments": "No app access assigned",
-      "alreadyAssigned": "Already assigned"
+      "alreadyAssigned": "Already assigned",
+      "revoke": "Revoke",
+      "revokeConfirmTitle": "Revoke app access",
+      "revokeConfirmDescription": "The user will no longer be able to sign in to this app. Continue?",
+      "revokeConfirm": "Confirm revoke",
+      "revoked": "App access revoked",
+      "revokeRetry": "Access revoked, identity projection is retrying",
+      "actions": "Actions"
     },
     "audit": {
       "hint": "Latest 20 operations related to this user",
