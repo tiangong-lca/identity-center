@@ -65,6 +65,9 @@
             </#outputformat>
         </script>
     </#if>
+    <#if realm.internationalizationEnabled>
+        <script>document.cookie="KEYCLOAK_LOCALE=${locale.currentLanguageTag};path=/realms/${realm.name};max-age=31536000;SameSite=Lax";</script>
+    </#if>
 </head>
 
 <body class="custom-body">
