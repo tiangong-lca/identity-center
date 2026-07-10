@@ -19,7 +19,9 @@
     },
     "status": {
       "active": "启用",
-      "disabled": "停用"
+      "disabled": "停用",
+      "pending_deactivate": "待停用",
+      "deactivated": "已停用"
     },
     "pagination": {
       "total": "共 {total} 条",

@@ -19,7 +19,9 @@
     },
     "status": {
       "active": "Active",
-      "disabled": "Disabled"
+      "disabled": "Disabled",
+      "pending_deactivate": "Pending Deactivation",
+      "deactivated": "Deactivated"
     },
     "pagination": {
       "total": "{total} in total",
