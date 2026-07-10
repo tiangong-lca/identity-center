@@ -2,7 +2,8 @@ import { getTranslations } from 'next-intl/server'
 import { redirect } from 'next/navigation'
 import { AdminShell } from '@/components/layout/admin-shell'
 import { QueryProvider } from '@/components/layout/query-provider'
-import { auth, signIn, signOut } from '@/lib/auth'
+import { auth } from '@/lib/auth'
+import { logoutAndRedirectToKeycloak } from '@/lib/auth/logout-action'
 
 export default async function AdminLayout({ children }: { children: React.ReactNode }) {
   const session = await auth()
@@ -18,8 +19,7 @@ export default async function AdminLayout({ children }: { children: React.ReactN
           <form
             action={async () => {
               'use server'
-              await signOut({ redirect: false })
-              await signIn('keycloak', { redirectTo: '/' })
+              await logoutAndRedirectToKeycloak()
             }}
           >
             <button
