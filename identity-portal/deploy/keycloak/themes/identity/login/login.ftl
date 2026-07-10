@@ -1,6 +1,6 @@
 <#import "template.ftl" as layout>
 
-<@layout.registrationLayout displayMessage=!messagesPerField.existsError('username','password') displayInfo=realm.password && realm.registrationAllowed && !registrationDisabled??; section>
+<@layout.registrationLayout displayMessage=!messagesPerField.existsError('username','password') displayInfo=true; section>
 <!-- template: login.ftl (identity theme) -->
 
     <#if section = "header">
@@ -100,12 +100,10 @@
         </div>
 
     <#elseif section = "info">
-        <#if realm.password && realm.registrationAllowed && !registrationDisabled??>
-            <div class="registration-link">
-                <span>${msg("noAccount")}</span>
-                <a href="${url.registrationUrl}">${msg("doRegister")}</a>
-            </div>
-        </#if>
+        <div class="registration-link">
+            <span>${msg("noAccount")}</span>
+            <a href="http://localhost:3000/register">${msg("doRegister")}</a>
+        </div>
     </#if>
 
 </@layout.registrationLayout>
