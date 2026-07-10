@@ -1,6 +1,6 @@
 import { getTranslations } from "next-intl/server";
 import Link from "next/link";
-import { auth, signOut } from "@/lib/auth";
+import { auth, signIn, signOut } from "@/lib/auth";
 import { LocaleToggle } from "@/components/layout/locale-toggle";
 import { QueryProvider } from "@/components/layout/query-provider";
 import { ThemeToggle } from "@/components/layout/theme-toggle";
@@ -75,7 +75,8 @@ export default async function HomePage() {
             <form
               action={async () => {
                 "use server";
-                await signOut({ redirectTo: "/" });
+                await signOut({ redirect: false });
+                await signIn("keycloak", { redirectTo: "/" });
               }}
             >
               <button
