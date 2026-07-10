@@ -102,8 +102,20 @@
     <#elseif section = "info">
         <div class="registration-link">
             <span>${msg("noAccount")}</span>
-            <a href="http://localhost:3000/register">${msg("doRegister")}</a>
+            <a href="/register" id="register-link">${msg("doRegister")}</a>
         </div>
+        <script>
+        (function() {
+            var link = document.getElementById('register-link');
+            if (!link) return;
+            try {
+                var p = new URLSearchParams(location.search);
+                var ru = p.get('redirect_uri');
+                if (!ru && p.get('client_data')) ru = JSON.parse(atob(p.get('client_data'))).ru;
+                if (ru) link.href = new URL(ru).origin + '/register';
+            } catch(e) {}
+        })();
+        </script>
     </#if>
 
 </@layout.registrationLayout>
