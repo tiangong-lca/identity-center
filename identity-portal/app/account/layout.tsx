@@ -16,10 +16,10 @@ export default async function AccountLayout({ children }: { children: React.Reac
   return (
     <QueryProvider>
       <div className="flex min-h-screen flex-col">
-        <header className="flex h-12 items-center justify-between border-b border-border bg-card px-4">
+        <header className="flex h-[50px] items-center justify-between border-b border-border bg-card px-4">
           <div className="flex items-center gap-6">
             <Link href="/" className="flex items-center gap-2">
-              <span className="inline-block size-5 rounded bg-primary" aria-hidden />
+              <span className="inline-block size-5 rounded bg-[#0080FF]" aria-hidden />
               <span className="text-sm font-semibold text-foreground">{tc('appName')}</span>
             </Link>
             <AccountNav />
