@@ -12,14 +12,16 @@ checkPaths:
   - docs/guides/business-app-integration-spec.md
   - docs/guides/business-app-onboarding.md
   - docs/guides/cms-sso-pitfalls.md
-lastReviewedAt: 2026-07-09
+lastReviewedAt: 2026-07-13
 ---
 
 # 业务应用 SSO 接入说明书
 
-> 面向**要接入统一身份平台的业务应用开发者**。
+> 面向**要接入统一身份平台的业务应用开发者**以及 **identity-center 管理员**。
 > 本文档基于首个接入应用（CMS）的实战经验编写，侧重「怎么做」和「别踩坑」。
 > 技术契约细节见 [业务应用接入技术规范](./business-app-integration-spec.md)。
+>
+> **角色导航**：业务应用开发者 → §1 ~ §9；identity-center 管理员 → §10。
 
 ---
 
@@ -297,6 +299,8 @@ Header: X-Webhook-Event-Id: <uuid>
 | JWT 验证失败 | typ: logout+jwt 不被支持 | 用底层 API 验签，绕过默认 JWT processor |
 | 应用列表 500 错误 | 数据库连接失败 | 检查 DATABASE_URL 端口是否与 Docker 映射一致 |
 | Keycloak 账号不显示应用 | 账号未通过 identity-center 创建 | 删除后经 identity-center 管理 API 重建 |
+| `oidc_token_exchange_failed` | Client Secret 不匹配或 Base URL 错误 | 见 §10.6 排坑清单 |
+| `Invalid parameter: redirect_uri` | Keycloak 客户端 redirectUris 未含生产地址 | 见 §10.3 URL 清单 #1 |
 
 ---
 
@@ -330,3 +334,193 @@ Header: X-Webhook-Event-Id: <uuid>
 | **合计** | **17-29h** | 建议排 3-4 个工作日 |
 
 > 经验值：CMS 接入实际花了 20h+，其中 SLO 占了 10h。
+
+---
+
+## 10. identity-center 管理员操作指南（部署 / 运维）
+
+> 本节面向 **identity-center 管理员**，不是业务应用开发者。
+> 覆盖：注册新应用、配置 Keycloak 客户端、生产环境 URL 清单、常用 Admin CLI 命令。
+
+### 10.1 注册新应用
+
+**方式 A：通过 Portal Admin UI（推荐）**
+
+1. 登录 Portal Admin Console（`http://<PORTAL_HOST>:3000/admin`）
+2. 进入「应用管理」→ 点击「添加应用」
+3. 填写：
+   - 应用编码（如 `cms`）
+   - 应用名称（如 `内容管理系统`）
+   - 登录入口 URL（如 `http://<APP_HOST>/ms/oidc/login`）
+   - OIDC 回调 URL（如 `http://<APP_HOST>/ms/oidc/callback`）
+   - 登出回调 URL（如 `http://<APP_HOST>/ms/login.do`）
+4. 提交 → Portal 会创建应用记录，并自动在 Keycloak 注册 Client
+
+**方式 B：通过 Bootstrap 脚本（初始部署 / 批量配置）**
+
+在 `identity-portal` 目录设置环境变量后执行 `pnpm bootstrap:keycloak`：
+
+```bash
+# CMS 示例
+export KEYCLOAK_BASE_URL=http://<KEYCLOAK_HOST>:8080
+export CMS_APP_ORIGIN=http://<CMS_HOST>           # ← 生产 CMS 地址
+export KC_BACKCHANNEL_HOST=<CMS_HOST>              # ← 生产 backchannel 地址（不能是 localhost）
+pnpm bootstrap:keycloak
+```
+
+脚本幂等，可安全重复执行。环境变量不设时默认 `localhost`。
+
+### 10.2 更新已有应用的 Keycloak 客户端
+
+应用已在 Keycloak 注册后，生产环境地址变更（最常见场景）可通过 **Keycloak Admin REST API** 更新，无需重跑 bootstrap：
+
+```bash
+# 1. 获取 admin token
+TOKEN=$(curl -s -X POST \
+  http://<KEYCLOAK_HOST>:8080/realms/master/protocol/openid-connect/token \
+  -d "client_id=admin-cli" \
+  -d "username=<ADMIN_USER>" \
+  -d "password=<ADMIN_PASS>" \
+  -d "grant_type=password" \
+  | python3 -c "import sys,json; print(json.load(sys.stdin)['access_token'])")
+
+# 2. 查找客户端 UUID
+CLIENT_UUID=$(curl -s \
+  "http://<KEYCLOAK_HOST>:8080/admin/realms/company-dev/clients?clientId=cms-business-app" \
+  -H "Authorization: Bearer $TOKEN" \
+  | python3 -c "import sys,json; print(json.load(sys.stdin)[0]['id'])")
+
+# 3. 更新 redirect URIs + web origins + logout 配置
+curl -s -X PUT \
+  "http://<KEYCLOAK_HOST>:8080/admin/realms/company-dev/clients/$CLIENT_UUID" \
+  -H "Authorization: Bearer $TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "redirectUris": [
+      "http://<CMS_HOST>/ms/oidc/callback"
+    ],
+    "webOrigins": [
+      "http://<CMS_HOST>"
+    ],
+    "attributes": {
+      "post.logout.redirect.uris": "http://<CMS_HOST>/ms/oidc/login",
+      "backchannel.logout.url": "http://<CMS_HOST>/ms/oidc/backchannel-logout",
+      "backchannel.logout.session.required": "true"
+    }
+  }'
+```
+
+> **注意**：`PUT` 请求会 **覆盖** 对应字段。如需保留 localhost 调试地址，同时在 `redirectUris` 数组中列出两条。
+
+### 10.3 生产环境 URL 清单（必改项）
+
+从 localhost 迁移到生产时，以下所有地址 **必须同步更新**，否则会出现 `invalid redirect_uri` 或 backchannel logout 不工作：
+
+| # | 配置位置 | 字段 | localhost 值 | 生产值 |
+|---|---|---|---|---|
+| 1 | **Keycloak 客户端** | `redirectUris` | `http://localhost:8081/ms/oidc/callback` | `http://<CMS_HOST>/ms/oidc/callback` |
+| 2 | **Keycloak 客户端** | `webOrigins` | `http://localhost:8081` | `http://<CMS_HOST>` |
+| 3 | **Keycloak 客户端** | `post.logout.redirect.uris` | `http://localhost:8081/ms/oidc/login` | `http://<CMS_HOST>/ms/oidc/login` |
+| 4 | **Keycloak 客户端** | `backchannel.logout.url` | `http://host.docker.internal:8081/ms/oidc/backchannel-logout` | `http://<CMS_HOST>/ms/oidc/backchannel-logout` |
+| 5 | **CMS `application-prod.yml`** | `keycloak.base-url` | `http://localhost:8080` | `http://<KEYCLOAK_HOST>:8080` |
+| 6 | **CMS `application-prod.yml`** | `keycloak.redirect-uri` | `http://localhost:8081/ms/oidc/callback` | `http://<CMS_HOST>/ms/oidc/callback` |
+| 7 | **Portal 应用配置** | 登录入口 URL | `http://localhost:8081/ms/oidc/login` | `http://<CMS_HOST>/ms/oidc/login` |
+| 8 | **Portal 应用配置** | OIDC 回调 URL | `http://localhost:8081/ms/oidc/callback` | `http://<CMS_HOST>/ms/oidc/callback` |
+
+> **遗漏 #1 最常见**：忘了更新 Keycloak 客户端的 redirectUris → CMS 登录报 `Invalid parameter: redirect_uri`。
+>
+> **遗漏 #4 最隐蔽**：backchannel logout URL 指向 localhost → Docker 容器内回环，SLO 静默失败。
+
+### 10.4 CMS 生产部署清单
+
+```bash
+# ── 1. CMS 配置（通过环境变量覆盖，无需改 jar） ──
+export KEYCLOAK_BASE_URL=http://<KEYCLOAK_HOST>:8080    # ← 不要加 /auth
+export KEYCLOAK_CLIENT_SECRET=<从 Keycloak 获取的真实 secret>
+export KEYCLOAK_REDIRECT_URI=http://<CMS_HOST>/ms/oidc/callback
+export REDIS_HOST=<REDIS_HOST>
+export REDIS_PASSWORD=<REDIS_PASSWORD>
+export REDIS_DATABASE=3
+
+# ── 2. Docker 部署 ──
+docker run -d \
+  -e KEYCLOAK_BASE_URL=$KEYCLOAK_BASE_URL \
+  -e KEYCLOAK_CLIENT_SECRET=$KEYCLOAK_CLIENT_SECRET \
+  -e KEYCLOAK_REDIRECT_URI=$KEYCLOAK_REDIRECT_URI \
+  -e REDIS_HOST=$REDIS_HOST \
+  -e REDIS_PASSWORD=$REDIS_PASSWORD \
+  -e REDIS_DATABASE=$REDIS_DATABASE \
+  -p 8081:8081 \
+  <cms镜像>
+
+# ── 3. 更新 Keycloak 客户端（见 §10.2） ──
+# ── 4. 更新 Portal 应用配置（Admin UI → 应用管理 → 编辑） ──
+# ── 5. 验证 SSO 全链路 ──
+#    a) Portal → 进入 CMS → 自动登录
+#    b) CMS 内登出 → Portal 也登出
+#    c) Portal 登出 → CMS 也登出
+```
+
+> **关键**：`KEYCLOAK_CLIENT_SECRET` 必须是 Keycloak 客户端 `cms-business-app` 的真实 secret。
+> 获取方式：Keycloak Admin Console → Clients → `cms-business-app` → Credentials → Copy。
+> Docker 镜像里的默认值 `placeholder-get-from-keycloak` 是占位符，**不替换会直接导致 token exchange 失败**。
+
+### 10.5 常用 Keycloak Admin CLI 命令
+
+```bash
+# 列出所有客户端
+curl -s http://<KEYCLOAK_HOST>:8080/admin/realms/company-dev/clients \
+  -H "Authorization: Bearer $TOKEN" | python3 -m json.tool
+
+# 查看单个客户端详情（含 redirectUris）
+curl -s "http://<KEYCLOAK_HOST>:8080/admin/realms/company-dev/clients/$CLIENT_UUID" \
+  -H "Authorization: Bearer $TOKEN" | python3 -m json.tool
+
+# 列出 Realm 内所有角色
+curl -s http://<KEYCLOAK_HOST>:8080/admin/realms/company-dev/roles \
+  -H "Authorization: Bearer $TOKEN" | python3 -m json.tool
+
+# 查看 CMS 客户端角色
+curl -s "http://<KEYCLOAK_HOST>:8080/admin/realms/company-dev/clients/$CLIENT_UUID/roles" \
+  -H "Authorization: Bearer $TOKEN" | python3 -m json.tool
+```
+
+### 10.6 生产环境踩坑记录
+
+#### 坑 1：`KEYCLOAK_CLIENT_SECRET` 是占位符
+
+**现象**：`oidc_token_exchange_failed`，CMS 日志显示 `status=401`。
+
+**原因**：Docker 镜像构建时 client secret 还拿不到，填了 `placeholder-get-from-keycloak` 作为占位符。运行时未替换 → Keycloak 拒绝认证。
+
+**修复**：从 Keycloak Admin Console 获取真实 secret 后设为环境变量：
+
+```bash
+# Keycloak Admin Console → Clients → cms-business-app → Credentials → Copy
+# 或通过 API 获取
+curl -s "http://<KEYCLOAK_HOST>:8080/admin/realms/company-dev/clients?clientId=cms-business-app" \
+  -H "Authorization: Bearer $TOKEN" \
+  | python3 -c "import sys,json; print(json.load(sys.stdin)[0]['secret'])"
+```
+
+#### 坑 2：Keycloak 客户端 redirectUris 只有 localhost
+
+**现象**：`Invalid parameter: redirect_uri`。
+
+**原因**：bootstrap 脚本用 `CMS_APP_ORIGIN=http://localhost:8081` 创建的客户端，生产地址没加进去。
+
+**修复**：见 §10.2，通过 Admin API 更新 `redirectUris`。
+
+#### Docker 环境变量排查
+
+```bash
+# 1. 检查 CMS 容器内的环境变量是否正确
+docker exec -it <cms容器名> env | grep KEYCLOAK
+
+# 2. 确认 CMS 容器能访问到 Keycloak
+docker exec -it <cms容器名> \
+  curl -s http://<KEYCLOAK_BASE_URL>/realms/company-dev/.well-known/openid-configuration | head -5
+
+# 3. 查看 CMS 日志中的 token exchange 错误详情
+docker logs <cms容器名> 2>&1 | grep "token exchange failed"
+```
