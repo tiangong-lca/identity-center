@@ -16,3 +16,15 @@ applications:
       - { code: admin, name: 系统管理员, description: TianGong LCA 系统管理员 }
       - { code: review-admin, name: 评审管理员, description: 评审流程管理员 }
       - { code: review-member, name: 评审成员, description: 评审成员 }
+
+  - code: cms
+    name: 内容管理系统
+    status: active
+    keycloak:
+      clientId: cms-business-app
+      accessRole: cms_access
+    webhook:
+      url: ${CMS_WEBHOOK_URL}
+      secretRef: CMS_WEBHOOK_SECRET
+    loginUrl: ${CMS_LOGIN_URL}
+    # 方案 A：不登记 roles（CMS 内部角色自治）

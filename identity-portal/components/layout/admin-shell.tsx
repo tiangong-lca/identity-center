@@ -28,51 +28,58 @@ export function AdminShell({
 }) {
   const t = useTranslations('nav')
   const tc = useTranslations('common')
+  const tp = useTranslations('portal')
   const pathname = usePathname()
 
   return (
-    <div className="flex min-h-screen flex-col">
-      {/* TopNav 48px(设计 shell 契约) */}
-      <header className="flex h-12 items-center justify-between border-b border-border bg-card px-4">
-        <Link href="/admin" className="flex items-center gap-2">
-          <span className="inline-block size-5 rounded bg-primary" aria-hidden />
-          <span className="text-sm font-semibold text-foreground">{tc('appName')}</span>
-        </Link>
-        <div className="flex items-center gap-4">
-          <LocaleToggle />
-          <ThemeToggle />
-          <span className="max-w-40 truncate text-xs text-muted-foreground" title={userEmail}>
-            {userEmail}
-          </span>
-          {signOutSlot}
+    <div className="flex min-h-screen flex-row">
+      <aside className="flex w-[180px] shrink-0 flex-col bg-[#0080FF] text-white">
+        <div className="flex h-[50px] items-center border-b border-white/10 px-4">
+          <Link href="/" className="flex items-center gap-2">
+            <span className="text-sm font-semibold text-white">{tc('appName')}</span>
+          </Link>
         </div>
-      </header>
+        <nav className="flex flex-col gap-0.5 p-2">
+          <Link
+            href="/"
+            className="flex h-9 items-center rounded-md px-3 text-sm text-white/90 transition-colors hover:bg-white/30"
+          >
+            {tp('home')}
+          </Link>
+          {NAV_ITEMS.map((item) => {
+            const active = item.exact ? pathname === item.href : pathname.startsWith(item.href)
+            return (
+              <Link
+                key={item.href}
+                href={item.href}
+                className={`flex h-9 items-center rounded-md px-3 text-sm transition-colors ${
+                  active
+                    ? 'bg-white/30 font-medium text-white'
+                    : 'text-white/90 hover:bg-white/30'
+                }`}
+              >
+                {t(item.key)}
+              </Link>
+            )
+          })}
+        </nav>
+      </aside>
 
-      <div className="flex flex-1">
-        {/* Sidebar 200px,菜单项 36px */}
-        <aside className="w-50 shrink-0 border-r border-border bg-sidebar">
-          <nav className="flex flex-col gap-0.5 p-2">
-            {NAV_ITEMS.map((item) => {
-              const active = item.exact ? pathname === item.href : pathname.startsWith(item.href)
-              return (
-                <Link
-                  key={item.href}
-                  href={item.href}
-                  className={`flex h-9 items-center rounded-md px-3 text-sm transition-colors ${
-                    active
-                      ? 'bg-primary/10 font-medium text-primary'
-                      : 'text-secondary-foreground hover:bg-sidebar-accent'
-                  }`}
-                >
-                  {t(item.key)}
-                </Link>
-              )
-            })}
-          </nav>
-        </aside>
+      <div className="flex min-w-0 flex-1 flex-col">
+        <header className="flex h-[50px] shrink-0 items-center justify-between border-b border-border bg-card px-4">
+          <div className="flex items-center gap-4">
+            <LocaleToggle />
+            <ThemeToggle />
+          </div>
+          <div className="flex items-center gap-4">
+            <span className="max-w-40 truncate text-xs text-muted-foreground" title={userEmail}>
+              {userEmail}
+            </span>
+            {signOutSlot}
+          </div>
+        </header>
 
-        {/* 内容区:32px 侧边距(设计对齐规则) */}
-        <main className="min-w-0 flex-1 bg-background px-8 py-6">{children}</main>
+        <main className="min-w-0 flex-1 overflow-auto p-6">{children}</main>
       </div>
     </div>
   )

@@ -161,7 +161,7 @@ export function AssignmentsTab({ appId }: { appId: string }) {
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead>{t('keycloakSub')}</TableHead>
+              <TableHead>{t('user')}</TableHead>
               <TableHead>{t('status')}</TableHead>
               <TableHead>{t('kcProjection')}</TableHead>
               <TableHead>{t('bizProjection')}</TableHead>
@@ -200,12 +200,19 @@ export function AssignmentsTab({ appId }: { appId: string }) {
               data?.items.map((assignment) => (
                 <TableRow key={assignment.id}>
                   <TableCell>
-                    <span
-                      className="block max-w-56 truncate font-mono text-xs text-secondary-foreground"
-                      title={assignment.keycloakSub}
-                    >
-                      {assignment.keycloakSub}
-                    </span>
+                    <div className="flex flex-col">
+                      <span className="truncate text-sm text-foreground">
+                        {assignment.userDisplayName ?? assignment.userEmail ?? assignment.keycloakSub}
+                      </span>
+                      {(assignment.userDisplayName || assignment.userEmail) && (
+                        <span
+                          className="max-w-56 truncate font-mono text-xs text-muted-foreground"
+                          title={assignment.keycloakSub}
+                        >
+                          {assignment.keycloakSub}
+                        </span>
+                      )}
+                    </div>
                   </TableCell>
                   <TableCell>
                     <AssignmentStatusBadge status={assignment.status} labels={statusLabels} />

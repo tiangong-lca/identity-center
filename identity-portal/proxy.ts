@@ -4,9 +4,11 @@ import { NextResponse, type NextRequest } from 'next/server'
  * Next.js 16 中间件(更名 proxy.ts):统一安全响应头。
  * 认证守卫由各 layout 服务端完成;此处仅加固传输层与浏览器策略。
  */
+const isDev = process.env.NODE_ENV !== 'production'
+
 const CSP = [
   "default-src 'self'",
-  "script-src 'self' 'unsafe-inline'",
+  `script-src 'self' 'unsafe-inline'${isDev ? " 'unsafe-eval'" : ''}`,
   "style-src 'self' 'unsafe-inline'",
   "img-src 'self' data: blob:",
   "font-src 'self' data:",

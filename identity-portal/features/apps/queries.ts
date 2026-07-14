@@ -34,6 +34,8 @@ export type ApplicationAssignment = {
   businessProjectionStatus: BusinessProjectionStatus
   lastBusinessProjectionError: string | null
   createdAt: string
+  userEmail: string | null
+  userDisplayName: string | null
 }
 
 export type ApplicationRole = {

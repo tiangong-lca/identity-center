@@ -11,6 +11,17 @@
 @custom-variant dark ([data-theme="dark"] &);
 
 /*
+ * CMS 风格覆盖:将品牌色对齐铭飞 CMS 主题(#0080FF 系),
+ * 页面背景改为 #eee 浅灰。仅在亮色主题下覆盖。
+ */
+:root {
+  --color-primary: #0080FF;
+  --color-primary-hover: #1a90ff;
+  --color-primary-click: #006fdb;
+  --color-bg-page: #eeeeee;
+}
+
+/*
  * shadcn 变量桥接层:全部取值自设计库语义 token。
  * 设计库在 [data-theme="dark"] 下自行翻转,因此无需 .dark 覆盖块。
  */

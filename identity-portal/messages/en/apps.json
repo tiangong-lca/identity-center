@@ -19,7 +19,9 @@
     },
     "status": {
       "active": "Active",
-      "disabled": "Disabled"
+      "disabled": "Disabled",
+      "pending_deactivate": "Pending Deactivation",
+      "deactivated": "Deactivated"
     },
     "pagination": {
       "total": "{total} in total",
@@ -71,6 +73,7 @@
       },
       "assignments": {
         "grant": "Grant access",
+        "user": "User",
         "keycloakSub": "Keycloak Sub",
         "status": "Status",
         "kcProjection": "IdP projection",

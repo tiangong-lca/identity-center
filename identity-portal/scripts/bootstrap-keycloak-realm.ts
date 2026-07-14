@@ -17,6 +17,7 @@ import { remediateEmailState } from './keycloak/remediate-email-state'
 const BASE_URL = process.env.KEYCLOAK_BASE_URL ?? 'http://localhost:8080'
 const REALM = process.env.KEYCLOAK_REALM ?? 'company-dev'
 const PORTAL_ORIGIN = process.env.PORTAL_ORIGIN ?? 'http://localhost:3000'
+const KC_BACKCHANNEL_HOST = process.env.KC_BACKCHANNEL_HOST ?? 'host.docker.internal'
 
 const REALM_ROLES: Record<string, string> = {
   admin_console_access: '管理后台入口准入(不表达具体权限)',
@@ -105,6 +106,9 @@ async function main() {
     attributes: {
       'post.logout.redirect.uris': `${PORTAL_ORIGIN}/*`,
       'pkce.code.challenge.method': 'S256',
+      'backchannel.logout.url': `${PORTAL_ORIGIN.replace('localhost', KC_BACKCHANNEL_HOST)}/api/auth/backchannel-logout`,
+      'backchannel.logout.session.required': 'true',
+      'backchannel.logout.revoke.offline.tokens': 'false',
     },
   })
 
@@ -133,6 +137,35 @@ async function main() {
     .catch(() => null)
   if (!existingLcaRole) {
     await kc.clients.createRole({ id: lcaClient.id, name: 'tiangong_lca_access' })
+  }
+
+  // 第二个业务应用:CMS(铭飞 CMS,Apache Shiro;OIDC 回调直接指向 CMS 后端)
+  const cmsAppOrigin = process.env.CMS_APP_ORIGIN ?? 'http://localhost:8081'
+  const cmsClient = await ensureClient(kc, {
+    clientId: 'cms-business-app',
+    name: 'CMS 平台',
+    description: '内容管理系统(铭飞 CMS 6.2.0,OIDC 桥接)',
+    publicClient: false,
+    standardFlowEnabled: true,
+    implicitFlowEnabled: false,
+    directAccessGrantsEnabled: false,
+    serviceAccountsEnabled: false,
+    redirectUris: [`${cmsAppOrigin}/ms/oidc/callback`],
+    webOrigins: [cmsAppOrigin],
+    attributes: {
+      'pkce.code.challenge.method': 'S256',
+      'post.logout.redirect.uris': `${cmsAppOrigin}/ms/oidc/login`,
+      'backchannel.logout.url': `${cmsAppOrigin.replace('localhost', KC_BACKCHANNEL_HOST)}/ms/oidc/backchannel-logout`,
+      'backchannel.logout.session.required': 'true',
+      'backchannel.logout.revoke.offline.tokens': 'false',
+    },
+  })
+  // 准入投影角色 cms_access
+  const existingCmsRole = await kc.clients
+    .findRole({ id: cmsClient.id, roleName: 'cms_access' })
+    .catch(() => null)
+  if (!existingCmsRole) {
+    await kc.clients.createRole({ id: cmsClient.id, name: 'cms_access' })
   }
 
   const legacySupabaseClient = (await kc.clients.find({ clientId: 'supabase-business-app' }))[0]

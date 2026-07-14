@@ -84,7 +84,7 @@ services:
       [
         "sh",
         "-c",
-        ": \"$${REDIS_PASSWORD:?REDIS_PASSWORD is required}\"; exec redis-server --appendonly yes --requirepass \"$${REDIS_PASSWORD}\"",
+        ": \"$${REDIS_PASSWORD:?REDIS_PASSWORD is required}\"; exec redis-server --appendonly yes --protected-mode yes --requirepass \"$${REDIS_PASSWORD}\" --rename-command CONFIG \"\" --rename-command FLUSHDB \"\" --rename-command FLUSHALL \"\"",
       ]
     volumes:
       - redis-data:/data

@@ -11,7 +11,7 @@ checkPaths:
   - docs/README.md
   - docs/design/README.md
   - docs/implementation/README.md
-lastReviewedAt: 2026-07-08
+lastReviewedAt: 2026-07-09
 lastReviewedCommit: 8687ad4f6cda360a7f0336d9137a592d7e022987
 ---
 
@@ -25,6 +25,8 @@ lastReviewedCommit: 8687ad4f6cda360a7f0336d9137a592d7e022987
 - [实施方案](./implementation/README.md) — 实施顺序、里程碑、范围裁剪与验收标准
 - [部署/启动/运行 Runbook](../identity-portal/deploy/runbooks/README.md) — 从零到运行的完整操作手册（含 5 份专项手册）
 - [业务应用接入指南](./guides/business-app-onboarding.md) — 新应用接入十步与验收清单
+- [业务应用接入技术规范](./guides/business-app-integration-spec.md) — 接入契约（API / 数据模型 / 校验）
+- [业务应用 SSO 接入说明书](./guides/sso-integration-handbook.md) — 实战版接入指南（基于 CMS 经验）
 
 ## 目录结构
 
