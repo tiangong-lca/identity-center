@@ -1,7 +1,7 @@
 version: 1
 layout: repo
-lastReviewedAt: "2026-07-08"
-lastReviewedCommit: "8687ad4f6cda360a7f0336d9137a592d7e022987"
+lastReviewedAt: "2026-09-13"
+lastReviewedCommit: "3775875d675727a5a2d2665d751a41e8b442b63d"
 
 # Repo-local docpact governance for identity-center.
 # The workspace root config governs the submodule pointer and cross-repo view;
@@ -19,6 +19,7 @@ catalog:
       canonicalRepo: tiangong-lca/identity-center
       entryDoc: docs/README.md
       workflowDocs:
+        - AGENTS.md
         - GOAL.md
         - docs/implementation/README.md
         - docs/implementation/decisions.md
@@ -71,6 +72,7 @@ ownership:
     - id: identity-governance-and-docs
       paths:
         include:
+          - AGENTS.md
           - GOAL.md
           - docs/**
           - .docpact/**
@@ -157,6 +159,7 @@ routing:
         - docs/implementation/definition-of-done.md
     repo-docs:
       paths:
+        - AGENTS.md
         - GOAL.md
         - docs/**
         - .docpact/**
@@ -169,6 +172,7 @@ routing:
 
 coverage:
   include:
+    - AGENTS.md
     - GOAL.md
     - docs/**
     - .docpact/**
@@ -209,6 +213,7 @@ coverage:
 
 docInventory:
   include:
+    - AGENTS.md
     - GOAL.md
     - docs/README.md
     - docs/design/README.md
@@ -254,6 +259,8 @@ rules:
         kind: doc-entry
       - path: GOAL.md
         kind: goal-contract
+      - path: AGENTS.md
+        kind: agent-entry
       - path: .docpact/**
         kind: doc-ai-layer
       - path: docs/implementation/README.md
