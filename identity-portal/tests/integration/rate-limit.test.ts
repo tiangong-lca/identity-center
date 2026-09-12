@@ -1,3 +1,4 @@
+import { randomUUID } from 'node:crypto'
 import Redis from 'ioredis'
 import { afterAll, describe, expect, it } from 'vitest'
 import { checkRateLimit, hashDim, rateLimitKey } from '@/lib/rate-limit/sliding-window'
@@ -10,7 +11,7 @@ afterAll(async () => {
 
 describe('rate-limit 滑动窗口(真实 Redis)', () => {
   it('窗口内超过上限拒绝,窗口滑动后恢复', async () => {
-    const key = rateLimitKey('test-login', hashDim(`user-${Date.now()}`))
+    const key = rateLimitKey('test-login', hashDim(`user-${randomUUID()}`))
     const rule = { windowMs: 800, max: 3 }
 
     for (let i = 0; i < 3; i++) {
@@ -24,8 +25,10 @@ describe('rate-limit 滑动窗口(真实 Redis)', () => {
 
   it('不同 key 互不影响', async () => {
     const rule = { windowMs: 10_000, max: 1 }
-    const k1 = rateLimitKey('test-iso', 'a')
-    const k2 = rateLimitKey('test-iso', 'b')
+    // namespace 按次随机唯一(并发进程也不会共用同一毫秒的键):10s 窗口跨重复运行会泄漏计数
+    const ns = `test-iso-${randomUUID()}`
+    const k1 = rateLimitKey(ns, 'a')
+    const k2 = rateLimitKey(ns, 'b')
     expect((await checkRateLimit(redis, k1, rule)).allowed).toBe(true)
     expect((await checkRateLimit(redis, k1, rule)).allowed).toBe(false)
     expect((await checkRateLimit(redis, k2, rule)).allowed).toBe(true)

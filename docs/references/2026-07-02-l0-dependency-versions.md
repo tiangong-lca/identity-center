@@ -53,3 +53,36 @@ tsx 4.22.4          dotenv 17.4.2
 - pnpm 10 默认拦截依赖构建脚本;已在 `package.json` `pnpm.onlyBuiltDependencies` 放行 `esbuild`(tsx 依赖)。
 - Node 本机 24.16,CI 用 22(均 ≥ Next 16 要求的 20)。
 - `@types/node` 为 ^20,与运行时差异可接受(仅类型)。
+
+## 安全驱动的依赖升级(2026-09-13,issue #17)
+
+pnpm audit 基线:5 critical / 30 high / 42 moderate / 5 low → 升级后:**3 critical / 2 high / 17 moderate / 4 low**;剩余 3C/2H 全部为 next-auth/@auth/core(见下,待裁决)。
+
+查证手段:registry dist-tags/依赖范围实查 + Context7(Next 16 升级指南;16.2→16.3 为常规 minor,本仓已用 `proxy.ts` nodejs runtime,不受 middleware→proxy 迁移影响)。
+
+| 依赖 | 变更 | 理由 |
+|---|---|---|
+| next | 16.2.10 → **16.3.5** | 修 2× critical RCE(image optimization AVIF / windows 承载)+ 4× high(Server Actions DoS、Turbopack middleware 绕过、2× SSRF);16.3.5 自带 postcss 8.5.23 与 sharp ^0.35.4(libvips/libheif 修复);peer 仍兼容 react 19.2.4 / next-auth `^16` / next-intl `^16` |
+| eslint-config-next | 16.2.10 → 16.3.5 | 与 next 同线;lint 规则集对现仓零新增告警 |
+| shadcn | ^4.12.0 → ^4.21.0 | 其 @modelcontextprotocol/sdk 依赖范围覆盖修复版;配合范围内刷新:hono 4.13.7、@hono/node-server 1.19.17、qs 6.16.0、ip-address 10.7.0、fast-uri 3.1.7、undici 7.29.1 |
+| vitest / @vitest/coverage-v8 | ^4.1.9 → ^4.1.11 | 修 @vitest/mocker 路径穿越(≥4.1.11);按 L0 决策留 4.x,不上 5.0 |
+| js-yaml | 5.2.1 → 5.4.1 | 修流集合指数解析 DoS(≥5.2.2);^5 范围内;eslintrc 侧 js-yaml 4.3.0 → 4.3.2 同步 |
+
+范围内传递刷新(`pnpm update --depth Infinity`):postcss 8.5.23/8.5.28、nanoid 3.3.19、brace-expansion 1.1.18 与 5.0.9、browserslist 4.28.9、baseline-browser-mapping 2.11.22。
+
+**next-auth/@auth/core 未动**(3C+1H+1M + 1C+1H+1M):next-auth 5.0.0-beta.31 精确依赖 `@auth/core: "0.41.2"`,修复版 0.41.3 需 next-auth 5.0.0-beta.32(beta 线,5.0.0 stable 不存在)或 override。已向用户提请明确例外,授权前不升级、不加 override、不降级 v4、不改认证架构。
+
+残留未修(含理由):
+- dompurify 3.2.7(4 low / 8 moderate):monaco-editor 0.55.1 精确钉死;最新 0.56.0 也仅 3.4.8,升 monaco 只能部分覆盖且引入编辑器行为变化,不在本次 critical/high 基线内,defer。
+- esbuild 0.18.20(1 moderate,dev server):drizzle-kit 0.31.10(latest stable)→ 废弃线 @esbuild-kit/core-utils@3.3.2 精确钉死;override 强升有破坏 drizzle-kit 风险;纯开发工具链,无运行时暴露。
+
+验证(2026-09-13,issue #17 scope 扩展后):lint / typecheck / unit(80)/ build 全绿;**全量未过滤集成测试(本地 compose fixture)连续两轮 104 通过 / 0 失败 / 1 条按设计跳过(邮件链路,由 KC_SMTP_HOST 门控)**;邮件模式单独验证:SMTP realm(mailpit:1025)下 keycloak-email 1/1 绿,验证后已还原正则 realm(email 关闭)。seed-business-apps.test.ts 期望已修正为当前 catalog 真源(tiangong-lca 3 角色;cms 无 roles——yaml"方案 A"注释,准入走 accessClientRole 投影),以 vi.stubEnv 固化 CMS_* 占位解析(serialize.ts 语义:webhook.url 占位缺失→整个 webhook 省略),保留原幂等双跑与逐应用身份/角色断言。
+
+共享 fixture 状态竞争修复(仅改测试,生产脚本/路由零改动,不筛测试、不全局串行):
+- remediate-email-state.test.ts:sweep 是全 realm 操作,共享 company-dev 会扫到并行文件创建的未验证用户(幂等断言 second.patched 误报 1)。改为随机命名 disposable realm(remediate-it-<hex>:realms.create → setConfig → 全程隔离 → afterAll realms.del;API 经 SDK 26.6.4 typings 与 REST DELETE /admin/realms/{realm} 双源核对),断言保持 first≥1 / second===0,并行性不变。
+- rate-limit.test.ts "不同 key 互不影响":固定 namespace 'test-iso' + 10s 窗口,计数跨重复运行泄漏;按同文件 test 1 既有习惯改为 `test-iso-${Date.now()}` 按次唯一。
+- api-contract.test.ts 公共注册用例:register 限流 10 次/小时/IP,测试流量固定落 'local' 桶,多次运行累积后误触 429;注入按次唯一 x-forwarded-for。
+
+pnpm-workspace.yaml:pnpm 11.9 在依赖更新时曾自动追加 `minimumReleaseAgeExclude: '@next/swc-win32-x64-msvc@16.3.5'`(该二进制发布于 2026-09-11T18:09Z,更新时约 23.4h,落入 pnpm 内建最小发布年龄窗);已移除该项,重跑 `pnpm install --frozen-lockfile` 于 ~24.3h 自然放行("Lockfile passes supply-chain policies, 1019 entries"),未放宽任何策略,workspace 文件保持干净。
+
+主 Agent 复核进一步要求:随机测试 realm 仅在本次创建成功后清理,清理失败会显式使测试失败;Redis 测试键使用 UUID 隔离并发进程;注册入口使用文档地址段内的随机合法 IPv6,避免位运算生成负数 IPv4 或短周期地址复用。所有调整仅作用于测试 fixture。

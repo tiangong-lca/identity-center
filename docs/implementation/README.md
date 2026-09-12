@@ -12,7 +12,7 @@ checkPaths:
   - GOAL.md
   - docs/design/README.md
 lastReviewedAt: 2026-09-13
-lastReviewedCommit: 3775875d675727a5a2d2665d751a41e8b442b63d
+lastReviewedCommit: 19d7e116bd877055e836993b31cc1cdd15729344
 ---
 
 # 统一身份平台实施方案
