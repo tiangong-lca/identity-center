@@ -11,8 +11,8 @@ checkPaths:
   - identity-portal/deploy/runbooks/README.md
   - identity-portal/deploy/docker/**
   - identity-portal/deploy/runbooks/**
-lastReviewedAt: 2026-07-08
-lastReviewedCommit: 0106728
+lastReviewedAt: 2026-09-13
+lastReviewedCommit: 3775875d675727a5a2d2665d751a41e8b442b63d
 ---
 
 # 统一身份平台 · 部署/启动/运行 Runbook
@@ -27,7 +27,7 @@ lastReviewedCommit: 0106728
 |---|---|---|
 | Docker + Compose | Docker 24+ / Compose v2 | 全部基础设施容器化 |
 | Node.js | ≥ 20(开发机 22/24 均可) | Next.js 16 要求 |
-| pnpm | 10.x | `corepack enable` 即可 |
+| pnpm | `packageManager` 声明版本 | 以 `identity-portal/package.json` 为唯一版本来源；可通过 Corepack 使用该版本 |
 | PostgreSQL client(可选) | 17 | 备份/恢复脚本用 `pg_dump/pg_restore` |
 
 服务与端口约定:

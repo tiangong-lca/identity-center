@@ -11,8 +11,8 @@ checkPaths:
   - docs/README.md
   - docs/design/README.md
   - docs/implementation/README.md
-lastReviewedAt: 2026-07-09
-lastReviewedCommit: 8687ad4f6cda360a7f0336d9137a592d7e022987
+lastReviewedAt: 2026-09-13
+lastReviewedCommit: 3775875d675727a5a2d2665d751a41e8b442b63d
 ---
 
 # Identity Platform 文档
