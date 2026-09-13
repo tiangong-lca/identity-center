@@ -70,7 +70,7 @@ pnpm audit 基线:5 critical / 30 high / 42 moderate / 5 low → 升级后:**3 c
 
 范围内传递刷新(`pnpm update --depth Infinity`):postcss 8.5.23/8.5.28、nanoid 3.3.19、brace-expansion 1.1.18 与 5.0.9、browserslist 4.28.9、baseline-browser-mapping 2.11.22。
 
-**next-auth/@auth/core 未动**(3C+1H+1M + 1C+1H+1M):next-auth 5.0.0-beta.31 精确依赖 `@auth/core: "0.41.2"`,修复版 0.41.3 需 next-auth 5.0.0-beta.32(beta 线,5.0.0 stable 不存在)或 override。已向用户提请明确例外,授权前不升级、不加 override、不降级 v4、不改认证架构。
+**next-auth/@auth/core 未动**(next-auth:2C+1H+1M;@auth/core:1C+1H+1M):next-auth 5.0.0-beta.31 精确依赖 `@auth/core: "0.41.2"`,修复版 0.41.3 需 next-auth 5.0.0-beta.32(beta 线,5.0.0 stable 不存在)或 override。已向用户提请明确例外,授权前不升级、不加 override、不降级 v4、不改认证架构。
 
 残留未修(含理由):
 - dompurify 3.2.7(4 low / 8 moderate):monaco-editor 0.55.1 精确钉死;最新 0.56.0 也仅 3.4.8,升 monaco 只能部分覆盖且引入编辑器行为变化,不在本次 critical/high 基线内,defer。
@@ -80,7 +80,7 @@ pnpm audit 基线:5 critical / 30 high / 42 moderate / 5 low → 升级后:**3 c
 
 共享 fixture 状态竞争修复(仅改测试,生产脚本/路由零改动,不筛测试、不全局串行):
 - remediate-email-state.test.ts:sweep 是全 realm 操作,共享 company-dev 会扫到并行文件创建的未验证用户(幂等断言 second.patched 误报 1)。改为随机命名 disposable realm(remediate-it-<hex>:realms.create → setConfig → 全程隔离 → afterAll realms.del;API 经 SDK 26.6.4 typings 与 REST DELETE /admin/realms/{realm} 双源核对),断言保持 first≥1 / second===0,并行性不变。
-- rate-limit.test.ts "不同 key 互不影响":固定 namespace 'test-iso' + 10s 窗口,计数跨重复运行泄漏;按同文件 test 1 既有习惯改为 `test-iso-${Date.now()}` 按次唯一。
+- rate-limit.test.ts "不同 key 互不影响":固定 namespace 'test-iso' + 10s 窗口,计数跨重复运行泄漏;使用 `test-iso-${randomUUID()}` 作为按次唯一的 namespace,与同文件首个用例的 UUID 键保持一致。
 - api-contract.test.ts 公共注册用例:register 限流 10 次/小时/IP,测试流量固定落 'local' 桶,多次运行累积后误触 429;注入按次唯一 x-forwarded-for。
 
 pnpm-workspace.yaml:pnpm 11.9 在依赖更新时曾自动追加 `minimumReleaseAgeExclude: '@next/swc-win32-x64-msvc@16.3.5'`(该二进制发布于 2026-09-11T18:09Z,更新时约 23.4h,落入 pnpm 内建最小发布年龄窗);已移除该项,重跑 `pnpm install --frozen-lockfile` 于 ~24.3h 自然放行("Lockfile passes supply-chain policies, 1019 entries"),未放宽任何策略,workspace 文件保持干净。
