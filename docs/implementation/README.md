@@ -12,7 +12,8 @@ checkPaths:
   - GOAL.md
   - docs/design/README.md
 lastReviewedAt: 2026-09-14
-lastReviewedCommit: a0a140fc848a9b7e23acca2301db75895c4b9bfe
+lastReviewedCommit: 7d8391f67fb6d7532f7620519652d9e5bfab4c62
+lastReviewedNote: "Reviewed for Identity17 continuation (user-approved next-auth beta.32 exception): exact next-auth 5.0.0-beta.31 -> 5.0.0-beta.32 projection with transitive @auth/core 0.41.3 and nodemailer peer widening; registry audit 0 critical/0 high (4 low/15 moderate recorded); frozen install idempotent; lint/typecheck exit 0; unit 80/80; build exit 0; full unfiltered integration 104 passed/1 skipped with the D-003 skip-conditional email suite and remediate-email-state PASS (forced SMTP run fails only on the realm's D-003 default no-SMTP precondition, recorded as environmental); D-006 decision documents the exception, resolved graph and gates."
 ---
 
 # 统一身份平台实施方案

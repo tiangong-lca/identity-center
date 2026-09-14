@@ -2,6 +2,19 @@
 
 > 按 GOAL.md §2:实施中发现的设计缺口、矛盾与用户裁决在此记录。
 
+## D-006 next-auth beta.31 → beta.32 安全例外升级(2026-09-14,用户批准)
+
+**背景**:next-auth 5.0.0-beta.31 存在邮件规范化安全问题(NFKC email normalization fix,上游 /nextauthjs/next-auth beta.32 变更集),用户明确批准该 beta 例外并要求完整验证后正常合并。
+
+**执行口径**:
+
+1. **精确升级**:仅 `identity-portal/package.json` 的 `next-auth` 5.0.0-beta.31 → **5.0.0-beta.32**;不加 overrides、不动其他直接依赖。传递图由 beta.32 自身声明决定:`@auth/core` 0.41.2 → **0.41.3**(beta.32 固定依赖,已确认存在于 npm);peerDeps 将 nodemailer 放宽为 `^7.0.7 || ^8.0.5`,并声明支持 Next 16/React 19(与现用 next 16.3.5/react 19.2.4 兼容)。
+2. **注册表审计实测**:升级后 `pnpm audit` 实测结果为 **0 critical / 0 high**(4 low + 15 moderate 保留,如实在案);无静默例外。
+3. **完整门禁实测**:frozen install 幂等;lint/typecheck exit 0;unit **80/80**;build exit 0;**全量未过滤集成** 104 passed / 1 skipped(keycloak-email 套件按 D-003 默认 SMTP 关闭设计 skip);独立 email 覆盖:remediate-email-state PASS,keycloak-email 强制运行失败于 Keycloak SMTP 发件配置("Invalid sender address 'null'"——当前 realm 按 D-003 默认无 SMTP,**环境前提而非 beta.32 回归**),按其设计契约保持 skip-when-SMTP-off,不做共享 harness 的 realm 重配置。
+4. **后续**:发布 0.2.x 正式版后按上游节奏复核 moderate 项;SMTP 链路实测维持 D-003 口径(启用时 KC_VERIFY_EMAIL=true + KC_SMTP_HOST=mailpit 重跑 bootstrap)。
+
+依据:用户 2026-09-14 对 identity-center#17 的 beta.32 明确批准(Context7 /nextauthjs/next-auth Next16/React19 peer 支持 + NFKC 修复)。
+
 ## D-005 注册申请选择应用与角色实施口径(2026-07-03,workspace 决策 D7,设计 §4.6)
 
 **背景**:注册链路原为 门户 `/register` 表单 → `POST /api/public/registration-requests` → 审批 → 开通;准入与角色分配是审批后的独立管理动作,申请单本身不携带目标应用/角色。workspace 设计追加指示(D7,§4.6):允许申请人在提交注册申请时一并选择目标应用与角色(多应用、每应用至多一角色、角色可不选)。以下为 identity-center 侧实施口径,按设计 §4.6 四条要点落地:

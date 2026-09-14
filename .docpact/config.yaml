@@ -1,7 +1,7 @@
 version: 1
 layout: repo
 lastReviewedAt: "2026-09-14"
-lastReviewedCommit: "a0a140fc848a9b7e23acca2301db75895c4b9bfe"
+lastReviewedCommit: "7d8391f67fb6d7532f7620519652d9e5bfab4c62"
 
 # Repo-local docpact governance for identity-center.
 # The workspace root config governs the submodule pointer and cross-repo view;

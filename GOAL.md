@@ -11,8 +11,9 @@ checkPaths:
   - GOAL.md
   - docs/implementation/README.md
   - docs/implementation/definition-of-done.md
-lastReviewedAt: 2026-09-13
-lastReviewedCommit: 19d7e116bd877055e836993b31cc1cdd15729344
+lastReviewedAt: 2026-09-14
+lastReviewedCommit: 7d8391f67fb6d7532f7620519652d9e5bfab4c62
+lastReviewedNote: "Reviewed for Identity17 continuation (user-approved next-auth beta.32 exception): exact next-auth 5.0.0-beta.32 projection with @auth/core 0.41.3; audit 0 critical/0 high; unit 80/80, full integration 104 passed/1 skipped (D-003 email suite skip documented); GOAL.md invariants and boundaries unchanged."
 ---
 
 # GOAL — 统一身份平台一期全量交付
