@@ -8,7 +8,6 @@ test.use({ storageState: { cookies: [], origins: [] } })
 
 async function keycloakLogin(page: import('@playwright/test').Page) {
   await page.goto('/login')
-  await page.getByRole('button', { name: /^登录$|^Sign in$/ }).click()
   await page.waitForURL(/localhost:8080/)
   await page.locator('#username').fill(ADMIN_EMAIL)
   await page.locator('#password').fill(ADMIN_PASSWORD)
@@ -23,11 +22,16 @@ test('登出后再点登录必须重新认证(不免密直入)', async ({ page }
 
   // 2) 登出(第二层:终止 Keycloak SSO 会话)
   await page.getByRole('button', { name: /退出登录|Sign out/ }).click()
-  await expect(page.getByRole('link', { name: /^登录$|^Sign in$/ })).toBeVisible({ timeout: 15_000 })
-
-  // 3) 再次点登录 → 应回到 Keycloak 登录表单(要求重新输入凭据),而非免密跳回门户
-  await page.getByRole('link', { name: /^登录$|^Sign in$/ }).click()
-  await page.getByRole('button', { name: /^登录$|^Sign in$/ }).click()
+  // 3) 当前登出 action 直接重新发起 OIDC，必须停在新的凭据表单。
   await page.waitForURL(/localhost:8080/, { timeout: 15_000 })
   await expect(page.locator('#username')).toBeVisible()
+  await expect(page.locator('#password')).toBeVisible()
+  await expect(page.locator('#password')).toHaveValue('')
+
+  // 显式重新认证后仍能完成回调，覆盖完整的登录 → 登出 → 再登录。
+  await page.locator('#username').fill(ADMIN_EMAIL)
+  await page.locator('#password').fill(ADMIN_PASSWORD)
+  await page.locator('#kc-login').click()
+  await page.waitForURL('http://localhost:3000/**')
+  await expect(page.getByText(ADMIN_EMAIL).first()).toBeVisible()
 })

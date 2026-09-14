@@ -8,7 +8,7 @@ const MAILPIT_API = process.env.MAILPIT_API ?? 'http://localhost:8025'
 /**
  * SMTP 链路验证:Keycloak 触发验证邮件 → Mailpit 实际收到。
  * 默认环境不发邮件(KC_VERIFY_EMAIL 关闭、无 SMTP),故此套件默认跳过;
- * 设 SMTP_TEST_ENABLED=1 启用邮件链路时运行,防"SMTP 配好却发不出"回归。
+ * 设 KC_SMTP_HOST 或 SMTP_TEST_ENABLED=1 启用邮件链路验证。
  *
  * 隔离契约(不触碰共享 Mailpit 邮箱与 company-dev realm):
  * - 启用时创建随机命名的 disposable realm(`email-proof-<uuid>`),SMTP 固定指向
@@ -22,10 +22,15 @@ const MAILPIT_API = process.env.MAILPIT_API ?? 'http://localhost:8025'
  * Mailpit 地址必须是 loopback 本地测试地址;URL 的用户名/密码/query/hash
  * 一律拒绝,仅接受规范根路径。
  */
-const smtpEnabled = process.env.SMTP_TEST_ENABLED === '1'
+const smtpEnabled = Boolean(process.env.KC_SMTP_HOST) || process.env.SMTP_TEST_ENABLED === '1'
 
 function assertLoopbackTestUrl(rawUrl: string, label: string): string {
-  const parsed = new URL(rawUrl)
+  let parsed: URL
+  try {
+    parsed = new URL(rawUrl)
+  } catch {
+    throw new Error(`${label} 必须是有效的本地测试 URL`)
+  }
   const host = parsed.hostname
   if (!(host === 'localhost' || host === '127.0.0.1' || host === '[::1]' || host === '::1')) {
     throw new Error(`${label} 必须是 loopback 本地测试地址(拒绝非本地主机)`)
@@ -44,7 +49,7 @@ function assertLoopbackTestUrl(rawUrl: string, label: string): string {
 }
 
 describe.skipIf(!smtpEnabled)('Keycloak 邮件发送链路(真实 KC + Mailpit,隔离 disposable realm)', () => {
-  const kc = new KcAdminClient({ baseUrl: BASE_URL, realmName: 'master' })
+  let kc: KcAdminClient
   const testRealm = `email-proof-${randomUUID()}`
   const email = `mail-${randomUUID().slice(0, 8)}@test.local`
   // 固定的本地 SMTP 目的地:Keycloak 容器网络内的 Mailpit;无远端配置入口
@@ -60,7 +65,7 @@ describe.skipIf(!smtpEnabled)('Keycloak 邮件发送链路(真实 KC + Mailpit,�
     // loopback 安全门在 beforeAll 内、任何 auth/create 之前执行
     keycloakBase = assertLoopbackTestUrl(BASE_URL, 'KEYCLOAK_BASE_URL')
     mailpitBase = assertLoopbackTestUrl(MAILPIT_API, 'MAILPIT_API')
-    kc.setConfig({ baseUrl: keycloakBase, realmName: 'master' })
+    kc = new KcAdminClient({ baseUrl: keycloakBase, realmName: 'master' })
     await kc.auth({
       username: process.env.KEYCLOAK_ADMIN_USERNAME ?? 'admin',
       password: process.env.KEYCLOAK_ADMIN_PASSWORD ?? 'admin',
@@ -129,7 +134,7 @@ async function waitForMail(to: string, mailpitBase: string, timeoutMs = 15_000) 
     if (res.ok) {
       const data = (await res.json()) as { messages?: Array<{ ID: string }> }
       if (data.messages && data.messages.length > 0) return data.messages[0]
-    } else if (res.status >= 500) {
+    } else {
       throw new Error(`Mailpit 查询服务错误: HTTP ${res.status}`)
     }
     await new Promise((r) => setTimeout(r, 300))

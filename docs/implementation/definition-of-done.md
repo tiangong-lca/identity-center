@@ -11,8 +11,8 @@ checkPaths:
   - docs/implementation/definition-of-done.md
   - GOAL.md
 lastReviewedAt: 2026-09-14
-lastReviewedCommit: 9cec991e5b6e4a43dd565278b7ad4e7d713fc78b
-lastReviewedNote: "Reviewed for Identity17 continuation follow-up: the D-003 skip-conditional keycloak-email suite now runs in a disposable email-proof-<uuid> realm with SMTP pointed at the local Mailpit (mailpit:1025), loopback guard, unique-recipient verification, no shared Mailpit clearing and realm cleanup that fails the proof on error; full unfiltered integration with SMTP_TEST_ENABLED=1 is 105/105 executed. Dependency state (next-auth beta.32, @auth/core 0.41.3, audit 0 critical/0 high with 4 low/15 moderate recorded) is unchanged."
+lastReviewedCommit: d7019b3ff535294d43bd5ea8cd6e4f2e757ea28d
+lastReviewedNote: "Identity17: reviewed the approved beta.32/core0.41.3 graph, 0 critical/high audit, 80 unit and 105 integration tests, isolated SMTP guards and real OIDC login/logout proof. Design and production identity semantics are unchanged; see D-006 for scope and fixture evidence."
 ---
 
 # 完成定义(DoD)核对 — GOAL.md §7

@@ -56,6 +56,8 @@ tsx 4.22.4          dotenv 17.4.2
 
 ## 安全驱动的依赖升级(2026-09-13,issue #17)
 
+以下为2026-09-13的历史检查点；当前批准和验证结果见本文末尾的2026-09-14补充。
+
 pnpm audit 基线:5 critical / 30 high / 42 moderate / 5 low → 升级后:**3 critical / 2 high / 17 moderate / 4 low**;剩余 3C/2H 全部为 next-auth/@auth/core(见下,待裁决)。
 
 查证手段:registry dist-tags/依赖范围实查 + Context7(Next 16 升级指南;16.2→16.3 为常规 minor,本仓已用 `proxy.ts` nodejs runtime,不受 middleware→proxy 迁移影响)。
@@ -86,3 +88,9 @@ pnpm audit 基线:5 critical / 30 high / 42 moderate / 5 low → 升级后:**3 c
 pnpm-workspace.yaml:pnpm 11.9 在依赖更新时曾自动追加 `minimumReleaseAgeExclude: '@next/swc-win32-x64-msvc@16.3.5'`(该二进制发布于 2026-09-11T18:09Z,更新时约 23.4h,落入 pnpm 内建最小发布年龄窗);已移除该项,重跑 `pnpm install --frozen-lockfile` 于 ~24.3h 自然放行("Lockfile passes supply-chain policies, 1019 entries"),未放宽任何策略,workspace 文件保持干净。
 
 主 Agent 复核进一步要求:随机测试 realm 仅在本次创建成功后清理,清理失败会显式使测试失败;Redis 测试键使用 UUID 隔离并发进程;注册入口使用文档地址段内的随机合法 IPv6,避免位运算生成负数 IPv4 或短周期地址复用。所有调整仅作用于测试 fixture。
+
+## 2026-09-14：已批准的 Auth.js 修复与独立验证
+
+用户批准 next-auth5.0.0-beta.32 例外；锁定依赖 @auth/core0.41.3。实际审计为0 critical /0 high /15 moderate /4 low，未添加 override。详见[决策D-006](../implementation/decisions.md)。
+
+Primary独立完成 frozen install、lint/typecheck、80个unit、SMTP启用的105个integration；真实浏览器OIDC登录/退出/再登录两项测试也通过。SMTP测试使用独立临时realm和本地Mailpit，保留两种原有启用方式；畸形/带凭据URL拒绝且不泄露输入，关闭SMTP时不触发连接。浏览器测试按现有AutoSubmit及直接返回Keycloak的退出流程等待导航，不再竞争中间页按钮。验证使用独立本地账号并清理其Keycloak/数据库记录，保留共享种子管理员的强制首次改密要求。没有生产身份或业务数据变更。

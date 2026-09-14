@@ -2,18 +2,15 @@
 
 > 按 GOAL.md §2:实施中发现的设计缺口、矛盾与用户裁决在此记录。
 
-## D-006 next-auth beta.31 → beta.32 安全例外升级(2026-09-14,用户批准)
+## D-006 next-auth beta.32 安全例外与验证(2026-09-14)
 
-**背景**:next-auth 5.0.0-beta.31 存在邮件规范化安全问题(NFKC email normalization fix,上游 /nextauthjs/next-auth beta.32 变更集),用户明确批准该 beta 例外并要求完整验证后正常合并。
+用户明确批准本次从 `next-auth 5.0.0-beta.31` 升至 `5.0.0-beta.32`；这是对稳定版本规则的单次例外，不是审计豁免。beta.32 精确依赖修复版 `@auth/core 0.41.3`，声明的 peers 兼容现用 Next16.3.5 / React19.2.4；nodemailer peer 范围增加 `^8.0.5`。未增加 overrides 或改变认证架构。当前审计为0 critical、0 high、15 moderate、4 low；待兼容的 Auth.js v5 稳定版出现后重新评估，保留现有 moderate/low 的适用性记录。
 
-**执行口径**:
+独立验证通过 frozen install、lint、typecheck、80个单元测试、105个全量未过滤集成测试及已有 build。SMTP测试创建独立临时 realm，固定使用本地 Mailpit，按唯一收件人验证邮件并严格清理；不清空共享邮箱、不修改共享 realm。保留 `KC_SMTP_HOST` 或 `SMTP_TEST_ENABLED=1` 两种启用方式。URL校验在启用后的beforeAll内执行，拒绝非本地、畸形、带凭据或query/hash的地址且不回显输入；网络或HTTP错误直接失败，正常收件等待仍有15秒上限。
 
-1. **精确升级**:仅 `identity-portal/package.json` 的 `next-auth` 5.0.0-beta.31 → **5.0.0-beta.32**;不加 overrides、不动其他直接依赖。传递图由 beta.32 自身声明决定:`@auth/core` 0.41.2 → **0.41.3**(beta.32 固定依赖,已确认存在于 npm);peerDeps 将 nodemailer 放宽为 `^7.0.7 || ^8.0.5`,并声明支持 Next 16/React 19(与现用 next 16.3.5/react 19.2.4 兼容)。
-2. **注册表审计实测**:升级后 `pnpm audit` 实测结果为 **0 critical / 0 high**(4 low + 15 moderate 保留,如实在案);无静默例外。
-3. **完整门禁实测**:frozen install 幂等;lint/typecheck exit 0;unit **80/80**;build exit 0;**全量未过滤集成(SMTP_TEST_ENABLED=1)105/105 全部执行通过**。独立 email 覆盖实测:keycloak-email 套件在测试内自建 `email-proof-<uuid>` 隔离 realm(SMTP 固定指向 Keycloak 容器网络内的本地 Mailpit mailpit:1025 与固定测试 from,无任意远端 SMTP 出站配置入口),仅创建自己的随机用户并发送 VERIFY_EMAIL,按唯一收件人检索并回读邮件详情断言收件人;URL 一律以 `new URL(path, base)` 对已核验根构造(拒绝凭据/query/hash/路径前缀,loopback 与 URL 形状校验置于 beforeAll 内、任何 auth/create 之前);Mailpit 查询的传输失败如实抛错,仅对"暂未收到"轮询(15s 窗口,不依赖超时膨胀);afterAll 删除 disposable realm(实测 0 残留;早期失败轮次的 2 个孤儿 realm 已按同一边界删除),**不清空共享 Mailpit、不改 company-dev realm、不重跑共享 bootstrap**;remediate-email-state PASS。
-4. **后续**:发布 0.2.x 正式版后按上游节奏复核 moderate 项(升级时实测 4 low + 15 moderate,非全零);SMTP 链路活体覆盖已由隔离 disposable realm 方案实现,共享 harness 的 D-003 默认姿态保持不变。
+真实浏览器验证覆盖 OIDC登录、退出后重新要求凭据、再次登录。既有 `/login` 会自动提交，退出action也直接重新发起OIDC；测试改为等待这些真实导航，消除点击已卸载中间页按钮的竞态，没有改动产品行为。验证使用新建的本地已激活测试管理员，完成后删除其Keycloak用户和数据库角色/镜像记录；共享种子管理员的首次改密要求保持原样。默认种子账号仍须按原有首次登录流程激活，不能把这次测试解释为取消该要求。
 
-依据:用户 2026-09-14 对 identity-center#17 的 beta.32 明确批准(Context7 /nextauthjs/next-auth Next16/React19 peer 支持 + NFKC 修复)。
+初次邮件补丁的URL拼接错误已修复，撤回未经证实的“投递延迟”解释和超时膨胀。初次长浏览器验证后的测试清理遇到master token刷新上下文问题，随后用新master会话删除了精确临时账号并验证无残留；后续验证及清理均成功。生产身份、realm/catalog导出、业务数据和部署配置未改变。当前事实见Issue17的验证记录；历史依赖检查点保留于[版本记录](../references/2026-07-02-l0-dependency-versions.md)。
 
 ## D-005 注册申请选择应用与角色实施口径(2026-07-03,workspace 决策 D7,设计 §4.6)
 
