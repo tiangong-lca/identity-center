@@ -10,8 +10,8 @@
 
 1. **精确升级**:仅 `identity-portal/package.json` 的 `next-auth` 5.0.0-beta.31 → **5.0.0-beta.32**;不加 overrides、不动其他直接依赖。传递图由 beta.32 自身声明决定:`@auth/core` 0.41.2 → **0.41.3**(beta.32 固定依赖,已确认存在于 npm);peerDeps 将 nodemailer 放宽为 `^7.0.7 || ^8.0.5`,并声明支持 Next 16/React 19(与现用 next 16.3.5/react 19.2.4 兼容)。
 2. **注册表审计实测**:升级后 `pnpm audit` 实测结果为 **0 critical / 0 high**(4 low + 15 moderate 保留,如实在案);无静默例外。
-3. **完整门禁实测**:frozen install 幂等;lint/typecheck exit 0;unit **80/80**;build exit 0;**全量未过滤集成** 104 passed / 1 skipped(keycloak-email 套件按 D-003 默认 SMTP 关闭设计 skip);独立 email 覆盖:remediate-email-state PASS,keycloak-email 强制运行失败于 Keycloak SMTP 发件配置("Invalid sender address 'null'"——当前 realm 按 D-003 默认无 SMTP,**环境前提而非 beta.32 回归**),按其设计契约保持 skip-when-SMTP-off,不做共享 harness 的 realm 重配置。
-4. **后续**:发布 0.2.x 正式版后按上游节奏复核 moderate 项;SMTP 链路实测维持 D-003 口径(启用时 KC_VERIFY_EMAIL=true + KC_SMTP_HOST=mailpit 重跑 bootstrap)。
+3. **完整门禁实测**:frozen install 幂等;lint/typecheck exit 0;unit **80/80**;build exit 0;**全量未过滤集成(SMTP_TEST_ENABLED=1)105/105 全部执行通过**(初始 104 passed/1 skipped 后,keycloak-email 套件改为隔离 disposable realm 方案补齐该项执行)。独立 email 覆盖实测:keycloak-email 套件在测试内自建 `email-proof-<uuid>` 隔离 realm(SMTP 指向 Keycloak 容器网络内的本地 Mailpit mailpit:1025,测试 from),仅创建自己的随机用户并发送 VERIFY_EMAIL,按唯一收件人检索并回读邮件详情断言收件人;运行前强制 loopback 安全门(Keycloak/Mailpit 必须是 localhost/127.0.0.1);afterAll 删除 disposable realm(实测 0 残留),**不清空共享 Mailpit、不改 company-dev realm、不重跑共享 bootstrap**;remediate-email-state PASS。
+4. **后续**:发布 0.2.x 正式版后按上游节奏复核 moderate 项(升级时实测 4 low + 15 moderate,非全零);SMTP 链路活体覆盖已由隔离 disposable realm 方案实现,共享 harness 的 D-003 默认姿态保持不变。
 
 依据:用户 2026-09-14 对 identity-center#17 的 beta.32 明确批准(Context7 /nextauthjs/next-auth Next16/React19 peer 支持 + NFKC 修复)。
 
