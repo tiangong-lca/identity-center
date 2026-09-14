@@ -12,8 +12,8 @@ checkPaths:
   - docs/design/README.md
   - docs/implementation/README.md
 lastReviewedAt: 2026-09-14
-lastReviewedCommit: 9cec991e5b6e4a43dd565278b7ad4e7d713fc78b
-lastReviewedNote: "Reviewed for Identity17 continuation follow-up: the D-003 skip-conditional keycloak-email suite now runs in a disposable email-proof-<uuid> realm with SMTP pointed at the local Mailpit (mailpit:1025), loopback guard, unique-recipient verification, no shared Mailpit clearing and realm cleanup that fails the proof on error; full unfiltered integration with SMTP_TEST_ENABLED=1 is 105/105 executed. Dependency state (next-auth beta.32, @auth/core 0.41.3, audit 0 critical/0 high with 4 low/15 moderate recorded) is unchanged."
+lastReviewedCommit: 7d8391f67fb6d7532f7620519652d9e5bfab4c62
+lastReviewedNote: "Reviewed for Identity17 continuation follow-up: the D-003 skip-conditional keycloak-email suite now runs in a disposable email-proof-<uuid> realm with SMTP fixed to the local Mailpit (mailpit:1025) and a fixed test from address, no arbitrary remote SMTP configuration entry; Mailpit URLs are built with new URL(path, base) against the loopback-verified root with credentials/query/hash rejected, transport failures surface instead of masking as delivery waits, and the orphaned disposable realms from earlier failed runs were removed under the same boundary. Full unfiltered integration with SMTP_TEST_ENABLED=1 is 105/105 executed. Dependency state is unchanged.: the D-003 skip-conditional keycloak-email suite now runs in a disposable email-proof-<uuid> realm with SMTP pointed at the local Mailpit (mailpit:1025), loopback guard, unique-recipient verification, no shared Mailpit clearing and realm cleanup that fails the proof on error; full unfiltered integration with SMTP_TEST_ENABLED=1 is 105/105 executed. Dependency state (next-auth beta.32, @auth/core 0.41.3, audit 0 critical/0 high with 4 low/15 moderate recorded) is unchanged."
 ---
 
 # Identity Platform 文档
