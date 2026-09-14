@@ -12,7 +12,7 @@ checkPaths:
   - identity-portal/deploy/docker/**
   - identity-portal/deploy/runbooks/**
 lastReviewedAt: 2026-09-13
-lastReviewedCommit: 3775875d675727a5a2d2665d751a41e8b442b63d
+lastReviewedCommit: 19d7e116bd877055e836993b31cc1cdd15729344
 ---
 
 # 统一身份平台 · 部署/启动/运行 Runbook
@@ -53,7 +53,8 @@ lastReviewedCommit: 3775875d675727a5a2d2665d751a41e8b442b63d
 docker compose -f deploy/docker/docker-compose.dev.yml up -d --wait
 
 # 2) 引导 Keycloak(幂等):realm/clients/角色/策略/双语/登录主题,并导出配置留档
-#    邮箱验证默认关闭(无需 SMTP);如需开启:KC_VERIFY_EMAIL=true + KC_SMTP_HOST=localhost + KC_SMTP_PORT=11025 后重跑本步
+#    邮箱验证默认关闭(无需 SMTP);如需开启:KC_VERIFY_EMAIL=true + KC_SMTP_HOST=mailpit + KC_SMTP_PORT=1025 后重跑本步
+#    (SMTP 连接由 Keycloak 容器内发起,须用 compose 内部地址;realm 默认按代码注释清空 smtpServer)
 pnpm bootstrap:keycloak
 pnpm bootstrap:keycloak -- --export     # 产物: deploy/keycloak/realm-company-dev.json
 

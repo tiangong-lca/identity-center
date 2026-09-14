@@ -1,7 +1,8 @@
 version: 1
 layout: repo
-lastReviewedAt: "2026-09-13"
-lastReviewedCommit: "3775875d675727a5a2d2665d751a41e8b442b63d"
+lastReviewedAt: "2026-09-14"
+lastReviewedCommit: "d7019b3ff535294d43bd5ea8cd6e4f2e757ea28d"
+lastReviewedNote: "Identity17: reviewed the approved beta.32/core0.41.3 graph, 0 critical/high audit, 80 unit and 105 integration tests, isolated SMTP guards and real OIDC login/logout proof. Design and production identity semantics are unchanged; see D-006 for scope and fixture evidence."
 
 # Repo-local docpact governance for identity-center.
 # The workspace root config governs the submodule pointer and cross-repo view;
@@ -465,6 +466,8 @@ rules:
         kind: test-gate
       - path: identity-portal/eslint.config.mjs
         kind: lint-gate
+      - path: docs/references/2026-07-02-l0-dependency-versions.md
+        kind: dependency-version-record
     requiredDocs:
       - path: .docpact/config.yaml
         mode: review_or_update

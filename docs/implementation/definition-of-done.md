@@ -10,8 +10,9 @@ whenToUpdate: 完成定义条目、验收标准或核对证据发生变化时更
 checkPaths:
   - docs/implementation/definition-of-done.md
   - GOAL.md
-lastReviewedAt: 2026-07-08
-lastReviewedCommit: 8687ad4f6cda360a7f0336d9137a592d7e022987
+lastReviewedAt: 2026-09-14
+lastReviewedCommit: d7019b3ff535294d43bd5ea8cd6e4f2e757ea28d
+lastReviewedNote: "Identity17: reviewed the approved beta.32/core0.41.3 graph, 0 critical/high audit, 80 unit and 105 integration tests, isolated SMTP guards and real OIDC login/logout proof. Design and production identity semantics are unchanged; see D-006 for scope and fixture evidence."
 ---
 
 # 完成定义(DoD)核对 — GOAL.md §7

@@ -11,8 +11,9 @@ checkPaths:
   - GOAL.md
   - docs/implementation/README.md
   - docs/implementation/definition-of-done.md
-lastReviewedAt: 2026-09-13
-lastReviewedCommit: 3775875d675727a5a2d2665d751a41e8b442b63d
+lastReviewedAt: 2026-09-14
+lastReviewedCommit: d7019b3ff535294d43bd5ea8cd6e4f2e757ea28d
+lastReviewedNote: "Identity17: reviewed the approved beta.32/core0.41.3 graph, 0 critical/high audit, 80 unit and 105 integration tests, isolated SMTP guards and real OIDC login/logout proof. Design and production identity semantics are unchanged; see D-006 for scope and fixture evidence."
 ---
 
 # GOAL — 统一身份平台一期全量交付

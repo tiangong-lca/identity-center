@@ -1,4 +1,4 @@
-import { randomUUID } from 'node:crypto'
+import { randomBytes, randomUUID } from 'node:crypto'
 import { NextRequest } from 'next/server'
 import { afterAll, beforeAll, describe, expect, it, vi } from 'vitest'
 import { eq } from 'drizzle-orm'
@@ -239,8 +239,13 @@ describe('L4 API 契约(mock 会话 + 真实 PG/KC/Redis)', () => {
   })
 
   it('公共注册入口 202(固定响应防枚举)', async () => {
+    // register 限流为 10 次/小时/IP(键含 x-forwarded-for):固定 IP 会让计数在
+    // 重复运行间泄漏并误触 429,故注入按次唯一的测试 IP
+    const runIp = `2001:db8:${randomBytes(12).toString('hex').match(/.{4}/g)!.join(':')}`
     const res = await submitRegistration(
-      req('POST', '/api/public/registration-requests', { email: `pub-${suffix}@test.local` }),
+      req('POST', '/api/public/registration-requests', { email: `pub-${suffix}@test.local` }, {
+        'x-forwarded-for': runIp,
+      }),
     )
     expect(res.status).toBe(202)
     expect((await res.json()).data.submitted).toBe(true)
