@@ -11,7 +11,8 @@ import { getKeycloakAdmin } from '@/lib/keycloak/admin-client'
 import { createRabbitMqAdapter } from '@/lib/mq/rabbitmq-adapter'
 import { ALL_EVENT_TOPICS } from '@/lib/sync/event-types'
 import { dispatchOutboxEvents } from '@/server/jobs/dispatch-outbox-events'
-import { deliverDueWebhooks, enqueueWebhookDeliveries } from '@/server/jobs/deliver-webhooks'
+import { deliverDueWebhooks } from '@/server/jobs/deliver-webhooks'
+import { consumeWebhookEvent } from '@/server/jobs/consume-webhook-event'
 import { projectKeycloakAssignments } from '@/server/jobs/project-assignments'
 import { reconcileApplicationProjections, reconcileKeycloakUsers } from '@/server/jobs/reconcile'
 import { reconcileCatalog } from '@/server/jobs/reconcile-catalog'
@@ -43,9 +44,16 @@ async function main() {
     'identity.webhook-fanout',
     [...ALL_EVENT_TOPICS],
     async (message) => {
-      await enqueueWebhookDeliveries(ctx, message)
+      await consumeWebhookEvent(ctx, message)
     },
-    { consumer: 'webhook-fanout' },
+    {
+      consumer: 'webhook-fanout',
+      failureQueue: 'identity.webhook-fanout.failed',
+      onFatalError: () => {
+        console.error('[worker] MQ 消费不可用，退出以触发容器重启')
+        process.exit(1)
+      },
+    },
   )
 
   // 2) BullMQ 定时任务

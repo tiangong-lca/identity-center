@@ -19,28 +19,31 @@ export function resolveWebhookSecret(ref: string | null): string | null {
  * 幂等:processed_events (eventId, 'webhook-fanout')。
  */
 export async function enqueueWebhookDeliveries(ctx: JobContext, message: MqMessage): Promise<number> {
-  const inserted = await ctx.db
-    .insert(schema.processedEvents)
-    .values({ eventId: message.eventId, consumer: 'webhook-fanout' })
-    .onConflictDoNothing()
-    .returning()
-  if (inserted.length === 0) return 0 // 已处理过,幂等跳过
+  // 标记与全部投递单一起提交；失败回滚后，同一事件仍可重试。
+  return ctx.db.transaction(async (tx) => {
+    const inserted = await tx
+      .insert(schema.processedEvents)
+      .values({ eventId: message.eventId, consumer: 'webhook-fanout' })
+      .onConflictDoNothing()
+      .returning()
+    if (inserted.length === 0) return 0 // 已处理过,幂等跳过
 
-  const apps = await ctx.db.query.applications.findMany({
-    where: and(eq(schema.applications.status, 'active'), isNotNull(schema.applications.webhookUrl)),
+    const apps = await tx.query.applications.findMany({
+      where: and(eq(schema.applications.status, 'active'), isNotNull(schema.applications.webhookUrl)),
+    })
+    if (apps.length === 0) return 0
+
+    const rows = apps.map((app) => ({
+      applicationId: app.id,
+      eventId: message.eventId,
+      eventType: message.eventType,
+      payload: message as unknown as Record<string, unknown>,
+      status: 'pending' as const,
+      nextRetryAt: new Date(),
+    }))
+    await tx.insert(schema.webhookDeliveries).values(rows)
+    return rows.length
   })
-  if (apps.length === 0) return 0
-
-  const rows = apps.map((app) => ({
-    applicationId: app.id,
-    eventId: message.eventId,
-    eventType: message.eventType,
-    payload: message as unknown as Record<string, unknown>,
-    status: 'pending' as const,
-    nextRetryAt: new Date(),
-  }))
-  await ctx.db.insert(schema.webhookDeliveries).values(rows)
-  return rows.length
 }
 
 /**

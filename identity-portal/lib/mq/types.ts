@@ -19,6 +19,10 @@ export type ConsumeOptions = {
   consumer: string
   /** handler 抛错时是否重新入队(默认 false → 丢弃,由对账/死信兜底) */
   requeueOnError?: boolean
+  /** 可选的持久化失败队列；确认保存原消息后才 ack，优先于 requeueOnError。 */
+  failureQueue?: string
+  /** 失败队列也不可用或消费通道断开时通知宿主重启，禁止静默停消费。 */
+  onFatalError?: (error: Error) => void
 }
 
 export type MqAdapter = {
