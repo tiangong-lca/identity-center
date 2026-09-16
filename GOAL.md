@@ -11,9 +11,9 @@ checkPaths:
   - GOAL.md
   - docs/implementation/README.md
   - docs/implementation/definition-of-done.md
-lastReviewedAt: 2026-09-14
-lastReviewedCommit: d7019b3ff535294d43bd5ea8cd6e4f2e757ea28d
-lastReviewedNote: "Identity17: reviewed the approved beta.32/core0.41.3 graph, 0 critical/high audit, 80 unit and 105 integration tests, isolated SMTP guards and real OIDC login/logout proof. Design and production identity semantics are unchanged; see D-006 for scope and fixture evidence."
+lastReviewedAt: 2026-09-16
+lastReviewedCommit: 50eff892cd98671e2556cacebe5a72ec198ee0f9
+lastReviewedNote: "Identity21: review metadata only. The goal, the §4 hard invariants and the §8 boundaries are unchanged. D-007 records the portal-wide noindex policy for the login, registration, account and administration surfaces, and that no public deployment exists, so the acceptance basis is the source policy plus its unit tests."
 ---
 
 # GOAL — 统一身份平台一期全量交付

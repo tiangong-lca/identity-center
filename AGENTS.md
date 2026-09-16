@@ -11,8 +11,8 @@ checkPaths:
   - AGENTS.md
   - docs/README.md
   - identity-portal/AGENTS.md
-lastReviewedAt: 2026-09-13
-lastReviewedCommit: 3775875d675727a5a2d2665d751a41e8b442b63d
+lastReviewedAt: 2026-09-16
+lastReviewedCommit: 50eff892cd98671e2556cacebe5a72ec198ee0f9
 ---
 
 # identity-center 代理入口
