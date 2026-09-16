@@ -20,6 +20,10 @@ export async function generateMetadata(): Promise<Metadata> {
   const t = await getTranslations("common");
   return {
     title: t("appName"),
+    // 身份中心只承载登录、注册、账号与管理界面，没有面向公众的内容：全部路由都不应进入
+    // 搜索结果。声明在根布局即覆盖每个现行路由与后续新增路由；认证仍是访问控制的依据，
+    // noindex 只是让搜索引擎不要收录这些界面。
+    robots: { index: false, follow: false },
   };
 }
 
