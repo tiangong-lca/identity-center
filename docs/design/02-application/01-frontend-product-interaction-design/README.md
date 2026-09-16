@@ -10,8 +10,8 @@ whenToUpdate: 前端产品交互设计、页面结构或交互规范发生变化
 checkPaths:
   - docs/design/02-application/01-frontend-product-interaction-design/README.md
   - identity-portal/AGENTS.md
-lastReviewedAt: 2026-07-07
-lastReviewedCommit: a376b16
+lastReviewedAt: 2026-09-16
+lastReviewedCommit: 50eff892cd98671e2556cacebe5a72ec198ee0f9
 ---
 
 # 06. 前端产品与交互设计

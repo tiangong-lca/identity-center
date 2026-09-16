@@ -10,9 +10,9 @@ whenToUpdate: 设计文档集目录结构、评审状态或收录范围发生变
 checkPaths:
   - docs/design/README.md
   - docs/README.md
-lastReviewedAt: 2026-09-14
-lastReviewedCommit: d7019b3ff535294d43bd5ea8cd6e4f2e757ea28d
-lastReviewedNote: "Identity17: reviewed the approved beta.32/core0.41.3 graph, 0 critical/high audit, 80 unit and 105 integration tests, isolated SMTP guards and real OIDC login/logout proof. Design and production identity semantics are unchanged; see D-006 for scope and fixture evidence."
+lastReviewedAt: 2026-09-16
+lastReviewedCommit: 50eff892cd98671e2556cacebe5a72ec198ee0f9
+lastReviewedNote: "Identity21: review metadata only, recorded for D-007. The design index and every design document are unchanged; the portal noindex policy is a metadata declaration in the root layout and changes no design content, page structure or interaction semantics."
 ---
 
 # 统一身份与用户门户设计文档集

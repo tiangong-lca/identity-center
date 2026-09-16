@@ -1,8 +1,8 @@
 version: 1
 layout: repo
-lastReviewedAt: "2026-09-14"
-lastReviewedCommit: "d7019b3ff535294d43bd5ea8cd6e4f2e757ea28d"
-lastReviewedNote: "Identity17: reviewed the approved beta.32/core0.41.3 graph, 0 critical/high audit, 80 unit and 105 integration tests, isolated SMTP guards and real OIDC login/logout proof. Design and production identity semantics are unchanged; see D-006 for scope and fixture evidence."
+lastReviewedAt: "2026-09-16"
+lastReviewedCommit: "50eff892cd98671e2556cacebe5a72ec198ee0f9"
+lastReviewedNote: "Identity21: reviewed the portal-wide noindex policy in the root layout and its unit test, plus D-007 (no public deployment exists, so source policy and unit tests are the acceptance basis; no service was deployed). coverage=ok/uncovered=0; the two design READMEs carry review-metadata-only updates."
 
 # Repo-local docpact governance for identity-center.
 # The workspace root config governs the submodule pointer and cross-repo view;
