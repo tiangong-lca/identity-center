@@ -6,9 +6,9 @@
 
 **背景**:身份中心只承载登录、注册、账号与管理界面,没有面向公众的内容;`app/**` 此前没有任何 `robots` 元数据或 `robots.txt` 声明。一旦该服务经 `deploy/docker` 加外层反代对外提供,这些界面就可能被搜索引擎收录。任务 #21 要求在 auth/admin 界面补上显式的"不索引"边界,并且不新增公开 API/业务路由,也不改变认证行为。
 
-**实施**:在根布局 `app/layout.tsx` 的 `generateMetadata()` 中声明 `robots: { index: false, follow: false }`。Next 16 的元数据按字段合并,子路由不覆盖 `robots`,因此该声明覆盖全部现行路由(`/login`、`/register`、`/account/**`、`/admin/**`、`/403` 等)与后续新增路由;不在 `admin`/`account` 等子布局重复声明,保持单一事实源。新增 `tests/unit/indexing-policy.test.ts`,直接调用真实的 `generateMetadata`(仅替换 `next/font/google` 与 `next-intl/server`)断言该策略,并做了变异验证:移除 `robots` 字段后两个断言均失败。未新增页面、API、依赖或认证行为,未改动 `docs/design/`。门禁结果:frozen install、`pnpm lint`、`pnpm typecheck`、`pnpm test`(82 个单元测试,含新增 2 个)全部通过。
+**实施**:在根布局 `app/layout.tsx` 的 `generateMetadata()` 中声明 `robots: { index: false, follow: false }`。Next 16 的元数据按字段合并,子路由不覆盖 `robots`,因此该声明覆盖全部现行路由(`/login`、`/register`、`/account/**`、`/admin/**`、`/403` 等)与后续新增路由;不在 `admin`/`account` 等子布局重复声明,保持单一事实源。新增 `tests/unit/indexing-policy.test.ts`,直接调用真实的 `generateMetadata`(仅替换 `next/font/google` 与 `next-intl/server`)断言该策略,并做了变异验证:移除 `robots` 字段后两个断言均失败。未新增页面、API、依赖或认证行为,未改动 `docs/design/` 正文。门禁结果:frozen install、`pnpm lint`、`pnpm typecheck`、`pnpm test`(82 个单元测试,含新增 2 个)全部通过。
 
-**未部署,因此未做线上验收**:全仓检索无 `tiangong.earth`,门户侧也没有硬编码公开主机;`deploy/docker/docker-compose.prod.yml` 由外层反代(Nginx/Caddy)终止 HTTPS 并转发到 `portal:3000`,`KC_HOSTNAME_STRICT=false`,runbook 使用通用 `host` 占位。即本仓当前没有可核验的公开部署,按 GOAL.md §9 如实记录:本次以源码级策略与单元测试作为验收依据,**未部署任何新的身份服务**,线上验收与接受度判定留给人工/root。
+**未识别到可核验的公开部署,因此未做线上验收**:全仓检索无 `tiangong.earth`,门户侧也没有硬编码公开主机;`deploy/docker/docker-compose.prod.yml` 由外层反代(Nginx/Caddy)终止 HTTPS 并转发到 `portal:3000`,`KC_HOSTNAME_STRICT=false`,runbook 使用通用 `host` 占位。这些仓库证据不能证明外部不存在部署;当前未能确定可核验的生产主机,按 GOAL.md §9 如实记录:本次以源码级策略与单元测试作为验收依据,**未部署任何新的身份服务**,线上验收与接受度判定留给人工/root。
 
 **`robots.txt` 的取舍(留给后续裁决)**:本次只声明 `noindex`,未新增 `robots.txt`。理由:若用 `Disallow` 阻止抓取,爬虫读不到 `noindex`,被阻止的 URL 仍可能被列出;保持可抓取才能让 `noindex` 生效,而"不放置任何 robots.txt"等同于允许抓取,效果一致,因此本次不新增文件即可生效。若后续希望显式声明,建议新增 `app/robots.txt`(Next 支持该静态文件约定),内容为 `User-agent: *` 与 `Allow: /`,不要改写成 `Disallow`。
 
