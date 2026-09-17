@@ -18,6 +18,8 @@ lastReviewedNote: "Identity21: the implementation plan and the §9 milestone tab
 
 # 统一身份平台实施方案
 
+运行维护：[Webhook 扇出失败恢复](webhook-fanout-recovery.md)（Issue #19）。
+
 > 制定日期：2026-07-02（v2，按一期全量交付修订）
 > 依据：[设计文档集](../design/README.md)（12 篇正式设计文档，已通过 2026-06-29 v2 评审，无遗留开放问题）
 > 定位：设计文档集描述目标态架构，本方案定义**实施顺序、验收标准和实施工作方式**。本方案不分期：一期完成全部目标态范围。
