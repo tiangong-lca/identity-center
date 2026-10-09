@@ -1,8 +1,8 @@
 version: 1
 layout: repo
-lastReviewedAt: "2026-09-16"
-lastReviewedCommit: "50eff892cd98671e2556cacebe5a72ec198ee0f9"
-lastReviewedNote: "Identity21: reviewed the portal-wide noindex policy in the root layout and its unit test, plus D-007 (no public deployment exists, so source policy and unit tests are the acceptance basis; no service was deployed). coverage=ok/uncovered=0; the two design READMEs carry review-metadata-only updates."
+lastReviewedAt: "2026-10-09"
+lastReviewedCommit: "cdfa62c942d929ab84dbd5d3a27ce43380495732"
+lastReviewedNote: "Identity23: reviewed bounded webhook attempts, manual audit closure and the CMS grant compatibility guard in D-008. Design bodies, goal, ownership and quality gates are unchanged; source delivery and workspace integration remain separately verified."
 
 # Repo-local docpact governance for identity-center.
 # The workspace root config governs the submodule pointer and cross-repo view;

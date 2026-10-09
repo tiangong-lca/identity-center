@@ -10,9 +10,9 @@ whenToUpdate: 完成定义条目、验收标准或核对证据发生变化时更
 checkPaths:
   - docs/implementation/definition-of-done.md
   - GOAL.md
-lastReviewedAt: 2026-09-16
-lastReviewedCommit: 50eff892cd98671e2556cacebe5a72ec198ee0f9
-lastReviewedNote: "Identity21: the definition-of-done content is unchanged. The new unit suite for the portal indexing policy runs under the existing pnpm test unit project; no gate, command or acceptance criterion was added or relaxed."
+lastReviewedAt: "2026-10-09"
+lastReviewedCommit: "cdfa62c942d929ab84dbd5d3a27ce43380495732"
+lastReviewedNote: "Identity23: reviewed bounded webhook attempts, manual audit closure and the CMS grant compatibility guard in D-008. Design bodies, goal, ownership and quality gates are unchanged; source delivery and workspace integration remain separately verified."
 ---
 
 # 完成定义(DoD)核对 — GOAL.md §7

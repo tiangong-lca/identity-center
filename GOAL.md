@@ -11,9 +11,9 @@ checkPaths:
   - GOAL.md
   - docs/implementation/README.md
   - docs/implementation/definition-of-done.md
-lastReviewedAt: 2026-09-16
-lastReviewedCommit: 50eff892cd98671e2556cacebe5a72ec198ee0f9
-lastReviewedNote: "Identity21: review metadata only. The goal, the §4 hard invariants and the §8 boundaries are unchanged. D-007 records the portal-wide noindex policy for the login, registration, account and administration surfaces, and that no public deployment exists, so the acceptance basis is the source policy plus its unit tests."
+lastReviewedAt: "2026-10-09"
+lastReviewedCommit: "cdfa62c942d929ab84dbd5d3a27ce43380495732"
+lastReviewedNote: "Identity23: reviewed bounded webhook attempts, manual audit closure and the CMS grant compatibility guard in D-008. Design bodies, goal, ownership and quality gates are unchanged; source delivery and workspace integration remain separately verified."
 ---
 
 # GOAL — 统一身份平台一期全量交付
