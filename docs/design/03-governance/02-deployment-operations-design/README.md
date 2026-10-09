@@ -11,8 +11,9 @@ checkPaths:
   - docs/design/03-governance/02-deployment-operations-design/README.md
   - identity-portal/deploy/**
   - identity-portal/lib/config/**
-lastReviewedAt: 2026-09-13
-lastReviewedCommit: 19d7e116bd877055e836993b31cc1cdd15729344
+lastReviewedAt: "2026-10-09"
+lastReviewedCommit: "cdfa62c942d929ab84dbd5d3a27ce43380495732"
+lastReviewedNote: "Identity23: reviewed bounded webhook attempts, manual audit closure and the CMS grant compatibility guard in D-008. Design bodies, goal, ownership and quality gates are unchanged; source delivery and workspace integration remain separately verified."
 ---
 
 # 10. 部署与运维设计

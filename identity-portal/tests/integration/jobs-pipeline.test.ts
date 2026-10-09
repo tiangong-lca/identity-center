@@ -180,7 +180,7 @@ describe('L3 任务管道与故障演练(真实 PG/KC/RabbitMQ)', () => {
     expect((await ctx.keycloak.getUser(keycloakUserId))?.enabled).toBe(true)
   })
 
-  it('演练4:webhook 5 连败 → dead;修复端点后死信重放 → delivered', async () => {
+  it('演练4:webhook 5 连败保留 dead;人工单次重排保持 attempts → delivered', async () => {
     receiverMode = 'fail'
     const eventId = `evt_${randomUUID()}`
     await tdb.db.insert(schema.webhookDeliveries).values({
@@ -208,14 +208,36 @@ describe('L3 任务管道与故障演练(真实 PG/KC/RabbitMQ)', () => {
     })
     expect(deadRow).toBeTruthy()
 
+    expect(deadRow?.attempts).toBe(5)
+    const originalAudits = await tdb.db.query.deadLetterEvents.findMany({
+      where: eq(schema.deadLetterEvents.eventId, eventId),
+    })
+    const requestsBeforeRepair = received.length
     receiverMode = 'ok'
-    await retryDeadLetterEvents(ctx) // webhook 死信 → 重置 pending
+    for (let cycle = 0; cycle < 3; cycle++) await retryDeadLetterEvents(ctx)
+    expect((await deliverDueWebhooks(ctx)).processed).toBe(0)
+    expect(received.length).toBe(requestsBeforeRepair)
+    expect(await tdb.db.query.webhookDeliveries.findFirst({
+      where: eq(schema.webhookDeliveries.eventId, eventId),
+    })).toEqual(deadRow)
+    expect(await tdb.db.query.deadLetterEvents.findMany({
+      where: eq(schema.deadLetterEvents.eventId, eventId),
+    })).toEqual(originalAudits)
+
+    // Explicit scoped manual requeue; retain attempts and original unresolved audit.
+    await tdb.db.update(schema.webhookDeliveries)
+      .set({ status: 'pending', nextRetryAt: new Date() })
+      .where(eq(schema.webhookDeliveries.id, deadRow!.id))
     const redeliver = await deliverDueWebhooks(ctx)
     expect(redeliver.processed).toBeGreaterThanOrEqual(1)
     const finalRow = await tdb.db.query.webhookDeliveries.findFirst({
       where: eq(schema.webhookDeliveries.eventId, eventId),
     })
     expect(finalRow?.status).toBe('delivered')
+    expect(finalRow?.attempts).toBe(6)
+    expect(await tdb.db.query.deadLetterEvents.findMany({
+      where: eq(schema.deadLetterEvents.eventId, eventId),
+    })).toEqual(originalAudits)
   })
 })
 

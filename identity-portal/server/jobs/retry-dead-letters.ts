@@ -4,34 +4,25 @@ import type { MqMessage } from '@/lib/mq/types'
 import type { JobContext, JobResult } from './types'
 
 /**
- * 死信重放:outbox 源 → 重新发布 MQ;webhook 源 → 投递单重置为待投。
- * 成功标记 resolved_at;仍失败保留等待下轮/人工。
+ * 自动重放仅处理 outbox 死信。
+ * Webhook 达到投递上限后保留 dead 与原 attempts，修复原因后由人工按应用和事件重放。
+ * Consumer 死信同样保留人工处理；不自动标记为已解决。
  */
 export async function retryDeadLetterEvents(ctx: JobContext): Promise<JobResult> {
   const rows = await ctx.db.query.deadLetterEvents.findMany({
-    where: isNull(schema.deadLetterEvents.resolvedAt),
+    where: and(
+      eq(schema.deadLetterEvents.source, 'outbox'),
+      isNull(schema.deadLetterEvents.resolvedAt),
+    ),
     limit: 100,
   })
   let processed = 0
   let failed = 0
 
   for (const row of rows) {
+    if (row.source !== 'outbox') continue
     try {
-      if (row.source === 'outbox') {
-        await ctx.mq.publish(row.eventType, row.payload as MqMessage)
-      } else if (row.source === 'webhook') {
-        await ctx.db
-          .update(schema.webhookDeliveries)
-          .set({ status: 'pending', nextRetryAt: new Date(), attempts: 0, updatedAt: new Date() })
-          .where(
-            and(
-              eq(schema.webhookDeliveries.eventId, row.eventId),
-              eq(schema.webhookDeliveries.status, 'dead'),
-            ),
-          )
-      } else {
-        continue // consumer 源保留人工处理
-      }
+      await ctx.mq.publish(row.eventType, row.payload as MqMessage)
       await ctx.db
         .update(schema.deadLetterEvents)
         .set({ resolvedAt: new Date() })

@@ -8,6 +8,16 @@ import {
 } from '@/lib/sync/webhook-signature'
 import type { JobContext, JobResult } from './types'
 
+/** 与正式 MCMS 的 resolvePayloadData 一致：只解开一层对象 payload。 */
+function cmsGrantApplicationCode(payload: unknown): string | null {
+  const isRecord = (value: unknown): value is Record<string, unknown> =>
+    value !== null && typeof value === 'object' && !Array.isArray(value)
+  if (!isRecord(payload)) return null
+  const data = isRecord(payload.payload) ? payload.payload : payload
+  const code = data.applicationCode
+  return typeof code === 'string' && code.length > 0 ? code.toLowerCase() : null
+}
+
 /** 应用 webhook secret 解析:webhook_secret_ref 指向 env 键名(生产=密钥管理注入的环境变量) */
 export function resolveWebhookSecret(ref: string | null): string | null {
   if (!ref) return null
@@ -29,9 +39,15 @@ export async function enqueueWebhookDeliveries(ctx: JobContext, message: MqMessa
   const apps = await ctx.db.query.applications.findMany({
     where: and(eq(schema.applications.status, 'active'), isNotNull(schema.applications.webhookUrl)),
   })
-  if (apps.length === 0) return 0
+  // MCMS grant 消费端缺少应用边界；明确属于其他应用的授权不建立 CMS 投递。
+  // 目标缺失/畸形仍登记，由发送前的校验隔离并留下死信审计。
+  const target = cmsGrantApplicationCode(message)
+  const recipients = apps.filter(
+    (app) => app.code !== 'cms' || message.eventType !== 'access.application.granted' || target === null || target === 'cms',
+  )
+  if (recipients.length === 0) return 0
 
-  const rows = apps.map((app) => ({
+  const rows = recipients.map((app) => ({
     applicationId: app.id,
     eventId: message.eventId,
     eventType: message.eventType,
@@ -67,6 +83,31 @@ export async function deliverDueWebhooks(ctx: JobContext): Promise<JobResult> {
       where: eq(schema.applications.id, delivery.applicationId),
     })
     if (!app?.webhookUrl) continue
+    if (
+      app.code === 'cms' &&
+      delivery.eventType === 'access.application.granted' &&
+      cmsGrantApplicationCode(delivery.payload) !== 'cms'
+    ) {
+      const message = 'routing-quarantine: cms grant target must be cms'
+      await ctx.db.transaction(async (tx) => {
+        await tx
+          .update(schema.webhookDeliveries)
+          .set({ status: 'dead', nextRetryAt: null, lastError: message, updatedAt: new Date() })
+          .where(eq(schema.webhookDeliveries.id, delivery.id))
+        await tx.insert(schema.deadLetterEvents).values({
+          source: 'webhook',
+          eventId: delivery.eventId,
+          eventType: delivery.eventType,
+          payload: delivery.payload as Record<string, unknown>,
+          consumer: 'webhook:cms',
+          error: message,
+          attempts: delivery.attempts,
+        })
+      })
+      failed++
+      console.error(`[webhook] cms ${delivery.eventId} routing quarantine: grant target is not cms`)
+      continue
+    }
     const secret = resolveWebhookSecret(app.webhookSecretRef)
 
     const rawBody = JSON.stringify(delivery.payload)
@@ -81,7 +122,10 @@ export async function deliverDueWebhooks(ctx: JobContext): Promise<JobResult> {
 
     const attempts = delivery.attempts + 1
     try {
-      const res = await fetchImpl(app.webhookUrl, { method: 'POST', headers, body: rawBody })
+      const res = await fetchImpl(app.webhookUrl, {
+        method: 'POST', headers, body: rawBody,
+        signal: AbortSignal.timeout(10_000),
+      })
       if (res.status >= 200 && res.status < 300) {
         await ctx.db
           .update(schema.webhookDeliveries)

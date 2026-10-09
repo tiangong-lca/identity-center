@@ -10,8 +10,9 @@ whenToUpdate: 同步机制、事件类型、事件契约、重试/死信策略�
 checkPaths:
   - docs/design/02-application/03-sync-event-design/README.md
   - docs/design/01-architecture/01-overall-architecture/README.md
-lastReviewedAt: 2026-07-08
-lastReviewedCommit: 01067284a33e5ae22f79009dc451d7fe91de0fc6
+lastReviewedAt: "2026-10-09"
+lastReviewedCommit: "cdfa62c942d929ab84dbd5d3a27ce43380495732"
+lastReviewedNote: "Identity23: reviewed bounded webhook attempts, manual audit closure and the CMS grant compatibility guard in D-008. Design bodies, goal, ownership and quality gates are unchanged; source delivery and workspace integration remain separately verified."
 ---
 
 # 08. 同步与事件设计

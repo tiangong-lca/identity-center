@@ -11,8 +11,9 @@ checkPaths:
   - identity-portal/deploy/runbooks/README.md
   - identity-portal/deploy/docker/**
   - identity-portal/deploy/runbooks/**
-lastReviewedAt: 2026-09-13
-lastReviewedCommit: 19d7e116bd877055e836993b31cc1cdd15729344
+lastReviewedAt: "2026-10-09"
+lastReviewedCommit: "cdfa62c942d929ab84dbd5d3a27ce43380495732"
+lastReviewedNote: "Identity23: reviewed bounded webhook attempts, manual audit closure and the CMS grant compatibility guard in D-008. Design bodies, goal, ownership and quality gates are unchanged; source delivery and workspace integration remain separately verified."
 ---
 
 # 统一身份平台 · 部署/启动/运行 Runbook
@@ -146,7 +147,7 @@ curl -s https://<域名>/api/health          # status=up
 | dispatch-outbox-events | 5s | outbox → RabbitMQ 派发(失败 5 次进死信) |
 | deliver-webhooks | 10s | 签名投递业务应用(退避 1s/5s/30s/2m/10m,5 败进死信) |
 | project-keycloak-assignments | 60s | 准入投影重试(pending/failed → Keycloak Client Role) |
-| retry-dead-letter-events | 5min | 死信重放(outbox 重发 / webhook 重置待投) |
+| retry-dead-letter-events | 5min | 仅重放未解决的 outbox 死信;webhook/consumer 保留人工处理 |
 | reconcile-keycloak-users | 1h | 用户状态对账(以平台事实修 KC) |
 | reconcile-application-projections | 1h | 准入投影对账(补齐/移除漂移) |
 
@@ -176,7 +177,7 @@ SELECT count(*) FROM application_assignments WHERE projection_status='failed';  
 |---|---|---|
 | 新登录 503 / 管理写操作 503 | Keycloak 容器与 `/health/ready` | 降级策略生效中;恢复 KC 后跑两个 reconcile 任务;详见 [故障响应](./incident-response.md) |
 | outbox pending 积压 | RabbitMQ 状态、worker 日志 | 恢复 MQ 后 dispatch 自动补发;死信用 retry 任务重放 |
-| webhook status=dead | 业务端点可达性、`last_error` | 修复端点 → 死信重放自动重投 |
+| webhook status=dead | 业务端点可达性、`last_error`、应用目标与消费端去重表 | 修复原因 → 精确范围人工单次重排,保留 attempts → 核对投递及去重 → 单独关闭原审计;见 [故障响应](./incident-response.md) |
 | 撤权 API 返回 502 | `application_assignments.last_projection_error` | 事实已 revoked;投影由重试任务补;持续失败查 KC 连通 |
 | 登录页非品牌主题 | keycloak 容器 themes 挂载 | 确认 `deploy/keycloak/themes` volume 与 realm loginTheme=identity |
 | 紧急管理通道 | — | `break_glass_admin`(仅初始化/修复;用后改密+审计),见 [故障响应](./incident-response.md) |
