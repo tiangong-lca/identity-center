@@ -11,9 +11,9 @@ checkPaths:
   - docs/README.md
   - docs/design/README.md
   - docs/implementation/README.md
-lastReviewedAt: 2026-09-16
-lastReviewedCommit: 50eff892cd98671e2556cacebe5a72ec198ee0f9
-lastReviewedNote: "Identity21: docs entry reviewed for D-007, the portal-wide noindex policy for the login, registration, account and administration surfaces. Entry content is unchanged; no public deployment exists."
+lastReviewedAt: 2026-10-16
+lastReviewedCommit: cdfa62c942d929ab84dbd5d3a27ce43380495732
+lastReviewedNote: "Identity25: reviewed bounded npm/Actions monitoring and existing secretless PR quality reuse; Docker-image qualification remains an explicit prerequisite. Design bodies, identity contracts and production inputs are unchanged."
 ---
 
 # Identity Platform 文档
@@ -25,6 +25,7 @@ lastReviewedNote: "Identity21: docs entry reviewed for D-007, the portal-wide no
 - [设计文档集](./design/README.md) — 目标态架构设计（已通过评审）
 - [实施方案](./implementation/README.md) — 实施顺序、里程碑、范围裁剪与验收标准
 - [部署/启动/运行 Runbook](../identity-portal/deploy/runbooks/README.md) — 从零到运行的完整操作手册（含 5 份专项手册）
+- [依赖维护](./guides/dependency-maintenance.md) — npm/Actions 监控、已有质量门与尚未合格的镜像监控前置条件
 - [业务应用接入指南](./guides/business-app-onboarding.md) — 新应用接入十步与验收清单
 - [业务应用接入技术规范](./guides/business-app-integration-spec.md) — 接入契约（API / 数据模型 / 校验）
 - [业务应用 SSO 接入说明书](./guides/sso-integration-handbook.md) — 实战版接入指南（基于 CMS 经验）

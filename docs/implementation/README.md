@@ -11,9 +11,9 @@ checkPaths:
   - docs/implementation/README.md
   - GOAL.md
   - docs/design/README.md
-lastReviewedAt: 2026-09-16
-lastReviewedCommit: 50eff892cd98671e2556cacebe5a72ec198ee0f9
-lastReviewedNote: "Identity21: the implementation plan and the §9 milestone table are unchanged. This entry records D-007, the portal-wide noindex policy in the root layout with its unit test, and that no public deployment exists, so no live acceptance was performed."
+lastReviewedAt: 2026-10-16
+lastReviewedCommit: cdfa62c942d929ab84dbd5d3a27ce43380495732
+lastReviewedNote: "Identity25: reviewed bounded npm/Actions monitoring and existing secretless PR quality reuse; Docker-image qualification remains an explicit prerequisite. Design bodies, identity contracts and production inputs are unchanged."
 ---
 
 # 统一身份平台实施方案

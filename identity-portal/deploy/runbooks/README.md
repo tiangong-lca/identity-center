@@ -11,8 +11,9 @@ checkPaths:
   - identity-portal/deploy/runbooks/README.md
   - identity-portal/deploy/docker/**
   - identity-portal/deploy/runbooks/**
-lastReviewedAt: 2026-09-13
-lastReviewedCommit: 19d7e116bd877055e836993b31cc1cdd15729344
+lastReviewedAt: 2026-10-16
+lastReviewedCommit: cdfa62c942d929ab84dbd5d3a27ce43380495732
+lastReviewedNote: "Identity25: reviewed bounded npm/Actions monitoring and existing secretless PR quality reuse; Docker-image qualification remains an explicit prerequisite. Design bodies, identity contracts and production inputs are unchanged."
 ---
 
 # 统一身份平台 · 部署/启动/运行 Runbook
@@ -192,3 +193,11 @@ KES_ENABLED=1 KINGBASE_ADMIN_URL=postgres://kingbase:kingbase@localhost:15433/te
 ```
 
 当前状态:开发机(arm64)无可用 KES 镜像,兼容三件套(约定/adapter/矩阵)已就绪,详见 [kingbasees-environment.md](../../../docs/references/kingbasees-environment.md)。
+
+## 依赖监控边界
+
+npm/Actions 的维护入口见[依赖维护说明](../../../docs/guides/dependency-maintenance.md)。
+CI 仍只复用既有 secretless frozen-install/lint/typecheck/unit，不执行本手册的部署命令。
+本次未启动容器、未升级镜像、未改 realm/catalog 或生产输入；Docker/Compose 监控仍由
+[Identity #26](https://github.com/tiangong-lca/identity-center/issues/26) 承担；该任务处于 Ready，
+尚未开始，必须先证明隔离启动、真实集成负例和资源清理，不能据此宣称镜像覆盖或激活。

@@ -1,0 +1,52 @@
+version: 2
+updates:
+  - package-ecosystem: npm
+    directory: /identity-portal
+    schedule:
+      interval: weekly
+      day: friday
+      time: "08:00"
+      timezone: Asia/Shanghai
+    cooldown:
+      default-days: 7
+    open-pull-requests-limit: 2
+    groups:
+      react-next:
+        applies-to: version-updates
+        patterns: [next, eslint-config-next, react, react-dom, "@types/react", "@types/react-dom"]
+        update-types: [minor, patch]
+      identity-auth:
+        applies-to: version-updates
+        patterns: [next-auth, "@auth/*", "@keycloak/*", jose]
+        update-types: [minor, patch]
+      database:
+        applies-to: version-updates
+        patterns: [drizzle-orm, drizzle-kit, pg, "@types/pg"]
+        update-types: [minor, patch]
+      queues:
+        applies-to: version-updates
+        patterns: [bullmq, ioredis, amqplib]
+        update-types: [minor, patch]
+      tests:
+        applies-to: version-updates
+        patterns: [vitest, "@vitest/*", "@playwright/test"]
+        update-types: [minor, patch]
+      styling:
+        applies-to: version-updates
+        patterns: [tailwindcss, "@tailwindcss/*", tailwind-merge, tw-animate-css]
+        update-types: [minor, patch]
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: weekly
+      day: friday
+      time: "08:20"
+      timezone: Asia/Shanghai
+    cooldown:
+      default-days: 7
+    open-pull-requests-limit: 1
+    groups:
+      actions-minor-patch:
+        applies-to: version-updates
+        patterns: ["*"]
+        update-types: [minor, patch]

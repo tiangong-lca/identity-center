@@ -10,9 +10,9 @@ whenToUpdate: 设计文档集目录结构、评审状态或收录范围发生变
 checkPaths:
   - docs/design/README.md
   - docs/README.md
-lastReviewedAt: 2026-09-16
-lastReviewedCommit: 50eff892cd98671e2556cacebe5a72ec198ee0f9
-lastReviewedNote: "Identity21: review metadata only, recorded for D-007. The design index and every design document are unchanged; the portal noindex policy is a metadata declaration in the root layout and changes no design content, page structure or interaction semantics."
+lastReviewedAt: 2026-10-16
+lastReviewedCommit: cdfa62c942d929ab84dbd5d3a27ce43380495732
+lastReviewedNote: "Identity25: reviewed bounded npm/Actions monitoring and existing secretless PR quality reuse; Docker-image qualification remains an explicit prerequisite. Design bodies, identity contracts and production inputs are unchanged."
 ---
 
 # 统一身份与用户门户设计文档集

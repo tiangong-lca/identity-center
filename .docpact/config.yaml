@@ -1,8 +1,8 @@
 version: 1
 layout: repo
-lastReviewedAt: "2026-09-16"
-lastReviewedCommit: "50eff892cd98671e2556cacebe5a72ec198ee0f9"
-lastReviewedNote: "Identity21: reviewed the portal-wide noindex policy in the root layout and its unit test, plus D-007 (no public deployment exists, so source policy and unit tests are the acceptance basis; no service was deployed). coverage=ok/uncovered=0; the two design READMEs carry review-metadata-only updates."
+lastReviewedAt: 2026-10-16
+lastReviewedCommit: cdfa62c942d929ab84dbd5d3a27ce43380495732
+lastReviewedNote: "Identity25: reviewed bounded npm/Actions monitoring and existing secretless PR quality reuse; Docker-image qualification remains an explicit prerequisite. Design bodies, identity contracts and production inputs are unchanged."
 
 # Repo-local docpact governance for identity-center.
 # The workspace root config governs the submodule pointer and cross-repo view;
@@ -64,6 +64,8 @@ ownership:
           - identity-portal/postcss.config.mjs
           - identity-portal/tsconfig.json
           - .github/workflows/ci.yml
+          - identity-portal/pnpm-lock.yaml
+          - identity-portal/pnpm-workspace.yaml
       ownerRepo: identity-center
     - id: identity-deployment-and-operations
       paths:
@@ -77,6 +79,7 @@ ownership:
           - GOAL.md
           - docs/**
           - .docpact/**
+          - .github/dependabot.yml
           - identity-portal/AGENTS.md
           - identity-portal/CLAUDE.md
           - identity-portal/README.md
@@ -203,12 +206,14 @@ coverage:
     - identity-platform-admin/**
     - .design_library/**
     - .github/workflows/ci.yml
+    - .github/dependabot.yml
+    - identity-portal/pnpm-lock.yaml
+    - identity-portal/pnpm-workspace.yaml
   exclude:
     - identity-portal/node_modules/**
     - identity-portal/.next/**
     - identity-portal/dist/**
     - identity-portal/coverage/**
-    - identity-portal/pnpm-lock.yaml
     - docs/design/_drafts/**
     - docs/implementation/plans/**
 
@@ -234,6 +239,7 @@ docInventory:
     - docs/implementation/decisions.md
     - docs/implementation/definition-of-done.md
     - docs/guides/business-app-onboarding.md
+    - docs/guides/dependency-maintenance.md
     - docs/references/kingbasees-compatibility-conventions.md
     - docs/references/kingbasees-environment.md
     - docs/references/security-checklist-signoff.md
@@ -460,6 +466,8 @@ rules:
         kind: repo-test
       - path: identity-portal/package.json
         kind: runtime-config
+      - path: identity-portal/pnpm-workspace.yaml
+        kind: package-manager-policy
       - path: identity-portal/vitest.config.ts
         kind: test-gate
       - path: identity-portal/playwright.config.ts
@@ -506,3 +514,17 @@ rules:
       - path: docs/design/02-application/01-frontend-product-interaction-design/README.md
         mode: review_or_update
     reason: Hi-fi prototypes and the design library are the visual source of truth and should stay aligned with the frontend interaction design.
+  - id: identity-dependency-maintenance
+    scope: repo
+    repo: identity-center
+    triggers:
+      - path: .github/dependabot.yml
+        kind: dependency-monitoring
+      - path: identity-portal/pnpm-lock.yaml
+        kind: dependency-lock
+      - path: docs/guides/dependency-maintenance.md
+        kind: maintenance-guide
+    requiredDocs:
+      - path: docs/guides/dependency-maintenance.md
+        mode: review_or_update
+    reason: Monitoring configuration and lock-only maintenance need focused compatibility/activation evidence; manifest, workspace build policy and source contracts remain strict.
