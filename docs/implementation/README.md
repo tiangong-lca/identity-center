@@ -11,9 +11,9 @@ checkPaths:
   - docs/implementation/README.md
   - GOAL.md
   - docs/design/README.md
-lastReviewedAt: 2026-10-16
-lastReviewedCommit: cdfa62c942d929ab84dbd5d3a27ce43380495732
-lastReviewedNote: "Identity25: reviewed bounded npm/Actions monitoring and existing secretless PR quality reuse; Docker-image qualification remains an explicit prerequisite. Design bodies, identity contracts and production inputs are unchanged."
+lastReviewedAt: 2026-10-17
+lastReviewedCommit: 1317a4724ceb0229523199a9dddaebd2497283be
+lastReviewedNote: "Identity #32: reviewed the bounded Next/eslint-config-next 16.4.2 source dependency change at 1317a47. Existing secretless gates and acceptance contracts remain unchanged; local frozen install/lint/typecheck/82 unit tests/standalone build pass. No application, auth, transport or production behavior change is authored, and no live/container/OIDC proof is claimed."
 ---
 
 # 统一身份平台实施方案

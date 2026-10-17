@@ -10,9 +10,9 @@ whenToUpdate: 完成定义条目、验收标准或核对证据发生变化时更
 checkPaths:
   - docs/implementation/definition-of-done.md
   - GOAL.md
-lastReviewedAt: 2026-09-16
-lastReviewedCommit: 50eff892cd98671e2556cacebe5a72ec198ee0f9
-lastReviewedNote: "Identity21: the definition-of-done content is unchanged. The new unit suite for the portal indexing policy runs under the existing pnpm test unit project; no gate, command or acceptance criterion was added or relaxed."
+lastReviewedAt: 2026-10-17
+lastReviewedCommit: 1317a4724ceb0229523199a9dddaebd2497283be
+lastReviewedNote: "Identity #32: reviewed the existing DoD against Next/eslint-config-next 16.4.2 at 1317a47. Local frozen install/lint/typecheck/82 unit tests/standalone build and offline package checks pass; these do not refresh the historical integration/e2e/deployment evidence or claim live identity qualification. DoD criteria remain unchanged; fresh CI and independent review remain pending."
 ---
 
 # 完成定义(DoD)核对 — GOAL.md §7

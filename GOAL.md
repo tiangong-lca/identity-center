@@ -11,9 +11,9 @@ checkPaths:
   - GOAL.md
   - docs/implementation/README.md
   - docs/implementation/definition-of-done.md
-lastReviewedAt: 2026-10-16
-lastReviewedCommit: cdfa62c942d929ab84dbd5d3a27ce43380495732
-lastReviewedNote: "Identity25: reviewed bounded npm/Actions monitoring and existing secretless PR quality reuse; Docker-image qualification remains an explicit prerequisite. Design bodies, identity contracts and production inputs are unchanged."
+lastReviewedAt: 2026-10-17
+lastReviewedCommit: 1317a4724ceb0229523199a9dddaebd2497283be
+lastReviewedNote: "Identity #32: reviewed the bounded Next/eslint-config-next 16.4.2 source qualification at 1317a47. Existing ownership, identity invariants, delivery scope, acceptance and production boundaries remain unchanged; local install/lint/typecheck/unit/standalone-build proof does not establish live/container/OIDC behavior or complete source delivery."
 ---
 
 # GOAL — 统一身份平台一期全量交付
