@@ -134,7 +134,13 @@ it('allows governed review metadata without admitting product or deployment-poli
 it('admits only the exact reviewed runbook CI correction, never deployment config or another document', () => {
   const file = 'identity-portal/deploy/runbooks/README.md'
   const root = path.resolve(__dirname, '../../..')
-  const before = execFileSync('git', ['-C', root, 'show', `d9b4827c961967fe16ef31c365025049c7ff8802:${file}`], { encoding: 'utf8' })
+  // The ordinary quality checkout is shallow; test data must not require ancestors.
+  const fixtureSource = fs.readFileSync(path.resolve(__dirname, '../auth-compatibility/fixtures/runbook-before-ci-proof.json'), 'utf8')
+  expect(Buffer.byteLength(fixtureSource, 'utf8')).toBeLessThan(16 * 1024)
+  const original = JSON.parse(fixtureSource) as { sourceCommit: string; sourcePath: string; content: string }
+  expect(original.sourceCommit).toBe('d9b4827c961967fe16ef31c365025049c7ff8802')
+  expect(original.sourcePath).toBe(file)
+  const before = original.content
   const after = fs.readFileSync(path.join(root, file), 'utf8')
   expect(() => assertProductDelta(file, before, after)).not.toThrow()
   expect(() => assertProductDelta(file, before, `${after}\nAllow production deployment.`)).toThrow()
