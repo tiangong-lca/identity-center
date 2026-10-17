@@ -11,9 +11,9 @@ checkPaths:
   - .github/dependabot.yml
   - identity-portal/pnpm-lock.yaml
   - docs/guides/dependency-maintenance.md
-lastReviewedAt: 2026-10-16
-lastReviewedCommit: cdfa62c942d929ab84dbd5d3a27ce43380495732
-lastReviewedNote: "Reviewed the Identity #25 candidate against the current Main base; this is source/portal validation, not Docker-image, deployment or production identity qualification."
+lastReviewedAt: 2026-10-17
+lastReviewedCommit: 1317a4724ceb0229523199a9dddaebd2497283be
+lastReviewedNote: "Identity #32: reviewed Next/eslint-config-next 16.4.2 at 1317a47 with the original PR history preserved. The real frozen install passes unchanged release-age policy; lint/typecheck/82 unit tests/standalone build and offline package consumption pass. Auth/React/Intl/runtime pins and build approvals remain unchanged. Exact-head CI, review and manual source delivery remain pending; no live/container/OIDC qualification is claimed."
 ---
 
 # Dependency maintenance
@@ -68,6 +68,11 @@ is not proof of hosted pnpm11.9 support. Keep that exact manager pin and record
 any real hosted failure as its own prerequisite rather than downgrading it.
 Security-alert/security-update settings are separate from version-monitoring
 cadence and must be verified independently.
+
+The bounded [2026-10-17 Next qualification](../references/2026-07-02-l0-dependency-versions.md#2026-10-17-next-1642-source-security-qualification)
+records the selected framework/lint versions, preserved compatibility pins and
+local source-only evidence for Identity #32 / original PR #31. It does not
+replace fresh hosted CI, independent review or required workspace integration.
 
 ## Docker and Compose prerequisite
 

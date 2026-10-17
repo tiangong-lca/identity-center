@@ -1,8 +1,8 @@
 version: 1
 layout: repo
-lastReviewedAt: 2026-10-16
-lastReviewedCommit: cdfa62c942d929ab84dbd5d3a27ce43380495732
-lastReviewedNote: "Identity25: reviewed bounded npm/Actions monitoring and existing secretless PR quality reuse; Docker-image qualification remains an explicit prerequisite. Design bodies, identity contracts and production inputs are unchanged."
+lastReviewedAt: "2026-10-17"
+lastReviewedCommit: "1317a4724ceb0229523199a9dddaebd2497283be"
+lastReviewedNote: "Identity #32: reviewed Next/eslint-config-next 16.4.2 and the minimal generated graph at 1317a47. Existing Node22/pnpm11.9, build approvals, secretless CI, gates and governance rules remain unchanged; local install/lint/typecheck/82 unit tests/standalone build pass. Independent review and exact-head CI remain pending; no deployment or live identity qualification is claimed."
 
 # Repo-local docpact governance for identity-center.
 # The workspace root config governs the submodule pointer and cross-repo view;

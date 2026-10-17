@@ -94,3 +94,75 @@ pnpm-workspace.yaml:pnpm 11.9 在依赖更新时曾自动追加 `minimumReleaseA
 用户批准 next-auth5.0.0-beta.32 例外；锁定依赖 @auth/core0.41.3。实际审计为0 critical /0 high /15 moderate /4 low，未添加 override。详见[决策D-006](../implementation/decisions.md)。
 
 Primary独立完成 frozen install、lint/typecheck、80个unit、SMTP启用的105个integration；真实浏览器OIDC登录/退出/再登录两项测试也通过。SMTP测试使用独立临时realm和本地Mailpit，保留两种原有启用方式；畸形/带凭据URL拒绝且不泄露输入，关闭SMTP时不触发连接。浏览器测试按现有AutoSubmit及直接返回Keycloak的退出流程等待导航，不再竞争中间页按钮。验证使用独立本地账号并清理其Keycloak/数据库记录，保留共享种子管理员的强制首次改密要求。没有生产身份或业务数据变更。
+
+## 2026-10-17: Next 16.4.2 source security qualification
+
+[Identity #32](https://github.com/tiangong-lca/identity-center/issues/32) owns
+qualification of the original [PR #31](https://github.com/tiangong-lca/identity-center/pull/31).
+The candidate retains original bot commit `f7d226537190b3564f6a0a73e50337df350433ac`
+and the current Main ancestor `ad919dc935fea2a5cdee0349d01440b139e406d7`.
+Dependency checkpoint `1317a4724ceb0229523199a9dddaebd2497283be` selects
+Next and eslint-config-next **16.4.2** together, preserving React/DOM **19.2.4**,
+next-auth **5.0.0-beta.32**, next-intl **4.13.1**, Node22, the exact pnpm11.9.0
+package-manager integrity and existing workspace build approvals.
+
+### Version and compatibility evidence
+
+Context7 retrieval reached its monthly quota, so verification used the official
+[Next 16 upgrade guide](https://nextjs.org/docs/app/guides/upgrading/version-16),
+[16.4 announcement](https://nextjs.org/blog/next-16-4), the selected package's
+bundled `next/dist/docs/` guides, and npm's package metadata for
+[next](https://registry.npmjs.org/next/16.4.2),
+[eslint-config-next](https://registry.npmjs.org/eslint-config-next/16.4.2),
+[next-auth](https://registry.npmjs.org/next-auth/5.0.0-beta.32) and
+[next-intl](https://registry.npmjs.org/next-intl/4.13.1).
+Next16.4.2 was the latest stable target checked on 2026-10-17. Its Node>=20.9.0
+and React/DOM^19 peer ranges permit the existing runtime and React pins;
+the retained auth and internationalization packages also permit Next^16 and
+React^19. New Cache Components or prefetching flags are not introduced.
+
+Exact-version GitHub advisory queries returned seven Next16.3.5 advisories:
+critical [next/og RCE](https://github.com/advisories/GHSA-vcvr-r3jv-pc5j),
+high [image SSRF](https://github.com/advisories/GHSA-cjq9-62q9-8jv4),
+medium [Draft Mode cache leakage](https://github.com/advisories/GHSA-3w37-wq28-93x7),
+[SSG/ISR poisoning](https://github.com/advisories/GHSA-4jqv-mc3x-m676),
+[metadata image disclosure](https://github.com/advisories/GHSA-f87g-xv8r-7p7x),
+[cross-user cache substitution](https://github.com/advisories/GHSA-mcj8-r9mp-w47p),
+and low [development MCP disclosure](https://github.com/advisories/GHSA-39w2-rjm5-chcv).
+Exact16.3.8 and16.4.2 queries returned zero. The original maintenance target
+already fixes those returned baseline advisories;16.4.2 also satisfies the
+latest compatible minor target. Package-level advisory matching is not proof
+that this application's configured deployment exposes each triggering feature,
+and these queries do not constitute a full transitive-graph security audit.
+
+### Local proof and its limits
+
+The existing maintenance-guide commands passed with Node22.23.2 and pnpm11.9.0:
+real frozen installation under the unchanged release-age policy, lint, typecheck,
+all **82 unit tests in 22 files**, and the standalone Turbopack build. The build
+used a clean process environment with no service/auth variables or environment
+files and generated the existing dynamic routes without starting the app server.
+The previous baseline-browser-mapping2.11.29 age rejection did not recur;
+no policy exception or reduced cutoff was used.
+
+An external offline probe consumed the generated standalone Next16.4.2 and
+React/DOM19.2.4 modules, rendered static React markup and constructed a NextResponse.
+It verified actual peer ranges, unchanged application configuration/workflow and
+build approvals, preserved unrelated direct resolutions, and the seven affected
+baseline advisory ranges against the selected target. The vulnerable16.3.5
+control matches all seven; neither16.3.8 nor16.4.2 matches them. No live exploit,
+HTTP request, OIDC operation, database, Redis, MQ or container was involved.
+
+Compared with the original bot head, the generated lock adds only Next,
+eslint-config-next and @next packages at16.4.2, updates their peer references,
+and prunes the unused array-includes3.1.9 entry in favor of the already locked
+3.2.0 resolution. The TypeScript ESLint family remains8.62.1; unrelated
+transitive upgrades from an exploratory update resolution were discarded.
+
+The unchanged `ci.yml` is the only source workflow and runs secretless PR/Main
+quality checks. There is no Main-triggered deployment workflow. Local build and
+offline proof do not qualify deployed startup, a container image, OIDC transport,
+live admission/event synchronization or production identity behavior. No such
+operation is authorized by this source change. Native and independent auto-merge
+must stay disabled; fresh exact-head hosted CI and independent review precede
+manual merge, followed by exact eligible child-commit integration in the workspace.
