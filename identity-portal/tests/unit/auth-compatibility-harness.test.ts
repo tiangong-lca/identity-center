@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { assertFixture, assertHostedContext, assertLocalOrigin, cleanEnvironment, composeDocument, IMAGE_TAGS, ownedLifecycle, redactor, lineRedactor, attemptCleanup } from '../auth-compatibility/contract.mjs'
+import { assertFixture, assertHostedContext, assertLocalOrigin, cleanEnvironment, composeDocument, IMAGE_TAGS, ownedLifecycle, redactor, lineRedactor, attemptCleanup, assertProductDelta } from '../auth-compatibility/contract.mjs'
 
 function fixture() {
   const nonce = 'a'.repeat(20)
@@ -121,4 +121,11 @@ it('the actual orchestrator rejects local invocation before a Docker transport c
     })).toThrow()
     expect(fs.existsSync(marker)).toBe(false)
   } finally { fs.rmSync(tmp, { recursive: true, force: true }) }
+})
+
+
+it('allows governed review metadata without admitting product or deployment-policy rewrites', () => {
+  expect(() => assertProductDelta('deploy/runbooks/README.md', '---\nreview: old\n---\nmanual deployment', '---\nreview: new\n---\nmanual deployment')).not.toThrow()
+  expect(() => assertProductDelta('deploy/runbooks/README.md', '---\nreview: old\n---\nmanual deployment', '---\nreview: new\n---\nautomatic deployment')).toThrow()
+  expect(() => assertProductDelta('lib/auth/auth-config.ts', 'old', 'new')).toThrow()
 })

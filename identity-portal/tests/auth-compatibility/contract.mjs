@@ -162,6 +162,12 @@ export async function ownedLifecycle(setup, run, cleanup) {
   }
 }
 
+export function assertProductDelta(file, before, after) {
+  assert.match(file, /\.md$/, 'Application/server source changes require another scope')
+  const body = value => value.replace(/^---\r?\n[\s\S]*?\r?\n---\r?\n/, '')
+  assert.equal(body(after), body(before), 'Only reviewed frontmatter may differ in runtime-area documents')
+}
+
 export function compareReceipts(baseline, candidate) {
   assert.deepEqual(candidate.images, baseline.images, 'Both runtimes must use the same immutable images')
   assert.deepEqual(candidate.transport, baseline.transport, 'Unexpected auth/diagnostic compatibility delta')

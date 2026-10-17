@@ -7,7 +7,7 @@ import http from 'node:http'
 import net from 'node:net'
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
-import { assertHostedContext, assertFixture, BASELINE, IMAGE_TAGS, composeDocument, cleanEnvironment, redactor, lineRedactor, attemptCleanup, ownedLifecycle, compareReceipts } from './contract.mjs'
+import { assertHostedContext, assertFixture, BASELINE, IMAGE_TAGS, composeDocument, cleanEnvironment, redactor, lineRedactor, attemptCleanup, ownedLifecycle, compareReceipts, assertProductDelta } from './contract.mjs'
 
 const sourceRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../../..')
 const infraEnv = Object.fromEntries(['PATH', 'HOME', 'USER', 'LANG'].filter(k => process.env[k]).map(k => [k, process.env[k]]))
@@ -299,7 +299,9 @@ async function main() {
   output = path.join(process.env.RUNNER_TEMP, `identity34-evidence-${process.env.GITHUB_RUN_ID}-${process.env.GITHUB_RUN_ATTEMPT}`)
   fs.mkdirSync(output, { mode: 0o700 })
   const changedProduct = git('diff', '--name-only', BASELINE, head, '--', 'identity-portal/app', 'identity-portal/lib', 'identity-portal/server', 'identity-portal/components', 'identity-portal/features', 'identity-portal/db', 'identity-portal/scripts', 'identity-portal/deploy', 'identity-portal/messages', 'identity-portal/next.config.ts', 'identity-portal/proxy.ts')
-  assert.equal(changedProduct, '', 'This proof does not authorize product or server policy changes')
+  for (const file of changedProduct ? changedProduct.split('\n') : []) {
+    assertProductDelta(file, git('show', `${BASELINE}:${file}`), git('show', `${head}:${file}`))
+  }
   const expectedManifest = JSON.parse(git('show', `${BASELINE}:identity-portal/package.json`))
   expectedManifest.dependencies['@keycloak/keycloak-admin-client'] = '^26.8.1'
   expectedManifest.dependencies.jose = '^6.2.12'
