@@ -64,6 +64,7 @@ ownership:
           - identity-portal/postcss.config.mjs
           - identity-portal/tsconfig.json
           - .github/workflows/ci.yml
+          - .github/workflows/auth-compatibility.yml
           - identity-portal/pnpm-lock.yaml
           - identity-portal/pnpm-workspace.yaml
       ownerRepo: identity-center
@@ -146,6 +147,7 @@ routing:
       paths:
         - identity-portal/deploy/**
         - .github/workflows/ci.yml
+        - .github/workflows/auth-compatibility.yml
         - docs/design/03-governance/02-deployment-operations-design/README.md
     business-app-onboarding:
       paths:
@@ -160,6 +162,7 @@ routing:
         - identity-portal/playwright.config.ts
         - identity-portal/eslint.config.mjs
         - .github/workflows/ci.yml
+        - .github/workflows/auth-compatibility.yml
         - docs/implementation/definition-of-done.md
     repo-docs:
       paths:
@@ -206,6 +209,7 @@ coverage:
     - identity-platform-admin/**
     - .design_library/**
     - .github/workflows/ci.yml
+    - .github/workflows/auth-compatibility.yml
     - .github/dependabot.yml
     - identity-portal/pnpm-lock.yaml
     - identity-portal/pnpm-workspace.yaml
@@ -435,6 +439,8 @@ rules:
       - path: identity-portal/lib/config/**
         kind: runtime-config
       - path: .github/workflows/ci.yml
+        kind: ci
+      - path: .github/workflows/auth-compatibility.yml
         kind: ci
     requiredDocs:
       - path: .docpact/config.yaml
