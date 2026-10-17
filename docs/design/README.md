@@ -10,9 +10,9 @@ whenToUpdate: 设计文档集目录结构、评审状态或收录范围发生变
 checkPaths:
   - docs/design/README.md
   - docs/README.md
-lastReviewedAt: 2026-10-16
-lastReviewedCommit: cdfa62c942d929ab84dbd5d3a27ce43380495732
-lastReviewedNote: "Identity25: reviewed bounded npm/Actions monitoring and existing secretless PR quality reuse; Docker-image qualification remains an explicit prerequisite. Design bodies, identity contracts and production inputs are unchanged."
+lastReviewedAt: 2026-10-17
+lastReviewedCommit: 118bc49b8866071a315f76e877e8fb57b943c732
+lastReviewedNote: "Identity #34: reviewed the minimal Keycloak admin 26.8.1/jose 6.2.12 graph and test-only hosted baseline/candidate auth harness. Local frozen install, lint, typecheck, 93 unit tests and standalone build pass; actual hosted Docker/OIDC/JWKS/Redis proof and independent review remain pending. Product/design bodies, production inputs, server version lines and the known SID-only baseline limitation are unchanged."
 ---
 
 # 统一身份与用户门户设计文档集

@@ -1,8 +1,8 @@
 version: 1
 layout: repo
-lastReviewedAt: "2026-10-17"
-lastReviewedCommit: "1317a4724ceb0229523199a9dddaebd2497283be"
-lastReviewedNote: "Identity #32: reviewed Next/eslint-config-next 16.4.2 and the minimal generated graph at 1317a47. Existing Node22/pnpm11.9, build approvals, secretless CI, gates and governance rules remain unchanged; local install/lint/typecheck/82 unit tests/standalone build pass. Independent review and exact-head CI remain pending; no deployment or live identity qualification is claimed."
+lastReviewedAt: 2026-10-17
+lastReviewedCommit: 90dee7e9728ac60ce72407894e79def9e0eb670e
+lastReviewedNote: "Identity #34 focused expiry review: test-only fixtures now distinguish stale iat from fresh-iat/past-exp rejection. Actual RS256 local controls, 13 targeted unit tests, lint and typecheck pass; new exact-head hosted handler/Redis proof remains pending. Runtime policy, dependencies, workflows and product semantics are unchanged; SID-only follow-up #35 remains separate and cancellation is static-reviewed only."
 
 # Repo-local docpact governance for identity-center.
 # The workspace root config governs the submodule pointer and cross-repo view;
@@ -64,6 +64,7 @@ ownership:
           - identity-portal/postcss.config.mjs
           - identity-portal/tsconfig.json
           - .github/workflows/ci.yml
+          - .github/workflows/auth-compatibility.yml
           - identity-portal/pnpm-lock.yaml
           - identity-portal/pnpm-workspace.yaml
       ownerRepo: identity-center
@@ -146,6 +147,7 @@ routing:
       paths:
         - identity-portal/deploy/**
         - .github/workflows/ci.yml
+        - .github/workflows/auth-compatibility.yml
         - docs/design/03-governance/02-deployment-operations-design/README.md
     business-app-onboarding:
       paths:
@@ -160,6 +162,7 @@ routing:
         - identity-portal/playwright.config.ts
         - identity-portal/eslint.config.mjs
         - .github/workflows/ci.yml
+        - .github/workflows/auth-compatibility.yml
         - docs/implementation/definition-of-done.md
     repo-docs:
       paths:
@@ -206,6 +209,7 @@ coverage:
     - identity-platform-admin/**
     - .design_library/**
     - .github/workflows/ci.yml
+    - .github/workflows/auth-compatibility.yml
     - .github/dependabot.yml
     - identity-portal/pnpm-lock.yaml
     - identity-portal/pnpm-workspace.yaml
@@ -435,6 +439,8 @@ rules:
       - path: identity-portal/lib/config/**
         kind: runtime-config
       - path: .github/workflows/ci.yml
+        kind: ci
+      - path: .github/workflows/auth-compatibility.yml
         kind: ci
     requiredDocs:
       - path: .docpact/config.yaml

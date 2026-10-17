@@ -11,9 +11,9 @@ checkPaths:
   - identity-portal/deploy/runbooks/README.md
   - identity-portal/deploy/docker/**
   - identity-portal/deploy/runbooks/**
-lastReviewedAt: 2026-10-16
-lastReviewedCommit: cdfa62c942d929ab84dbd5d3a27ce43380495732
-lastReviewedNote: "Identity25: reviewed bounded npm/Actions monitoring and existing secretless PR quality reuse; Docker-image qualification remains an explicit prerequisite. Design bodies, identity contracts and production inputs are unchanged."
+lastReviewedAt: 2026-10-17
+lastReviewedCommit: 751d061991f63dd47dd805c377de49753aa5ef03
+lastReviewedNote: "Identity #34 follow-up: corrected the CI description to distinguish unchanged quality checks from pending hosted disposable auth proof. Production deployment authorization, image version lines and realm policy remain unchanged; the guard admits only this exact reviewed README body correction."
 ---
 
 # 统一身份平台 · 部署/启动/运行 Runbook
@@ -197,7 +197,13 @@ KES_ENABLED=1 KINGBASE_ADMIN_URL=postgres://kingbase:kingbase@localhost:15433/te
 ## 依赖监控边界
 
 npm/Actions 的维护入口见[依赖维护说明](../../../docs/guides/dependency-maintenance.md)。
-CI 仍只复用既有 secretless frozen-install/lint/typecheck/unit，不执行本手册的部署命令。
-本次未启动容器、未升级镜像、未改 realm/catalog 或生产输入；Docker/Compose 监控仍由
+既有 `ci.yml` quality 门保持 secretless frozen-install/lint/typecheck/unit。
+另有按相关 PR 输入触发的 `auth-compatibility.yml`，在 GitHub-hosted Ubuntu 上，
+用同一固定摘要的临时 PostgreSQL17、Keycloak26.5 与已认证 Redis7，执行基线/候选
+隔离启动、realm bootstrap、迁移、standalone build、真实浏览器 OIDC/PKCE、
+JWKS/backchannel/Redis 与会话拒绝验证及资源清理；首次 hosted 执行仍待完成。
+两个工作流均不授权或执行本手册的生产部署命令，也不使用生产凭据。
+本地 source/unit/build 检查未启动 Docker；服务镜像版本线、realm/catalog 生产策略与
+生产输入未改。Docker/Compose 监控仍由
 [Identity #26](https://github.com/tiangong-lca/identity-center/issues/26) 承担；该任务处于 Ready，
 尚未开始，必须先证明隔离启动、真实集成负例和资源清理，不能据此宣称镜像覆盖或激活。

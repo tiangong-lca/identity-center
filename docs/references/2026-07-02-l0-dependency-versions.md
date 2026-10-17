@@ -166,3 +166,46 @@ live admission/event synchronization or production identity behavior. No such
 operation is authorized by this source change. Native and independent auto-merge
 must stay disabled; fresh exact-head hosted CI and independent review precede
 manual merge, followed by exact eligible child-commit integration in the workspace.
+
+
+## 2026-10-17 auth-client source and harness qualification
+
+Identity #34 composes original PR #30 onto accepted Main
+`d9b4827c961967fe16ef31c365025049c7ff8802`, retaining original
+`a73d785c1388b0ac97c281e5b9d47d5ce52a8987` as an ancestor. Official npm metadata
+still identifies Keycloak admin **26.8.1** and jose **6.2.12** as latest stable.
+The Keycloak client requires Node>=18; the existing Node22 track satisfies it.
+Context7 remained quota-blocked, so official registry/changelog/action sources
+provided the fallback. Package integrity was verified against official archives;
+all 360 installed Keycloak-client files and 80 jose files match those bytes.
+
+Only these two package records and their importer/snapshot references change.
+The two shared jose edges are Auth.js core and the already-selected MCP SDK.
+All 1020 other package records remain exact. The unrelated original PostCSS
+rollback and URI-template refresh are excluded: PostCSS8.5.30 and URI-template
+2.0.10 remain. Next/eslint16.4.2, React/DOM19.2.4, NextAuth beta.32, Zod, all
+Kiota preview103 selections, pnpm11.9 integrity/build approvals/release-age policy,
+product0.1.0 and server image version lines are preserved.
+
+Local clean-environment frozen install, lint, typecheck, **93 unit tests in 23
+files** (including11 harness safety/cleanup/workflow tests) and standalone build
+pass. The pure tests verify hosted-only execution, endpoint/resource ownership,
+credential isolation and redaction, cleanup continuation, and the concrete
+secretless workflow. They do not start Docker or prove auth transports. Early
+helper import/type-check failures are preserved and corrected without application
+changes. No service, real account, production API or database was used locally.
+
+New workflow dependencies were freshly verified at their latest stable releases
+and pinned to upstream executable commits: checkout7.0.1, setup-node7.1.0,
+pnpm/action-setup6.1.0 (whose current action contract supports pnpm11), and
+upload-artifact7.0.2. This affects the new proof workflow only; existing `ci.yml`
+is unchanged. Actual hosted baseline/candidate Docker startup, image/digest
+binding, browser/OIDC/JWKS/backchannel/Redis behavior, cleanup receipts and
+independent review remain pending. No runtime result or source delivery is claimed.
+
+The known baseline SID-only revocation mismatch is characterized separately by
+the test harness and is not silently fixed or attributed to this dependency bump.
+The real provider's token shape and explicit owner judgment determine acceptance
+of the covered logout scenario. Server-image upgrades, full-image monitoring,
+production configuration, deployment and external business identity flows remain
+outside this source task.

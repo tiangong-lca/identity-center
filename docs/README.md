@@ -12,8 +12,8 @@ checkPaths:
   - docs/design/README.md
   - docs/implementation/README.md
 lastReviewedAt: 2026-10-17
-lastReviewedCommit: 1317a4724ceb0229523199a9dddaebd2497283be
-lastReviewedNote: "Identity #32: reviewed the bounded Next/eslint-config-next 16.4.2 source qualification at 1317a47. Existing ownership, identity invariants, delivery scope, acceptance and production boundaries remain unchanged; local install/lint/typecheck/unit/standalone-build proof does not establish live/container/OIDC behavior or complete source delivery."
+lastReviewedCommit: 90dee7e9728ac60ce72407894e79def9e0eb670e
+lastReviewedNote: "Identity #34 focused expiry review: test-only fixtures now distinguish stale iat from fresh-iat/past-exp rejection. Actual RS256 local controls, 13 targeted unit tests, lint and typecheck pass; new exact-head hosted handler/Redis proof remains pending. Runtime policy, dependencies, workflows and product semantics are unchanged; SID-only follow-up #35 remains separate and cancellation is static-reviewed only."
 ---
 
 # Identity Platform 文档
