@@ -3,6 +3,7 @@ import Redis from 'ioredis'
 import { SignJWT, type JWTPayload } from 'jose'
 import { fixture, receipt } from './fixture'
 import { localJwks } from './local-jwks'
+import { timeNegatives } from './time-claims'
 
 const event = 'http://schemas.openid.net/event/backchannel-logout'
 
@@ -43,7 +44,7 @@ test('real route/JWKS/Redis controls and separately recorded baseline SID limita
     const negatives: Array<[string, JWTPayload]> = [
       ['issuer', { ...base('issuer'), iss: `${jwks.issuer}-wrong` }],
       ['audience', { ...base('audience'), aud: 'other-client' }],
-      ['expired', { ...base('expired'), iat: Math.floor(Date.now() / 1000) - 600 }],
+      ...timeNegatives(base, Math.floor(Date.now() / 1000)),
       ['nonce', { ...base('nonce'), nonce: 'forbidden' }],
       ['events', { ...base('events'), events: {} }],
       ['no-identity', { ...base('no-identity'), sub: undefined }],

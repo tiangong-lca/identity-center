@@ -1,8 +1,8 @@
 version: 1
 layout: repo
 lastReviewedAt: 2026-10-17
-lastReviewedCommit: 118bc49b8866071a315f76e877e8fb57b943c732
-lastReviewedNote: "Identity #34: reviewed the minimal Keycloak admin 26.8.1/jose 6.2.12 graph and test-only hosted baseline/candidate auth harness. Local frozen install, lint, typecheck, 93 unit tests and standalone build pass; actual hosted Docker/OIDC/JWKS/Redis proof and independent review remain pending. Product/design bodies, production inputs, server version lines and the known SID-only baseline limitation are unchanged."
+lastReviewedCommit: 90dee7e9728ac60ce72407894e79def9e0eb670e
+lastReviewedNote: "Identity #34 focused expiry review: test-only fixtures now distinguish stale iat from fresh-iat/past-exp rejection. Actual RS256 local controls, 13 targeted unit tests, lint and typecheck pass; new exact-head hosted handler/Redis proof remains pending. Runtime policy, dependencies, workflows and product semantics are unchanged; SID-only follow-up #35 remains separate and cancellation is static-reviewed only."
 
 # Repo-local docpact governance for identity-center.
 # The workspace root config governs the submodule pointer and cross-repo view;

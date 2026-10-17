@@ -1,5 +1,29 @@
 import { describe, expect, it } from 'vitest'
+import { generateKeyPair, jwtVerify, SignJWT, type JWTPayload } from 'jose'
 import { assertFixture, assertHostedContext, assertLocalOrigin, cleanEnvironment, composeDocument, IMAGE_TAGS, ownedLifecycle, redactor, lineRedactor, attemptCleanup, assertProductDelta } from '../auth-compatibility/contract.mjs'
+import { timeNegatives } from '../auth-compatibility/time-claims'
+
+it('signs distinct stale-iat and past-exp inputs, with an otherwise accepted fresh-iat control', async () => {
+  const now = 1_792_224_000
+  const issuer = 'http://localhost:21001/realms/synthetic'
+  const base = (sub: string): JWTPayload => ({ iss: issuer, aud: 'user-portal', sub, iat: now })
+  const { privateKey, publicKey } = await generateKeyPair('RS256')
+  const sign = (claims: JWTPayload) => new SignJWT(claims).setProtectedHeader({ alg: 'RS256' }).sign(privateKey)
+  // The real handler's verification options, with a fixed clock only for this unit control.
+  const options = { algorithms: ['RS256'], issuer, maxTokenAge: '2m', currentDate: new Date(now * 1000) }
+  const cases = timeNegatives(base, now)
+  expect(cases.map(([name]) => name)).toEqual(['stale-iat', 'expired-exp'])
+  expect(cases[0][1]).not.toHaveProperty('exp')
+  expect(cases[1][1]).toMatchObject({ iat: now, exp: now - 600 })
+  for (const [name, claims] of cases) {
+    await expect(jwtVerify(await sign(claims), publicKey, options), name).rejects.toMatchObject({
+      code: 'ERR_JWT_EXPIRED', claim: name === 'stale-iat' ? 'iat' : 'exp', reason: 'check_failed',
+    })
+  }
+  const fresh = { ...cases[1][1] }
+  delete fresh.exp
+  await expect(jwtVerify(await sign(fresh), publicKey, options)).resolves.toMatchObject({ payload: fresh })
+})
 
 function fixture() {
   const nonce = 'a'.repeat(20)
