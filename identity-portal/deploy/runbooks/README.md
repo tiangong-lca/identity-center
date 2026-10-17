@@ -12,8 +12,8 @@ checkPaths:
   - identity-portal/deploy/docker/**
   - identity-portal/deploy/runbooks/**
 lastReviewedAt: 2026-10-17
-lastReviewedCommit: 751d061991f63dd47dd805c377de49753aa5ef03
-lastReviewedNote: "Identity #34 follow-up: corrected the CI description to distinguish unchanged quality checks from pending hosted disposable auth proof. Production deployment authorization, image version lines and realm policy remain unchanged; the guard admits only this exact reviewed README body correction."
+lastReviewedCommit: 2019c74d474dae391f99a665dee27b15fec4bd96
+lastReviewedNote: "Identity #36 / original #28: reviewed the sole ordinary-CI checkout v7.0.1 immutable pin on accepted Main 2019c74d. Exact PR source, read-only credentials, Node22/pnpm11.9 frozen quality gates and production authorization are preserved. Product, auth harness, image inputs and document bodies are unchanged; fresh hosted quality, independent review and integration remain required."
 ---
 
 # 统一身份平台 · 部署/启动/运行 Runbook

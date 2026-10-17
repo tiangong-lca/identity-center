@@ -12,8 +12,8 @@ checkPaths:
   - GOAL.md
   - docs/design/README.md
 lastReviewedAt: 2026-10-17
-lastReviewedCommit: 90dee7e9728ac60ce72407894e79def9e0eb670e
-lastReviewedNote: "Identity #34 focused expiry review: test-only fixtures now distinguish stale iat from fresh-iat/past-exp rejection. Actual RS256 local controls, 13 targeted unit tests, lint and typecheck pass; new exact-head hosted handler/Redis proof remains pending. Runtime policy, dependencies, workflows and product semantics are unchanged; SID-only follow-up #35 remains separate and cancellation is static-reviewed only."
+lastReviewedCommit: 2019c74d474dae391f99a665dee27b15fec4bd96
+lastReviewedNote: "Identity #36 / original #28: reviewed the sole ordinary-CI checkout v7.0.1 immutable pin on accepted Main 2019c74d. Exact PR source, read-only credentials, Node22/pnpm11.9 frozen quality gates and production authorization are preserved. Product, auth harness, image inputs and document bodies are unchanged; fresh hosted quality, independent review and integration remain required."
 ---
 
 # 统一身份平台实施方案

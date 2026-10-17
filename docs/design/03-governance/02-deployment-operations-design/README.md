@@ -12,8 +12,8 @@ checkPaths:
   - identity-portal/deploy/**
   - identity-portal/lib/config/**
 lastReviewedAt: 2026-10-17
-lastReviewedCommit: 118bc49b8866071a315f76e877e8fb57b943c732
-lastReviewedNote: "Identity #34: reviewed the minimal Keycloak admin 26.8.1/jose 6.2.12 graph and test-only hosted baseline/candidate auth harness. Local frozen install, lint, typecheck, 93 unit tests and standalone build pass; actual hosted Docker/OIDC/JWKS/Redis proof and independent review remain pending. Product/design bodies, production inputs, server version lines and the known SID-only baseline limitation are unchanged."
+lastReviewedCommit: 2019c74d474dae391f99a665dee27b15fec4bd96
+lastReviewedNote: "Identity #36 / original #28: reviewed the sole ordinary-CI checkout v7.0.1 immutable pin on accepted Main 2019c74d. Exact PR source, read-only credentials, Node22/pnpm11.9 frozen quality gates and production authorization are preserved. Product, auth harness, image inputs and document bodies are unchanged; fresh hosted quality, independent review and integration remain required."
 ---
 
 # 10. 部署与运维设计
