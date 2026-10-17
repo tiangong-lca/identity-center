@@ -12,8 +12,8 @@ checkPaths:
   - docs/design/README.md
   - docs/implementation/README.md
 lastReviewedAt: 2026-10-17
-lastReviewedCommit: 1317a4724ceb0229523199a9dddaebd2497283be
-lastReviewedNote: "Identity #32: reviewed the bounded Next/eslint-config-next 16.4.2 source qualification at 1317a47. Existing ownership, identity invariants, delivery scope, acceptance and production boundaries remain unchanged; local install/lint/typecheck/unit/standalone-build proof does not establish live/container/OIDC behavior or complete source delivery."
+lastReviewedCommit: 118bc49b8866071a315f76e877e8fb57b943c732
+lastReviewedNote: "Identity #34: reviewed the minimal Keycloak admin 26.8.1/jose 6.2.12 graph and test-only hosted baseline/candidate auth harness. Local frozen install, lint, typecheck, 93 unit tests and standalone build pass; actual hosted Docker/OIDC/JWKS/Redis proof and independent review remain pending. Product/design bodies, production inputs, server version lines and the known SID-only baseline limitation are unchanged."
 ---
 
 # Identity Platform 文档

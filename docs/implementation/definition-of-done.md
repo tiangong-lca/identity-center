@@ -11,8 +11,8 @@ checkPaths:
   - docs/implementation/definition-of-done.md
   - GOAL.md
 lastReviewedAt: 2026-10-17
-lastReviewedCommit: 1317a4724ceb0229523199a9dddaebd2497283be
-lastReviewedNote: "Identity #32: reviewed the existing DoD against Next/eslint-config-next 16.4.2 at 1317a47. Local frozen install/lint/typecheck/82 unit tests/standalone build and offline package checks pass; these do not refresh the historical integration/e2e/deployment evidence or claim live identity qualification. DoD criteria remain unchanged; fresh CI and independent review remain pending."
+lastReviewedCommit: 118bc49b8866071a315f76e877e8fb57b943c732
+lastReviewedNote: "Identity #34: reviewed the minimal Keycloak admin 26.8.1/jose 6.2.12 graph and test-only hosted baseline/candidate auth harness. Local frozen install, lint, typecheck, 93 unit tests and standalone build pass; actual hosted Docker/OIDC/JWKS/Redis proof and independent review remain pending. Product/design bodies, production inputs, server version lines and the known SID-only baseline limitation are unchanged."
 ---
 
 # 完成定义(DoD)核对 — GOAL.md §7

@@ -12,8 +12,8 @@ checkPaths:
   - identity-portal/pnpm-lock.yaml
   - docs/guides/dependency-maintenance.md
 lastReviewedAt: 2026-10-17
-lastReviewedCommit: 1317a4724ceb0229523199a9dddaebd2497283be
-lastReviewedNote: "Identity #32: reviewed Next/eslint-config-next 16.4.2 at 1317a47 with the original PR history preserved. The real frozen install passes unchanged release-age policy; lint/typecheck/82 unit tests/standalone build and offline package consumption pass. Auth/React/Intl/runtime pins and build approvals remain unchanged. Exact-head CI, review and manual source delivery remain pending; no live/container/OIDC qualification is claimed."
+lastReviewedCommit: 118bc49b8866071a315f76e877e8fb57b943c732
+lastReviewedNote: "Identity #34: reviewed the minimal Keycloak admin 26.8.1/jose 6.2.12 graph and test-only hosted baseline/candidate auth harness. Local frozen install, lint, typecheck, 93 unit tests and standalone build pass; actual hosted Docker/OIDC/JWKS/Redis proof and independent review remain pending. Product/design bodies, production inputs, server version lines and the known SID-only baseline limitation are unchanged."
 ---
 
 # Dependency maintenance
@@ -73,6 +73,42 @@ The bounded [2026-10-17 Next qualification](../references/2026-07-02-l0-dependen
 records the selected framework/lint versions, preserved compatibility pins and
 local source-only evidence for Identity #32 / original PR #31. It does not
 replace fresh hosted CI, independent review or required workspace integration.
+
+## Bounded auth-client interoperability proof (Identity #34)
+
+The separate `auth-compatibility.yml` PR workflow is scoped to dependency and
+its own test inputs. It preserves the existing `ci.yml` quality job and uses an
+exact-head checkout, read-only permissions and pinned verified action commits.
+Node22 and the exact pnpm11.9 manifest declaration remain the application tools.
+No production secret, deployment environment, external IdP or main-push operation
+is part of this job.
+
+The [test harness](../../identity-portal/tests/auth-compatibility/README.md)
+compares accepted baseline `d9b4827c961967fe16ef31c365025049c7ff8802` with the
+composed candidate. It uses the same recorded immutable PostgreSQL17,
+Keycloak26.5 and authenticated Redis7 images, with independent synthetic realms,
+project names, ports, networks and storage. Existing admin/PKCE tests are followed
+by actual standalone Auth.js browser login, real signed backchannel/JWKS/Redis
+revocation and pre-existing-session denial. Controlled JWT/JWKS/Redis negatives
+are separate from that real provider flow. Process, Docker and inventory cleanup
+are all attempted even if another cleanup action fails; only sanitized receipts
+are retained. A deliberately unhealthy fixture checks failure cleanup.
+
+The local orchestrator refuses Docker activation. Local daemon sockets are absent;
+starting an engine could restart unobserved resources. Local unit/build success
+therefore does not claim the hosted protocol proof has run. First exact-head
+hosted execution, independent review and source/integration delivery remain
+required. The proof is npm-client interoperability, not completion of Identity #26.
+
+SID-only logout remains a recorded baseline limit: the handler writes a SID marker
+but session polling checks subject markers. The harness observes both versions
+without claiming that path is fixed or library-caused. Real Keycloak token shape
+must establish the covered logout scenario, and any remaining limit needs explicit
+owner disposition. No product behavior or realm policy is changed for the test.
+
+The [dated dependency record](../references/2026-07-02-l0-dependency-versions.md#2026-10-17-auth-client-source-and-harness-qualification)
+records selected artifacts, graph preservation and the distinction between local
+checks and pending hosted interoperability evidence.
 
 ## Docker and Compose prerequisite
 

@@ -1,8 +1,8 @@
 version: 1
 layout: repo
-lastReviewedAt: "2026-10-17"
-lastReviewedCommit: "1317a4724ceb0229523199a9dddaebd2497283be"
-lastReviewedNote: "Identity #32: reviewed Next/eslint-config-next 16.4.2 and the minimal generated graph at 1317a47. Existing Node22/pnpm11.9, build approvals, secretless CI, gates and governance rules remain unchanged; local install/lint/typecheck/82 unit tests/standalone build pass. Independent review and exact-head CI remain pending; no deployment or live identity qualification is claimed."
+lastReviewedAt: 2026-10-17
+lastReviewedCommit: 118bc49b8866071a315f76e877e8fb57b943c732
+lastReviewedNote: "Identity #34: reviewed the minimal Keycloak admin 26.8.1/jose 6.2.12 graph and test-only hosted baseline/candidate auth harness. Local frozen install, lint, typecheck, 93 unit tests and standalone build pass; actual hosted Docker/OIDC/JWKS/Redis proof and independent review remain pending. Product/design bodies, production inputs, server version lines and the known SID-only baseline limitation are unchanged."
 
 # Repo-local docpact governance for identity-center.
 # The workspace root config governs the submodule pointer and cross-repo view;

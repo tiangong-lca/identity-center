@@ -12,8 +12,8 @@ checkPaths:
   - GOAL.md
   - docs/design/README.md
 lastReviewedAt: 2026-10-17
-lastReviewedCommit: 1317a4724ceb0229523199a9dddaebd2497283be
-lastReviewedNote: "Identity #32: reviewed the bounded Next/eslint-config-next 16.4.2 source dependency change at 1317a47. Existing secretless gates and acceptance contracts remain unchanged; local frozen install/lint/typecheck/82 unit tests/standalone build pass. No application, auth, transport or production behavior change is authored, and no live/container/OIDC proof is claimed."
+lastReviewedCommit: 118bc49b8866071a315f76e877e8fb57b943c732
+lastReviewedNote: "Identity #34: reviewed the minimal Keycloak admin 26.8.1/jose 6.2.12 graph and test-only hosted baseline/candidate auth harness. Local frozen install, lint, typecheck, 93 unit tests and standalone build pass; actual hosted Docker/OIDC/JWKS/Redis proof and independent review remain pending. Product/design bodies, production inputs, server version lines and the known SID-only baseline limitation are unchanged."
 ---
 
 # 统一身份平台实施方案
