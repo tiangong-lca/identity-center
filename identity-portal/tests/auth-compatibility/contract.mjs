@@ -1,4 +1,5 @@
 import assert from 'node:assert/strict'
+import { createHash } from 'node:crypto'
 
 export const BASELINE = 'd9b4827c961967fe16ef31c365025049c7ff8802'
 export const REPOSITORY = 'tiangong-lca/identity-center'
@@ -165,7 +166,13 @@ export async function ownedLifecycle(setup, run, cleanup) {
 export function assertProductDelta(file, before, after) {
   assert.match(file, /\.md$/, 'Application/server source changes require another scope')
   const body = value => value.replace(/^---\r?\n[\s\S]*?\r?\n---\r?\n/, '')
-  assert.equal(body(after), body(before), 'Only reviewed frontmatter may differ in runtime-area documents')
+  if (body(after) === body(before)) return
+  // Exact non-executable CI-description correction reviewed for Identity #34.
+  // No other runbook body or executable/configuration change is admitted.
+  assert.equal(file, 'identity-portal/deploy/runbooks/README.md')
+  const digest = value => createHash('sha256').update(body(value).trim()).digest('hex')
+  assert.equal(digest(before), '2531b2c5f61601e571fd3ba1734da758fc0708656929684dea3dd63295f47b37', 'Unexpected original runbook body')
+  assert.equal(digest(after), 'aed127df51a5fe03bc24def2df602ecb58e16ffb884aadcc71885fbda06ef73c', 'Only the exact reviewed CI description may differ')
 }
 
 export function compareReceipts(baseline, candidate) {

@@ -129,3 +129,16 @@ it('allows governed review metadata without admitting product or deployment-poli
   expect(() => assertProductDelta('deploy/runbooks/README.md', '---\nreview: old\n---\nmanual deployment', '---\nreview: new\n---\nautomatic deployment')).toThrow()
   expect(() => assertProductDelta('lib/auth/auth-config.ts', 'old', 'new')).toThrow()
 })
+
+
+it('admits only the exact reviewed runbook CI correction, never deployment config or another document', () => {
+  const file = 'identity-portal/deploy/runbooks/README.md'
+  const root = path.resolve(__dirname, '../../..')
+  const before = execFileSync('git', ['-C', root, 'show', `d9b4827c961967fe16ef31c365025049c7ff8802:${file}`], { encoding: 'utf8' })
+  const after = fs.readFileSync(path.join(root, file), 'utf8')
+  expect(() => assertProductDelta(file, before, after)).not.toThrow()
+  expect(() => assertProductDelta(file, before, `${after}\nAllow production deployment.`)).toThrow()
+  expect(() => assertProductDelta('identity-portal/deploy/runbooks/deployment.md', before, after)).toThrow()
+  expect(() => assertProductDelta('identity-portal/deploy/docker/docker-compose.prod.yml', before, after)).toThrow()
+  expect(() => assertProductDelta(file, before.replace('Identity #26', 'Identity #99'), after)).toThrow()
+})
