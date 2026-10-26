@@ -3,7 +3,12 @@
 Identity #34 qualifies Keycloak admin26.8.1 and jose6.2.12 against accepted
 Main `d9b4827c961967fe16ef31c365025049c7ff8802`. This is test support; application
 behavior, server version lines, production Compose and existing quality CI stay
-unchanged. The first hosted run and independent review are pending.
+unchanged by #34. Identity #41 moves both fixture executions to Node24.22.1,
+updates the expected types24 manifest and admits only the exact reviewed Node24
+Dockerfile and runbook environment-row deltas. The Docker dependency stage also
+copies the existing pnpm workspace build approvals. Other executable product or
+deployment changes still fail closed; unit negatives protect these boundaries.
+Fresh exact-head hosted proof and independent review remain required.
 
 `.github/workflows/auth-compatibility.yml` runs only for related PR inputs,
 checks out the exact head and uses a read-only token. The Node orchestrator refuses

@@ -106,6 +106,7 @@ it('keeps hosted auth proof secretless, PR-head bound and absent from unrelated 
   expect(workflow.permissions).toEqual({ contents: 'read' })
   const job = workflow.jobs['auth-compatibility']
   expect(job['runs-on']).toBe('ubuntu-24.04')
+  expect(job.steps.find(step => step.uses?.startsWith('actions/setup-node@'))?.with?.['node-version']).toBe('24.22.1')
   expect(job.steps[0].with?.ref).toBe('${{ github.event.pull_request.head.sha }}')
   expect(job.steps[0].with?.['persist-credentials']).toBe(false)
   expect(source).not.toMatch(/secrets\.|pull_request_target|workflow_dispatch/)
@@ -171,4 +172,18 @@ it('admits only the exact reviewed runbook CI correction, never deployment confi
   expect(() => assertProductDelta('identity-portal/deploy/runbooks/deployment.md', before, after)).toThrow()
   expect(() => assertProductDelta('identity-portal/deploy/docker/docker-compose.prod.yml', before, after)).toThrow()
   expect(() => assertProductDelta(file, before.replace('Identity #26', 'Identity #99'), after)).toThrow()
+})
+
+it('admits the exact reviewed Node24 Dockerfile, rejects other image or build-policy changes', () => {
+  const file = 'identity-portal/deploy/docker/Dockerfile'
+  const original = JSON.parse(fs.readFileSync(path.resolve(__dirname, '../auth-compatibility/fixtures/dockerfile-before-node24.json'), 'utf8')) as { sourceCommit: string; sourcePath: string; content: string }
+  expect(original.sourceCommit).toBe('104135f3aae4d39cebef13a9f12abfc53daed376')
+  expect(original.sourcePath).toBe(file)
+  const after = fs.readFileSync(path.resolve(__dirname, '../../../', file), 'utf8')
+  expect(() => assertProductDelta(file, original.content, after)).not.toThrow()
+  for (const changed of [after.replace('24.22.1-alpine', '25-alpine'), after.replace(' pnpm-workspace.yaml', ''), `${after}\nRUN echo unreviewed\n`]) {
+    expect(() => assertProductDelta(file, original.content, changed)).toThrow()
+  }
+  expect(() => assertProductDelta(file, original.content.replace('22-alpine', '22-slim'), after)).toThrow()
+  expect(() => assertProductDelta('identity-portal/deploy/docker/docker-compose.prod.yml', original.content, after)).toThrow()
 })

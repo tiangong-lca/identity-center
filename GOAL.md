@@ -11,9 +11,9 @@ checkPaths:
   - GOAL.md
   - docs/implementation/README.md
   - docs/implementation/definition-of-done.md
-lastReviewedAt: 2026-10-17
-lastReviewedCommit: 2019c74d474dae391f99a665dee27b15fec4bd96
-lastReviewedNote: "Identity #36 / original #28: reviewed the sole ordinary-CI checkout v7.0.1 immutable pin on accepted Main 2019c74d. Exact PR source, read-only credentials, Node22/pnpm11.9 frozen quality gates and production authorization are preserved. Product, auth harness, image inputs and document bodies are unchanged; fresh hosted quality, independent review and integration remain required."
+lastReviewedAt: 2026-10-26
+lastReviewedCommit: 104135f3aae4d39cebef13a9f12abfc53daed376
+lastReviewedNote: "Identity #41: reviewed the explicitly authorized Node24.22.1/types24 runtime migration, preserved product scope and manual production authorization. Local source gates pass; exact-head hosted image/auth validation, independent review, merge and integration remain required."
 ---
 
 # GOAL — 统一身份平台一期全量交付

@@ -295,7 +295,7 @@ async function readinessFailureControl(root, images) {
 async function main() {
   const head = git('rev-parse', 'HEAD')
   assertHostedContext(process.env, process.platform, head)
-  assert.equal(process.versions.node.split('.')[0], '22', 'Preserve the owner Node22 track')
+  assert.equal(process.version, 'v24.22.1', 'Use the reviewed Node24 LTS runtime')
   output = path.join(process.env.RUNNER_TEMP, `identity34-evidence-${process.env.GITHUB_RUN_ID}-${process.env.GITHUB_RUN_ATTEMPT}`)
   fs.mkdirSync(output, { mode: 0o700 })
   const changedProduct = git('diff', '--name-only', BASELINE, head, '--', 'identity-portal/app', 'identity-portal/lib', 'identity-portal/server', 'identity-portal/components', 'identity-portal/features', 'identity-portal/db', 'identity-portal/scripts', 'identity-portal/deploy', 'identity-portal/messages', 'identity-portal/next.config.ts', 'identity-portal/proxy.ts')
@@ -305,6 +305,8 @@ async function main() {
   const expectedManifest = JSON.parse(git('show', `${BASELINE}:identity-portal/package.json`))
   expectedManifest.dependencies['@keycloak/keycloak-admin-client'] = '^26.8.1'
   expectedManifest.dependencies.jose = '^6.2.12'
+  expectedManifest.devDependencies['@types/node'] = '^24.19.2'
+  expectedManifest.engines = { node: '>=24.22.1 <25' }
   assert.deepEqual(JSON.parse(fs.readFileSync(path.join(sourceRoot, 'identity-portal/package.json'))), expectedManifest)
   const root = fs.mkdtempSync(path.join(process.env.RUNNER_TEMP, 'identity34-owned-'))
   const images = {}

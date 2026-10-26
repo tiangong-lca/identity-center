@@ -11,9 +11,9 @@ checkPaths:
   - identity-portal/deploy/runbooks/README.md
   - identity-portal/deploy/docker/**
   - identity-portal/deploy/runbooks/**
-lastReviewedAt: 2026-10-17
-lastReviewedCommit: 2019c74d474dae391f99a665dee27b15fec4bd96
-lastReviewedNote: "Identity #36 / original #28: reviewed the sole ordinary-CI checkout v7.0.1 immutable pin on accepted Main 2019c74d. Exact PR source, read-only credentials, Node22/pnpm11.9 frozen quality gates and production authorization are preserved. Product, auth harness, image inputs and document bodies are unchanged; fresh hosted quality, independent review and integration remain required."
+lastReviewedAt: 2026-10-26
+lastReviewedCommit: 104135f3aae4d39cebef13a9f12abfc53daed376
+lastReviewedNote: "Identity #41: reviewed Node24.22.1 runtime/CI/image inputs and types24.19.2; exact pnpm11.9 integrity, other dependency versions, product semantics and manual production authorization remain. Local frozen install, lint, typecheck, 96 units and standalone build pass. Fresh hosted image/auth proof, independent review, merge and integration remain required."
 ---
 
 # 统一身份平台 · 部署/启动/运行 Runbook
@@ -27,7 +27,7 @@ lastReviewedNote: "Identity #36 / original #28: reviewed the sole ordinary-CI ch
 | 依赖 | 版本 | 说明 |
 |---|---|---|
 | Docker + Compose | Docker 24+ / Compose v2 | 全部基础设施容器化 |
-| Node.js | ≥ 20(开发机 22/24 均可) | Next.js 16 要求 |
+| Node.js | 24.22.1 LTS（24.x） | `.nvmrc` 固定开发版本；CI、Portal/Worker 镜像与 `engines.node` 同步 |
 | pnpm | `packageManager` 声明版本 | 以 `identity-portal/package.json` 为唯一版本来源；可通过 Corepack 使用该版本 |
 | PostgreSQL client(可选) | 17 | 备份/恢复脚本用 `pg_dump/pg_restore` |
 

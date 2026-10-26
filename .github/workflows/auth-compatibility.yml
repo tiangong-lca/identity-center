@@ -3,6 +3,9 @@ name: Auth dependency compatibility
 on:
   pull_request:
     paths:
+      - .nvmrc
+      - identity-portal/deploy/docker/Dockerfile
+      - identity-portal/pnpm-workspace.yaml
       - identity-portal/package.json
       - identity-portal/pnpm-lock.yaml
       - identity-portal/tests/auth-compatibility/**
@@ -36,7 +39,50 @@ jobs:
           package_json_file: identity-portal/package.json
       - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
         with:
-          node-version: 22
+          node-version: 24.22.1
+      - name: Build and inspect isolated Node24 Portal and Worker images
+        shell: bash
+        run: |
+          set -euo pipefail
+          image_prefix="identity41-node24-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}"
+          evidence_dir="${RUNNER_TEMP}/identity41-image-evidence-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}"
+          mkdir -m 700 "$evidence_dir"
+          docker info >/dev/null
+          # Hosted-runner-only, synthetic build inputs; no push or deployment.
+          for target in runner worker; do
+            if docker image inspect "${image_prefix}:${target}" >/dev/null 2>&1; then
+              echo 'Refuse pre-existing image identity' >&2; exit 1
+            fi
+            if docker container inspect "${image_prefix}-${target}" >/dev/null 2>&1; then
+              echo 'Refuse pre-existing container identity' >&2; exit 1
+            fi
+          done
+          cleanup_images() {
+            trap - EXIT INT TERM
+            local cleanup_failed=0
+            docker info >/dev/null || cleanup_failed=1
+            for target in runner worker; do
+              if docker container inspect "${image_prefix}-${target}" >/dev/null 2>&1; then
+                docker rm -f "${image_prefix}-${target}" || cleanup_failed=1
+              fi
+              if docker image inspect "${image_prefix}:${target}" >/dev/null 2>&1; then
+                docker image rm "${image_prefix}:${target}" || cleanup_failed=1
+              fi
+              if docker container inspect "${image_prefix}-${target}" >/dev/null 2>&1 || docker image inspect "${image_prefix}:${target}" >/dev/null 2>&1; then
+                cleanup_failed=1
+              fi
+            done
+            printf '{"ownedImagesAndContainersRemoved":%s}\n' "$([ "$cleanup_failed" = 0 ] && echo true || echo false)" > "$evidence_dir/cleanup.json"
+            test "$cleanup_failed" = 0
+          }
+          trap 'original_exit=$?; if cleanup_images; then exit "$original_exit"; else exit 1; fi' EXIT
+          trap 'exit 130' INT
+          trap 'exit 143' TERM
+          for target in runner worker; do
+            docker build --label "org.tiangong.identity-proof=${image_prefix}" --target "$target" --tag "${image_prefix}:${target}" --file deploy/docker/Dockerfile .
+            docker image inspect "${image_prefix}:${target}" --format '{{.Id}} {{.Os}}/{{.Architecture}}' > "$evidence_dir/${target}-image.txt"
+            docker run --rm --name "${image_prefix}-${target}" --label "org.tiangong.identity-proof=${image_prefix}" --entrypoint node "${image_prefix}:${target}" -e 'if (process.version !== "v24.22.1") process.exit(1); console.log(process.version)' > "$evidence_dir/${target}-node.txt"
+          done
       - name: Qualify isolated baseline and candidate auth transports
         env:
           AUTH_PROOF_HEAD: ${{ github.event.pull_request.head.sha }}
@@ -46,6 +92,8 @@ jobs:
         uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
           name: identity-auth-proof-${{ github.run_id }}-${{ github.run_attempt }}
-          path: ${{ runner.temp }}/identity34-evidence-*
+          path: |
+            ${{ runner.temp }}/identity34-evidence-*
+            ${{ runner.temp }}/identity41-image-evidence-*
           if-no-files-found: error
           retention-days: 7
