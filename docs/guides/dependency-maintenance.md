@@ -11,9 +11,9 @@ checkPaths:
   - .github/dependabot.yml
   - identity-portal/pnpm-lock.yaml
   - docs/guides/dependency-maintenance.md
-lastReviewedAt: 2026-10-17
-lastReviewedCommit: 118bc49b8866071a315f76e877e8fb57b943c732
-lastReviewedNote: "Identity #34: reviewed the minimal Keycloak admin 26.8.1/jose 6.2.12 graph and test-only hosted baseline/candidate auth harness. Local frozen install, lint, typecheck, 93 unit tests and standalone build pass; actual hosted Docker/OIDC/JWKS/Redis proof and independent review remain pending. Product/design bodies, production inputs, server version lines and the known SID-only baseline limitation are unchanged."
+lastReviewedAt: 2026-10-26
+lastReviewedCommit: 29f8a76603220d26e72fc1033189bbca68e6ed6d
+lastReviewedNote: "Identity #38: reviewed the exact @types/node >=25.0.0 proposal ceiling and explicit major-baseline revisit condition. Current ^20 types, Node22 runtime, pinned package graph, auth/quality gates and production boundaries remain unchanged; migration to 24 and hosted activation require separate evidence."
 ---
 
 # Dependency maintenance
@@ -22,8 +22,16 @@ lastReviewedNote: "Identity #34: reviewed the minimal Keycloak admin 26.8.1/jose
 GitHub Actions. It owns weekly staggered Shanghai schedules, seven-day cooldowns,
 limits of two npm PRs and one Actions PR, and related minor/patch groups. Major
 updates stay individually visible; there is no auto-merge. Prototype assets are
-outside the npm directory. No exclusion is needed; any future `exclude-paths`
+outside the npm directory. No path exclusion is needed; any future `exclude-paths`
 entry must be repository-relative without a leading slash.
+
+The npm entry ignores only `@types/node` versions `>=25.0.0`, leaving 24.x
+eligible as the Node 24 LTS ceiling for future proposals. The portal currently
+declares `@types/node: ^20` and CI selects Node22; both remain unchanged. This
+ceiling does not migrate the types or runtime to 24. Any such migration needs
+separate reviewed scope, and lifting the ceiling needs explicit approval of a
+major Node runtime/types baseline change and its compatibility qualification.
+Unrelated package and Actions majors remain eligible.
 
 Preserve Node22 CI and the exact pnpm11.9 package-manager declaration/integrity,
 frozen lockfile, workspace build approvals and current runtime pins. The existing
