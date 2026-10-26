@@ -41,47 +41,67 @@ jobs:
         with:
           node-version: 24.22.1
       - name: Build and inspect isolated Node24 Portal and Worker images
+        timeout-minutes: 28
         shell: bash
         run: |
           set -euo pipefail
           image_prefix="identity41-node24-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}"
           evidence_dir="${RUNNER_TEMP}/identity41-image-evidence-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}"
           mkdir -m 700 "$evidence_dir"
-          docker info >/dev/null
+          # Image workload <= 23 minutes; the 28-minute step leaves cleanup time.
+          # The 45-minute job hard stop can still interrupt later auth/artifact steps.
+          bounded_docker() {
+            local deadline="$1"; shift
+            node tests/auth-compatibility/bounded-command.mjs "$deadline" 2000 docker "$@"
+          }
+          bounded_docker 15000 info >/dev/null
           # Hosted-runner-only, synthetic build inputs; no push or deployment.
           for target in runner worker; do
-            if docker image inspect "${image_prefix}:${target}" >/dev/null 2>&1; then
+            remaining=$(bounded_docker 5000 image ls --filter "reference=${image_prefix}:${target}" --format '{{.ID}}')
+            if test -n "$remaining"; then
               echo 'Refuse pre-existing image identity' >&2; exit 1
             fi
-            if docker container inspect "${image_prefix}-${target}" >/dev/null 2>&1; then
+            remaining=$(bounded_docker 5000 container ls --all --filter "name=^/${image_prefix}-${target}$" --format '{{.ID}}')
+            if test -n "$remaining"; then
               echo 'Refuse pre-existing container identity' >&2; exit 1
             fi
           done
           cleanup_images() {
-            trap - EXIT INT TERM
-            local cleanup_failed=0
-            docker info >/dev/null || cleanup_failed=1
+            trap - EXIT
+            trap '' INT TERM
+            local cleanup_failed=0 remaining
+            # A partial/failed receipt exists even if the hosted runner is lost.
+            printf '{"ownedImagesAndContainersRemoved":false,"cleanupCompleted":false}\n' > "$evidence_dir/cleanup.json"
+            bounded_docker 5000 info >/dev/null || cleanup_failed=1
             for target in runner worker; do
-              if docker container inspect "${image_prefix}-${target}" >/dev/null 2>&1; then
-                docker rm -f "${image_prefix}-${target}" || cleanup_failed=1
+              if bounded_docker 5000 container inspect "${image_prefix}-${target}" >/dev/null 2>&1; then
+                bounded_docker 5000 rm -f "${image_prefix}-${target}" || cleanup_failed=1
+              else
+                inspect_exit=$?
+                test "$inspect_exit" = 1 || cleanup_failed=1
               fi
-              if docker image inspect "${image_prefix}:${target}" >/dev/null 2>&1; then
-                docker image rm "${image_prefix}:${target}" || cleanup_failed=1
+              if bounded_docker 5000 image inspect "${image_prefix}:${target}" >/dev/null 2>&1; then
+                bounded_docker 5000 image rm "${image_prefix}:${target}" || cleanup_failed=1
+              else
+                inspect_exit=$?
+                test "$inspect_exit" = 1 || cleanup_failed=1
               fi
-              if docker container inspect "${image_prefix}-${target}" >/dev/null 2>&1 || docker image inspect "${image_prefix}:${target}" >/dev/null 2>&1; then
-                cleanup_failed=1
-              fi
+              # Successful list calls, rather than failed inspect calls, prove absence.
+              remaining=$(bounded_docker 5000 container ls --all --filter "name=^/${image_prefix}-${target}$" --format '{{.ID}}') || cleanup_failed=1
+              test -z "$remaining" || cleanup_failed=1
+              remaining=$(bounded_docker 5000 image ls --filter "reference=${image_prefix}:${target}" --format '{{.ID}}') || cleanup_failed=1
+              test -z "$remaining" || cleanup_failed=1
             done
-            printf '{"ownedImagesAndContainersRemoved":%s}\n' "$([ "$cleanup_failed" = 0 ] && echo true || echo false)" > "$evidence_dir/cleanup.json"
+            printf '{"ownedImagesAndContainersRemoved":%s,"cleanupCompleted":true}\n' "$([ "$cleanup_failed" = 0 ] && echo true || echo false)" > "$evidence_dir/cleanup.json"
             test "$cleanup_failed" = 0
           }
           trap 'original_exit=$?; if cleanup_images; then exit "$original_exit"; else exit 1; fi' EXIT
           trap 'exit 130' INT
           trap 'exit 143' TERM
           for target in runner worker; do
-            docker build --label "org.tiangong.identity-proof=${image_prefix}" --target "$target" --tag "${image_prefix}:${target}" --file deploy/docker/Dockerfile .
-            docker image inspect "${image_prefix}:${target}" --format '{{.Id}} {{.Os}}/{{.Architecture}}' > "$evidence_dir/${target}-image.txt"
-            docker run --rm --name "${image_prefix}-${target}" --label "org.tiangong.identity-proof=${image_prefix}" --entrypoint node "${image_prefix}:${target}" -e 'if (process.version !== "v24.22.1") process.exit(1); console.log(process.version)' > "$evidence_dir/${target}-node.txt"
+            bounded_docker 600000 build --label "org.tiangong.identity-proof=${image_prefix}" --target "$target" --tag "${image_prefix}:${target}" --file deploy/docker/Dockerfile .
+            bounded_docker 15000 image inspect "${image_prefix}:${target}" --format '{{.Id}} {{.Os}}/{{.Architecture}}' > "$evidence_dir/${target}-image.txt"
+            bounded_docker 60000 run --rm --name "${image_prefix}-${target}" --label "org.tiangong.identity-proof=${image_prefix}" --entrypoint node "${image_prefix}:${target}" -e 'if (process.version !== "v24.22.1") process.exit(1); console.log(process.version)' > "$evidence_dir/${target}-node.txt"
           done
       - name: Qualify isolated baseline and candidate auth transports
         env:

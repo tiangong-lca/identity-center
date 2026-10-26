@@ -12,8 +12,8 @@ checkPaths:
   - docs/design/README.md
   - docs/implementation/README.md
 lastReviewedAt: 2026-10-26
-lastReviewedCommit: 104135f3aae4d39cebef13a9f12abfc53daed376
-lastReviewedNote: "Identity #41: reviewed Node24.22.1 runtime/CI/image inputs and types24.19.2; exact pnpm11.9 integrity, other dependency versions, product semantics and manual production authorization remain. Local frozen install, lint, typecheck, 96 units and standalone build pass. Fresh hosted image/auth proof, independent review, merge and integration remain required."
+lastReviewedCommit: 189707a3d384a2ebb9f43053a56f4121a40404f7
+lastReviewedNote: "Identity #41 review fixes: raw Git blob extraction preserves exact Dockerfile hashes; all hosted image Docker calls have deadlines and TERM/KILL escalation, cleanup attempts both targets and writes failed/incomplete receipts. Local lint, typecheck, 105 units including eight actual-workflow cleanup controls and syntax pass. Runtime24.22.1/types24.19.2/pnpm11.9 integrity and other dependencies remain unchanged. No Docker/services/production activation; final-head hosted image/auth proof, review, merge and integration remain required."
 ---
 
 # Identity Platform 文档

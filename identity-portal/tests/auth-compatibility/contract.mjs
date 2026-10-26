@@ -1,5 +1,6 @@
 import assert from 'node:assert/strict'
 import { createHash } from 'node:crypto'
+import { execFileSync } from 'node:child_process'
 
 export const BASELINE = 'd9b4827c961967fe16ef31c365025049c7ff8802'
 export const REPOSITORY = 'tiangong-lca/identity-center'
@@ -161,6 +162,14 @@ export async function ownedLifecycle(setup, run, cleanup) {
       throw new AggregateError(failure ? [failure, e] : [e], 'Owned fixture cleanup failed')
     }
   }
+}
+
+// File digests bind Git blob contents, including terminal newlines. Never trim here.
+export function assertProductDeltaFromGit(file, beforeRef, afterRef, options) {
+  const blob = ref => execFileSync('git', ['show', `${ref}:${file}`], {
+    ...options, encoding: 'utf8', env: { ...options?.env, GIT_NO_LAZY_FETCH: '1' },
+  })
+  assertProductDelta(file, blob(beforeRef), blob(afterRef))
 }
 
 export function assertProductDelta(file, before, after) {
