@@ -12,8 +12,8 @@ checkPaths:
   - docs/design/README.md
   - docs/implementation/README.md
 lastReviewedAt: 2026-10-26
-lastReviewedCommit: a3d6269ce92e066a4a39c517a87cd334c3f6c16e
-lastReviewedNote: "Identity #41 Windows test boundary: only the eight POSIX hosted-workflow execution controls skip on win32; portable unit and hosted Ubuntu proof stay active. No native Windows execution proof claimed. Review fixes: raw Git blob extraction preserves exact Dockerfile hashes; all hosted image Docker calls have deadlines and TERM/KILL escalation, cleanup attempts both targets and writes failed/incomplete receipts. Local lint, typecheck, 105 units including eight actual-workflow cleanup controls and syntax pass. Runtime24.22.1/types24.19.2/pnpm11.9 integrity and other dependencies remain unchanged. No Docker/services/production activation; final-head hosted image/auth proof, review, merge and integration remain required."
+lastReviewedCommit: 3161be477faf321632d19709465ade7a2ae1c9e2
+lastReviewedNote: "Identity #41: quality CI on 3161be4 failed despite 105 passing cases because four unhandled JSON parse errors exposed a fake-state truncation race. Both fake Docker writers now write a PID-unique sibling temporary file and rename it over the polled state. Parsing and assertions remain strict. Local lint/typecheck, 105 units and six concurrent-load cancellation repeats pass without unhandled errors. Windows skips only the eight POSIX controls; no native Windows proof claimed. Product/runtime/workflow unchanged; new exact-head hosted CI and artifact validation remain required."
 ---
 
 # Identity Platform 文档

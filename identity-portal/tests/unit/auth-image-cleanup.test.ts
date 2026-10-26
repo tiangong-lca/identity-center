@@ -15,6 +15,13 @@ const imageStep = workflow.jobs['auth-compatibility'].steps.find(s => s.name?.st
 const fakeDocker = `#!${process.execPath}
 const fs = require('node:fs'), a = process.argv.slice(2), p = process.env.FAKE_STATE
 const s = JSON.parse(fs.readFileSync(p, 'utf8')), mode = process.env.FAKE_MODE
+// Publish a complete sibling file before replacing the polled path.
+// The reader must see either whole state, never writeFileSync's truncation window.
+const publish = () => {
+  const temporary = p + '.' + process.pid + '.tmp'
+  fs.writeFileSync(temporary, JSON.stringify(s))
+  fs.renameSync(temporary, p)
+}
 s.calls.push(a)
 const cleanup = s.builds === 2 || s.failed
 const hang = cleanup && ((mode === 'hang-remove' && a[0] === 'image' && a[1] === 'rm' && a[2].endsWith(':runner')) || (mode === 'hang-info' && a[0] === 'info') || (mode === 'hang-inventory' && a[0] === 'container' && a[1] === 'ls'))
@@ -22,7 +29,7 @@ let rc = 0
 if (hang || (mode === 'cancel' && a[0] === 'run')) {
   if (mode === 'cancel') s.containers.push(a[a.indexOf('--name') + 1])
   s.hungPids.push(process.pid)
-  fs.writeFileSync(p, JSON.stringify(s))
+  publish()
   process.on('SIGTERM', () => {})
   setInterval(() => {}, 1000)
 } else {
@@ -44,7 +51,7 @@ if (hang || (mode === 'cancel' && a[0] === 'run')) {
     else s.images = s.images.filter(v => v !== a[2])
   } else if (a[0] === 'rm') s.containers = s.containers.filter(v => v !== a[2])
   else throw Error(JSON.stringify(a))
-  fs.writeFileSync(p, JSON.stringify(s)); process.exit(rc)
+  publish(); process.exit(rc)
 }
 `
 type State = { images: string[]; containers: string[]; builds: number; calls: string[][]; hungPids: number[] }
