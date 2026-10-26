@@ -103,6 +103,10 @@ async function control(mode: string) {
     fs.rmSync(tmp, { recursive: true, force: true })
   }
 }
+// Windows local development remains supported. This suite executes the hosted
+// Ubuntu Bash workflow and POSIX process groups, so only these eight transport
+// controls are skipped on win32; portable unit tests and hosted proof stay active.
+const posixIt = process.platform === 'win32' ? it.skip : it
 for (const mode of ['success', 'build-fail', 'cleanup-fail', 'preexisting', 'hang-remove', 'hang-info', 'hang-inventory', 'cancel']) {
-  it(`executes the actual image workflow with bounded cleanup: ${mode}`, () => control(mode), 10_000)
+  posixIt(`executes the actual image workflow with bounded cleanup: ${mode}`, () => control(mode), 10_000)
 }

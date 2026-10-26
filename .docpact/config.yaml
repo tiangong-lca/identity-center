@@ -1,8 +1,8 @@
 version: 1
 layout: repo
 lastReviewedAt: "2026-10-26"
-lastReviewedCommit: "189707a3d384a2ebb9f43053a56f4121a40404f7"
-lastReviewedNote: "Identity #41 review fixes: raw Git blob extraction preserves exact Dockerfile hashes; all hosted image Docker calls have deadlines and TERM/KILL escalation, cleanup attempts both targets and writes failed/incomplete receipts. Local lint, typecheck, 105 units including eight actual-workflow cleanup controls and syntax pass. Runtime24.22.1/types24.19.2/pnpm11.9 integrity and other dependencies remain unchanged. No Docker/services/production activation; final-head hosted image/auth proof, review, merge and integration remain required."
+lastReviewedCommit: "a3d6269ce92e066a4a39c517a87cd334c3f6c16e"
+lastReviewedNote: "Identity #41 Windows test boundary: only the eight POSIX hosted-workflow execution controls skip on win32; portable unit and hosted Ubuntu proof stay active. No native Windows execution proof claimed. Review fixes: raw Git blob extraction preserves exact Dockerfile hashes; all hosted image Docker calls have deadlines and TERM/KILL escalation, cleanup attempts both targets and writes failed/incomplete receipts. Local lint, typecheck, 105 units including eight actual-workflow cleanup controls and syntax pass. Runtime24.22.1/types24.19.2/pnpm11.9 integrity and other dependencies remain unchanged. No Docker/services/production activation; final-head hosted image/auth proof, review, merge and integration remain required."
 
 # Repo-local docpact governance for identity-center.
 # The workspace root config governs the submodule pointer and cross-repo view;
