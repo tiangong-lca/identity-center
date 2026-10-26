@@ -10,9 +10,9 @@ whenToUpdate: 完成定义条目、验收标准或核对证据发生变化时更
 checkPaths:
   - docs/implementation/definition-of-done.md
   - GOAL.md
-lastReviewedAt: 2026-10-17
-lastReviewedCommit: 90dee7e9728ac60ce72407894e79def9e0eb670e
-lastReviewedNote: "Identity #34 focused expiry review: test-only fixtures now distinguish stale iat from fresh-iat/past-exp rejection. Actual RS256 local controls, 13 targeted unit tests, lint and typecheck pass; new exact-head hosted handler/Redis proof remains pending. Runtime policy, dependencies, workflows and product semantics are unchanged; SID-only follow-up #35 remains separate and cancellation is static-reviewed only."
+lastReviewedAt: 2026-10-26
+lastReviewedCommit: 3161be477faf321632d19709465ade7a2ae1c9e2
+lastReviewedNote: "Identity #41: quality CI on 3161be4 failed despite 105 passing cases because four unhandled JSON parse errors exposed a fake-state truncation race. Both fake Docker writers now write a PID-unique sibling temporary file and rename it over the polled state. Parsing and assertions remain strict. Local lint/typecheck, 105 units and six concurrent-load cancellation repeats pass without unhandled errors. Windows skips only the eight POSIX controls; no native Windows proof claimed. Product/runtime/workflow unchanged; new exact-head hosted CI and artifact validation remain required."
 ---
 
 # 完成定义(DoD)核对 — GOAL.md §7

@@ -12,8 +12,8 @@ checkPaths:
   - identity-portal/pnpm-lock.yaml
   - docs/guides/dependency-maintenance.md
 lastReviewedAt: 2026-10-26
-lastReviewedCommit: 29f8a76603220d26e72fc1033189bbca68e6ed6d
-lastReviewedNote: "Identity #38: reviewed the exact @types/node >=25.0.0 proposal ceiling and explicit major-baseline revisit condition. Current ^20 types, Node22 runtime, pinned package graph, auth/quality gates and production boundaries remain unchanged; migration to 24 and hosted activation require separate evidence."
+lastReviewedCommit: 104135f3aae4d39cebef13a9f12abfc53daed376
+lastReviewedNote: "Identity #41: reviewed Node24.22.1 runtime/CI/image inputs and types24.19.2; exact pnpm11.9 integrity, other dependency versions, product semantics and manual production authorization remain. Local frozen install, lint, typecheck, 96 units and standalone build pass. Fresh hosted image/auth proof, independent review, merge and integration remain required."
 ---
 
 # Dependency maintenance
@@ -25,16 +25,16 @@ updates stay individually visible; there is no auto-merge. Prototype assets are
 outside the npm directory. No path exclusion is needed; any future `exclude-paths`
 entry must be repository-relative without a leading slash.
 
-The npm entry ignores only `@types/node` versions `>=25.0.0`, leaving 24.x
-eligible as the Node 24 LTS ceiling for future proposals. The portal currently
-declares `@types/node: ^20` and CI selects Node22; both remain unchanged. This
-ceiling does not migrate the types or runtime to 24. Any such migration needs
-separate reviewed scope, and lifting the ceiling needs explicit approval of a
-major Node runtime/types baseline change and its compatibility qualification.
-Unrelated package and Actions majors remain eligible.
+The npm entry ignores only `@types/node` versions `>=25.0.0`, keeping types24
+aligned with the reviewed Node24 LTS baseline. Identity #41 migrates the runtime
+to Node24.22.1 and the manifest to `@types/node: ^24.19.2`; `.nvmrc`, both CI
+workflows and Portal/Worker Docker stages select that runtime. Lifting the ceiling
+needs explicit approval of another major runtime/types baseline and compatibility
+qualification. Other packages and Actions continue ordinary Dependabot proposals,
+including individually visible majors.
 
-Preserve Node22 CI and the exact pnpm11.9 package-manager declaration/integrity,
-frozen lockfile, workspace build approvals and current runtime pins. The existing
+Preserve the exact pnpm11.9 package-manager declaration/integrity, frozen lockfile,
+workspace build approvals and Node24 track. The existing
 `next-auth` beta.32 approval in D-006 is a single exception: monitoring does not
 authorize another prerelease or weaken SSO/auth/admission/event-sync contracts.
 Manifest and source changes retain existing stricter Docpact rules. A lock-only
@@ -87,7 +87,7 @@ replace fresh hosted CI, independent review or required workspace integration.
 The separate `auth-compatibility.yml` PR workflow is scoped to dependency and
 its own test inputs. It preserves the existing `ci.yml` quality job and uses an
 exact-head checkout, read-only permissions and pinned verified action commits.
-Node22 and the exact pnpm11.9 manifest declaration remain the application tools.
+Node24.22.1 and the exact pnpm11.9 manifest declaration remain the application tools.
 No production secret, deployment environment, external IdP or main-push operation
 is part of this job.
 
@@ -124,9 +124,11 @@ Docker/Compose monitoring is **not enabled** by this change. The owner is
 `identity-center`; [Identity #26](https://github.com/tiangong-lca/identity-center/issues/26)
 owns the executable image-qualification prerequisite. It is Ready and has not
 started; no image coverage or activation is claimed. The source Dockerfile
-contains Node22 Alpine portal/worker targets; Compose
+contains Node24.22.1 Alpine portal/worker targets; Compose
 selects PostgreSQL17, Keycloak26.5, Redis7 and RabbitMQ4, with dev Mailpit and
-optional KES. Their tags, manifests and production env inputs remain unchanged.
+optional KES. Their service tags and production env inputs remain unchanged. The Node image
+source change is tracked under #41 and still needs isolated image-build proof;
+it does not activate Docker monitoring or authorize deployment.
 
 `tests/unit/realm-config.test.ts` validates generated representation only. The
 existing real `keycloak-bootstrap`, `keycloak-admin`, migrations/repositories,

@@ -11,9 +11,9 @@ checkPaths:
   - AGENTS.md
   - docs/README.md
   - identity-portal/AGENTS.md
-lastReviewedAt: 2026-10-17
-lastReviewedCommit: 118bc49b8866071a315f76e877e8fb57b943c732
-lastReviewedNote: "Identity #34: reviewed the minimal Keycloak admin 26.8.1/jose 6.2.12 graph and test-only hosted baseline/candidate auth harness. Local frozen install, lint, typecheck, 93 unit tests and standalone build pass; actual hosted Docker/OIDC/JWKS/Redis proof and independent review remain pending. Product/design bodies, production inputs, server version lines and the known SID-only baseline limitation are unchanged."
+lastReviewedAt: 2026-10-26
+lastReviewedCommit: 104135f3aae4d39cebef13a9f12abfc53daed376
+lastReviewedNote: "Identity #41: reviewed Node24.22.1 runtime/CI/image inputs and types24.19.2; exact pnpm11.9 integrity, other dependency versions, product semantics and manual production authorization remain. Local frozen install, lint, typecheck, 96 units and standalone build pass. Fresh hosted image/auth proof, independent review, merge and integration remain required."
 ---
 
 # identity-center 代理入口

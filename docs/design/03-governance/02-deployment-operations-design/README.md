@@ -11,9 +11,9 @@ checkPaths:
   - docs/design/03-governance/02-deployment-operations-design/README.md
   - identity-portal/deploy/**
   - identity-portal/lib/config/**
-lastReviewedAt: 2026-10-17
-lastReviewedCommit: 2019c74d474dae391f99a665dee27b15fec4bd96
-lastReviewedNote: "Identity #36 / original #28: reviewed the sole ordinary-CI checkout v7.0.1 immutable pin on accepted Main 2019c74d. Exact PR source, read-only credentials, Node22/pnpm11.9 frozen quality gates and production authorization are preserved. Product, auth harness, image inputs and document bodies are unchanged; fresh hosted quality, independent review and integration remain required."
+lastReviewedAt: 2026-10-26
+lastReviewedCommit: 189707a3d384a2ebb9f43053a56f4121a40404f7
+lastReviewedNote: "Identity #41 review fixes: raw Git blob extraction preserves exact Dockerfile hashes; all hosted image Docker calls have deadlines and TERM/KILL escalation, cleanup attempts both targets and writes failed/incomplete receipts. Local lint, typecheck, 105 units including eight actual-workflow cleanup controls and syntax pass. Runtime24.22.1/types24.19.2/pnpm11.9 integrity and other dependencies remain unchanged. No Docker/services/production activation; final-head hosted image/auth proof, review, merge and integration remain required."
 ---
 
 # 10. 部署与运维设计

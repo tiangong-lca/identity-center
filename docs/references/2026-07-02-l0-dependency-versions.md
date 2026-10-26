@@ -209,3 +209,52 @@ The real provider's token shape and explicit owner judgment determine acceptance
 of the covered logout scenario. Server-image upgrades, full-image monitoring,
 production configuration, deployment and external business identity flows remain
 outside this source task.
+
+
+## 2026-10-26 Node24 LTS qualification (Identity #41)
+
+On 2026-10-26 the human explicitly authorized migration to the latest compatible
+Node24 LTS and ordinary Dependabot proposals for other dependencies, under
+workspace coordination #2033. Node25+ remains outside this baseline.
+
+The [official release index](https://nodejs.org/dist/index.json) identifies
+**Node24.22.1**, released 2026-10-20, as the latest 24.x LTS (Krypton).
+The downloaded Darwin arm64 archive matches the release SHA256
+`89c682593d76cd44233fa53b1563264e7de9cbb189cad169135c5b4fadfbc0a7`.
+The [npm registry](https://registry.npmjs.org/@types%2fnode) identifies
+**@types/node24.19.2**, published 2026-10-09, as the latest stable types24.
+Both exceed pnpm11's default one-day release-age floor; the existing Dependabot
+seven-day cooldown is unchanged. A six-day-old Node security release is selected
+manually under the explicit runtime scope, not an automatic cooldown exception.
+
+Context7 was queried first for Node24, Next and pnpm. Because its Next version
+coverage did not include 16.4.2, the exact installed Next16.4.2 installation guide
+and registry manifest were checked: Node>=20.9.0. The exact pnpm11.9.0 registry
+manifest requires Node>=22.13; pnpm's official compatibility table supports Node24.
+The pnpm packageManager version/integrity and workspace build approvals remain
+unchanged. Docker's official `node:24.22.1-alpine` manifest was verified for Linux
+amd64 and arm64 (observed index digest
+`sha256:06d7adf3e0ef61a13f1d28682726366f97a15aa1888c934d3ecec86c33918b53`).
+
+`.nvmrc`, both CI workflows and all Docker stages now select 24.22.1;
+`engines.node` confines local execution to `>=24.22.1 <25`. Types use
+`^24.19.2`, with the Dependabot >=25 ignore retained. Lock resolution changes
+only types24, its required undici-types7.24.6 and corresponding peer identities;
+other concrete package versions remain unchanged. The Docker dependency stage
+also copies the existing pnpm-workspace.yaml so strict build approvals apply.
+
+The actual Darwin arm64 Node24.22.1 / pnpm11.9.0 run passed frozen install,
+ESLint, typecheck, all 96 unit tests and Next standalone build. No Docker engine,
+production identity service or database was contacted. These local gates prove
+source/build compatibility only. Fresh hosted auth baseline/candidate proof,
+isolated Portal/Worker image builds, independent review, merge and exact root
+integration remain required. Existing SID-only logout limitation (#35), server
+image lines, product auth policy and deployment authorization are unchanged.
+
+The related hosted workflow builds both actual Docker targets and runs each
+image's Node binary with no application/service startup. Unique run-bound tags
+and container names are checked absent before allocation. EXIT/INT/TERM traps
+remove only those owned tags/containers and upload explicit cleanup receipts;
+intermediate build cache is retained only on the disposable GitHub-hosted runner.
+No host daemon is started, global prune performed or image published. Interrupted
+runner disposal is not reported as an explicit successful cleanup receipt.

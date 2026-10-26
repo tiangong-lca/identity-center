@@ -1,5 +1,6 @@
 import assert from 'node:assert/strict'
 import { createHash } from 'node:crypto'
+import { execFileSync } from 'node:child_process'
 
 export const BASELINE = 'd9b4827c961967fe16ef31c365025049c7ff8802'
 export const REPOSITORY = 'tiangong-lca/identity-center'
@@ -163,16 +164,31 @@ export async function ownedLifecycle(setup, run, cleanup) {
   }
 }
 
+// File digests bind Git blob contents, including terminal newlines. Never trim here.
+export function assertProductDeltaFromGit(file, beforeRef, afterRef, options) {
+  const blob = ref => execFileSync('git', ['show', `${ref}:${file}`], {
+    ...options, encoding: 'utf8', env: { ...options?.env, GIT_NO_LAZY_FETCH: '1' },
+  })
+  assertProductDelta(file, blob(beforeRef), blob(afterRef))
+}
+
 export function assertProductDelta(file, before, after) {
+  // Identity #41 admits only this exact reviewed Node24 image/build-policy delta.
+  if (file === 'identity-portal/deploy/docker/Dockerfile') {
+    const digest = value => createHash('sha256').update(value).digest('hex')
+    assert.equal(digest(before), '65848148d14e18e76196936776cc22f321a7368cde424f9c639ee4bd5d103419', 'Unexpected original Dockerfile')
+    assert.equal(digest(after), '2c6223876bec064c6a7f0177b8a8081d7f5047c349054c224ad75a9825048f96', 'Only the exact reviewed Node24 Dockerfile may differ')
+    return
+  }
   assert.match(file, /\.md$/, 'Application/server source changes require another scope')
   const body = value => value.replace(/^---\r?\n[\s\S]*?\r?\n---\r?\n/, '')
   if (body(after) === body(before)) return
-  // Exact non-executable CI-description correction reviewed for Identity #34.
+  // Exact CI-description and Node24 environment-row corrections reviewed for Identity #34/#41.
   // No other runbook body or executable/configuration change is admitted.
   assert.equal(file, 'identity-portal/deploy/runbooks/README.md')
   const digest = value => createHash('sha256').update(body(value).trim()).digest('hex')
   assert.equal(digest(before), '2531b2c5f61601e571fd3ba1734da758fc0708656929684dea3dd63295f47b37', 'Unexpected original runbook body')
-  assert.equal(digest(after), 'aed127df51a5fe03bc24def2df602ecb58e16ffb884aadcc71885fbda06ef73c', 'Only the exact reviewed CI description may differ')
+  assert.equal(digest(after), 'cc739f5b5664958e738283a84214578a2daf11b3ec11f583e77f1d040200733a', 'Only the exact reviewed CI description may differ')
 }
 
 export function compareReceipts(baseline, candidate) {
