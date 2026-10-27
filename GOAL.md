@@ -12,8 +12,8 @@ checkPaths:
   - docs/implementation/README.md
   - docs/implementation/definition-of-done.md
 lastReviewedAt: 2026-10-27
-lastReviewedCommit: 6ef7c216075aae429d4c573d0c32a005f6fa9774
-lastReviewedNote: "Identity #44: reviewed exact React/DOM19.3.1 and types19.3.0 peer closure, separate immutable-baseline qualification, entrypoint negatives and synthetic standalone UI support. Frozen install, lint/typecheck, 109 full-suite units, final20 harness cases and standalone build pass locally. Prior memory-cap and test-type build failures retained and corrected. Hosted auth/UI/image proof, independent review, source merge and exact integration remain pending; old auth-client case, SID-only limitation, product and production authority unchanged."
+lastReviewedCommit: c36bae1cbfa033af97b0279225f91941dc6641a0
+lastReviewedNote: "Identity #44 independent review repair: React qualification now classifies every tracked changed path and rejects unknown product/config paths; explicit governance allowances preserve all but three review metadata fields. Actual entrypoint negatives cover business-apps YAML, Drizzle config and a new product path. Scoped21 harness cases, lint/typecheck and clean source preflight pass. Historical auth-client fence, application/build inputs and production boundaries unchanged. Earlier109-unit/build evidence retained; no new full-suite/build or hosted proof claimed."
 ---
 
 # GOAL — 统一身份平台一期全量交付
