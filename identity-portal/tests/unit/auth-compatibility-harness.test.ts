@@ -298,6 +298,52 @@ it('executes actual browser orchestration for both variants with distinct awaite
   }
 })
 
+it('executes actual Catalog semantic navigation and awaits each route before the next click', async () => {
+  const source = fs.readFileSync(path.resolve(__dirname, '../auth-compatibility/catalog-ui.ts'), 'utf8')
+  const start = source.indexOf("    diagnostics.setStage('navigation')")
+  const end = source.indexOf('    const snapshot = ', start)
+  expect(start).toBeGreaterThan(-1); expect(end).toBeGreaterThan(start)
+  const body = source.slice(start, end)
+  const invoke = async (code: string) => {
+    let route = '/admin/apps/registry'; let pending = ''; let sentinel = false
+    const events: string[] = []
+    const links = [
+      { name: 'Overview', href: '/admin' }, { name: 'Applications', href: '/admin/apps' },
+      { name: 'Application list', href: '/admin/apps' }, { name: 'Registry', href: '/admin/apps/registry' },
+    ]
+    const locator = (matches: typeof links) => ({ matches, click: async () => {
+      expect(matches).toHaveLength(1)
+      expect(pending).toBe('')
+      pending = matches[0].href; events.push(`click:${matches[0].name}`)
+    } })
+    const page = {
+      evaluate: async () => { sentinel = true },
+      locator: (selector: string) => locator(links.filter(link => selector === `a[href="${link.href}"]`)),
+      getByRole: (role: string) => {
+        expect(role).toBe('navigation')
+        return { getByRole: (kind: string, options: { name: string; exact: boolean }) => {
+          expect(kind).toBe('link'); expect(options.exact).toBe(true)
+          return locator(links.filter(link => link.name === options.name))
+        } }
+      },
+    }
+    const assertions = (subject: unknown) => ({
+      toHaveCount: async (count: number) => expect((subject as ReturnType<typeof locator>).matches).toHaveLength(count),
+      toHaveURL: async (url: string) => {
+        expect(subject).toBe(page)
+        expect(pending).toBe(new URL(url).pathname)
+        route = pending; pending = ''; events.push(`url:${route}`)
+      },
+    })
+    await new Function('page', 'expect', 'c', 'diagnostics', `return (async()=>{${code}})()`)(page, assertions, { portalOrigin: 'http://localhost:21002' }, { setStage: () => {} })
+    expect(sentinel).toBe(true)
+    return { route, events }
+  }
+  expect(await invoke(body)).toEqual({ route: '/admin/apps/registry', events: ['click:Overview', 'url:/admin', 'click:Applications', 'url:/admin/apps', 'click:Registry', 'url:/admin/apps/registry'] })
+  await expect(invoke(body.replace(/    await expect\(page\)\.toHaveURL\(`\$\{c.portalOrigin\}\/admin`\)\n/, ''))).rejects.toThrow()
+  await expect(invoke(body.replace("page.getByRole('navigation').getByRole('link', { name: 'Applications', exact: true })", "page.locator('a[href=\"/admin/apps\"]')"))).rejects.toThrow()
+})
+
 it('executes actual broad-only and Catalog asset selection, persisting each actual source binding', () => {
   const source = fs.readFileSync(path.resolve(__dirname, '../auth-compatibility/run.mjs'), 'utf8')
   const start = source.indexOf('      const uiPlan = qualificationUiPlan(')
