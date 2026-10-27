@@ -389,3 +389,23 @@ privacy negatives and independent adversarial probes cover secret leakage, forge
 assets, malformed getters and byte caps. Independent review found no material
 issue. This is a diagnostic change, not a product fix or acceptance relaxation;
 actual error causes and both variants' full hosted proof remain pending.
+
+The first diagnostic head d6409d0 passed117-unit quality, CodeQL and both images,
+but stopped before either variant/browser: Compose2.38.2 returned0 after the20s
+wait while the intentionally false probe retained the normal60x3s retry policy.
+Artifact12717169330 is checksum/source/image/privacy/empty-cleanup verified; no
+browser-errors receipt exists and the original three page-error causes remain
+unknown. The [exact upstream wait loop](https://github.com/docker/compose/blob/v2.38.2/pkg/compose/convergence.go#L444-L445)
+returns nil when its context finishes, while [start's deadline mapping](https://github.com/docker/compose/blob/v2.38.2/pkg/compose/start.go#L133-L147)
+requires a non-nil dependency error, consistent with the observed timeout race.
+
+The narrow support correction makes only the bad health probe become unhealthy
+before that deadline (one retry/1s cadence/1s timeout/zero start period), retains
+unexpected-zero failure, and records actual owned full-ID running/unhealthy state
+before cleanup. A fixed expected rejection classification is also required;
+concurrent unhealthy state plus an unrelated nonzero startup error is insufficient.
+Independent extraction/replay caught that draft cause gap; it is fixed and covered
+by actual-function inert regressions, including unrelated1/125, unknown/missing
+state, cancellation and receipt/cleanup failures. All normal fixtures, service
+versions, page-error/auth gates and product behavior stay unchanged. Scoped tests,
+lint/typecheck and source/privacy review do not substitute for fresh hosted proof.

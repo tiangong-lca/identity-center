@@ -157,3 +157,22 @@ short/opaque secrets, JWT/JWE, headers, custom names/function names, safe-equiva
 fingerprints, throwing getters, invalid coordinates/stages and size overflow.
 These controls do not establish the actual hosted error cause or compatibility;
 fresh hosted evidence remains required.
+
+## Controlled bad-readiness fixture
+
+Only the intentional Keycloak failure probe uses `exit 1`, one retry,1s interval,
+1s timeout and zero start period. Its configured failure budget is below the unchanged
+20s Compose wait deadline; normal fixture health policies and all images remain
+exact. Compose2.38.2 can take a nil-return deadline path, so timeout exit alone is
+not evidence of an unhealthy service and every unexpected zero still fails.
+
+Before cleanup the control selects exactly one full container ID using its own
+project/service labels, then inspects only ID and engine status/health enums.
+No full inspect, environment, command or container/health log is read. A fixed
+rejection category is derived from the exact owned-Keycloak unhealthy terminal
+line in the already-retained Compose command output; raw prose is not copied into
+the health receipt. Acceptance requires this cause, a verified nonzero exit,
+owned running/unhealthy state, saved health evidence and successful saved cleanup.
+Unknown/missing evidence, unrelated exit1/125, cancellation, zero exits and
+receipt/cleanup failures all remain failures. Only the original expected startup
+exception can be suppressed; auth operations never run in this negative control.

@@ -9,6 +9,7 @@ import path from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { assertHostedContext, assertFixture, IMAGE_TAGS, composeDocument, cleanEnvironment, redactor, lineRedactor, attemptCleanup, ownedLifecycle, compareReceipts } from './contract.mjs'
 
+import { badReadinessDocument, observeBadKeycloakHealth, classifyBadReadinessRejection, requireExpectedBadReadinessError, READINESS_CONTROL_WAIT_SECONDS } from './readiness-control.mjs'
 import { emittedBrowserAssetPaths } from './browser-assets.mjs'
 import { qualificationCase, assertQualificationSources, assertQualificationManifest, assertQualificationVersions, assertQualificationProductDeltaFromGit, assertReactSourcePathFromGit } from './qualification-case.mjs'
 
@@ -265,11 +266,14 @@ async function variant(variant, root, images, head) {
 async function readinessFailureControl(root, images) {
   const c = await newFixture('baseline', path.join(root, 'readiness-control'))
   const file = path.join(c.directory, 'compose.json')
-  const document = composeDocument(c, images, path.join(sourceRoot, 'identity-portal/deploy/keycloak/themes'))
-  document.services.keycloak.healthcheck.test = ['CMD-SHELL', 'exit 1']
+  const document = badReadinessDocument(c, images, path.join(sourceRoot, 'identity-portal/deploy/keycloak/themes'))
   fs.writeFileSync(file, JSON.stringify(document), { mode: 0o600 })
   let owned = false
-  let startupFailed = false
+  let startupError
+  let exitCode
+  let startupRejection = 'unclassified'
+  let health
+  let healthRecorded = false
   let cleaned = false
   const command = args => ['compose', '-p', c.project, '-f', file, ...args]
   try {
@@ -277,25 +281,44 @@ async function readinessFailureControl(root, images) {
       for (const kind of ['containers', 'volumes', 'networks']) assert.deepEqual(await resources(c, kind), [])
       owned = true
       try {
-        await execute('docker', command(['up', '-d', '--wait', '--wait-timeout', '20', 'postgres', 'keycloak', 'redis']), { name: 'readiness-control-start', timeout: 40_000 })
-      } catch (e) { startupFailed = true; throw e }
+        await execute('docker', command(['up', '-d', '--wait', '--wait-timeout', String(READINESS_CONTROL_WAIT_SECONDS), 'postgres', 'keycloak', 'redis']), { name: 'readiness-control-start', timeout: 40_000 })
+        exitCode = 0
+      } catch (e) {
+        startupError = e
+        try { exitCode = JSON.parse(fs.readFileSync(path.join(output, 'readiness-control-start.receipt.json'), 'utf8')).exitCode } catch { /* Missing/unknown exit evidence must fail closed. */ }
+      }
+      try { startupRejection = classifyBadReadinessRejection(c.project, fs.readFileSync(path.join(output, 'readiness-control-start.log'), 'utf8')) } catch { /* Missing rejection evidence must fail closed. */ }
+      let observation = { observed: false, reason: cancelled ? 'cancelled' : 'unavailable-or-invalid' }
+      if (!cancelled) {
+        try {
+          health = await observeBadKeycloakHealth(c, (args, name) => {
+            if (cancelled) throw Error('Cancelled owned health observation')
+            return execute('docker', args, { name: `readiness-control-${name}`, timeout: 5000, cleanup: true })
+          })
+          observation = { observed: true, health }
+        } catch { /* Retain only a fixed failure category, never raw inspect data. */ }
+      }
+      fs.writeFileSync(path.join(output, 'readiness-control-health.json'), JSON.stringify({ project: c.project, startupRejection, exitCode: Number.isInteger(exitCode) && exitCode >= 0 && exitCode <= 255 ? exitCode : null, ...observation }, null, 2), { mode: 0o600 })
+      healthRecorded = true
+      if (startupError) throw startupError
       throw Error('Deliberately unhealthy service unexpectedly passed readiness')
     }, async () => { throw Error('Readiness failure must prevent auth operations') }, async () => {
       if (!owned) return
       const actions = [['docker', () => execute('docker', command(['down', '--volumes', '--remove-orphans', '--timeout', '5']), { name: 'readiness-control-cleanup', timeout: 25_000, cleanup: true })]]
       for (const kind of ['containers', 'volumes', 'networks']) actions.push([kind, () => resources(c, kind)])
       const cleanup = await attemptCleanup(actions)
-      cleaned = cleanup.failures.length === 0 && ['containers', 'volumes', 'networks'].every(kind => cleanup.results[kind]?.length === 0)
-      fs.writeFileSync(path.join(output, 'readiness-control-cleanup.json'), JSON.stringify({ project: c.project, passed: cleaned,
+      const cleanupPassed = cleanup.failures.length === 0 && ['containers', 'volumes', 'networks'].every(kind => cleanup.results[kind]?.length === 0)
+      fs.writeFileSync(path.join(output, 'readiness-control-cleanup.json'), JSON.stringify({ project: c.project, passed: cleanupPassed,
         remaining: Object.fromEntries(['containers', 'volumes', 'networks'].map(kind => [kind, cleanup.results[kind] ?? ['inventory unavailable']])),
         failures: cleanup.failures.map(f => f.name) }, null, 2))
+      cleaned = cleanupPassed
       assert.equal(cleaned, true, 'Readiness control cleanup/inventory failed')
     })
   } catch (e) {
-    if (!startupFailed || !cleaned || cancelled) throw e
+    // Suppress only the expected startup rejection, never cleanup/receipt failures.
+    requireExpectedBadReadinessError(e, startupError, { project: c.project, exitCode, startupRejection, health, healthRecorded, cleaned, cancelled })
   }
-  assert.equal(startupFailed && cleaned, true)
-  const result = { project: c.project, deliberateReadinessFailure: true, authOperationsStarted: false, cleanupPassed: true }
+  const result = { project: c.project, deliberateReadinessFailure: true, authOperationsStarted: false, cleanupPassed: true, exitCode, startupRejection, health }
   fs.writeFileSync(path.join(output, 'readiness-failure-control.json'), JSON.stringify(result, null, 2))
   return result
 }

@@ -505,3 +505,148 @@ it('enforces the total diagnostic byte budget before the sample cap for large tr
   expect(Buffer.byteLength(JSON.stringify(snapshot), 'utf8')).toBeLessThanOrEqual(8192)
   expect(JSON.stringify(snapshot)).not.toMatch(/ignoredPrivateFunction|unknown private payload|https?:/)
 })
+
+import { badReadinessDocument, observeBadKeycloakHealth, classifyBadReadinessRejection, ownedKeycloakId, ownedHealthProjection, assertBadReadinessResult, requireExpectedBadReadinessError, OWNED_HEALTH_FORMAT, READINESS_CONTROL_WAIT_SECONDS } from '../auth-compatibility/readiness-control.mjs'
+
+it('makes only the bad health probe fail well before the unchanged readiness deadline', () => {
+  const images = Object.fromEntries(Object.entries(IMAGE_TAGS).map(([name, tag]) => [name, `${tag}@sha256:${'a'.repeat(64)}`]))
+  const normal = composeDocument(fixture(), images, '/owned/theme')
+  const original = structuredClone(normal)
+  const bad = badReadinessDocument(fixture(), images, '/owned/theme')
+  const seconds = (value: string) => Number(/^([0-9]+)s$/.exec(value)![1])
+  const probe = bad.services.keycloak.healthcheck
+  const budget = seconds(probe.start_period) + probe.retries * (seconds(probe.interval) + seconds(probe.timeout))
+  expect(READINESS_CONTROL_WAIT_SECONDS).toBe(20)
+  expect(probe.test).toEqual(['CMD-SHELL', 'exit 1'])
+  expect(probe.start_period).toBe('0s')
+  expect(budget).toBeLessThan(READINESS_CONTROL_WAIT_SECONDS / 2)
+  const prior = normal.services.keycloak.healthcheck
+  expect(prior.retries * (seconds(prior.interval) + seconds(prior.timeout))).toBeGreaterThan(READINESS_CONTROL_WAIT_SECONDS)
+  const expected = structuredClone(normal)
+  expected.services.keycloak.healthcheck = probe
+  expect(bad).toEqual(expected)
+  expect(normal).toEqual(original)
+})
+
+it('selects a full owned Keycloak identity before inspecting only safe engine health enums', async () => {
+  const c = fixture(); const id = 'a'.repeat(64)
+  const calls: string[][] = []
+  const health = await observeBadKeycloakHealth(c, async (args: string[]) => {
+    calls.push(args)
+    if (args[0] === 'ps') return id
+    if (args[0] === 'inspect') return `${id} running unhealthy`
+    throw Error('Unexpected Docker command')
+  })
+  expect(calls).toEqual([
+    ['ps', '-a', '-q', '--no-trunc', '--filter', `label=com.docker.compose.project=${c.project}`, '--filter', 'label=com.docker.compose.service=keycloak'],
+    ['inspect', '--type', 'container', '--format', OWNED_HEALTH_FORMAT, id],
+  ])
+  expect(OWNED_HEALTH_FORMAT).not.toMatch(/Env|Config|Log|Command|json/)
+  expect(health).toEqual({ project: c.project, service: 'keycloak', containerId: id, status: 'running', health: 'unhealthy' })
+  expect(JSON.stringify(health)).not.toMatch(/password|secret|log|Env/)
+})
+
+it('rejects absent, abbreviated, multiple, mismatched and unknown health projections without echoing them', async () => {
+  const id = 'a'.repeat(64); const c = fixture()
+  for (const text of ['', 'a'.repeat(12), `${id}\n${'b'.repeat(64)}`, 'private-credential-value']) expect(() => ownedKeycloakId(text)).toThrow('Expected exactly one full owned Keycloak container identity')
+  for (const text of ['', `${id} running unknown-private`, `${'b'.repeat(64)} running unhealthy`, `${id} running unhealthy extra-private`, `${id} unknown-private unhealthy`]) {
+    try { ownedHealthProjection(c.project, id, text); throw Error('Unexpected accepted projection') } catch (error) {
+      expect((error as Error).message).toBe('Invalid owned health projection')
+      expect((error as Error).message).not.toContain('private')
+    }
+  }
+  let inspected = false
+  await expect(observeBadKeycloakHealth(c, async (args: string[]) => {
+    if (args[0] === 'inspect') inspected = true
+    return ''
+  })).rejects.toThrow('Expected exactly one full owned Keycloak container identity')
+  expect(inspected).toBe(false)
+})
+
+it('requires observed owned unhealthy state, nonzero exit, health receipt and cleanup without hiding cancellation or unrelated errors', () => {
+  const project = fixture().project; const containerId = 'a'.repeat(64)
+  const health = { project, service: 'keycloak', containerId, status: 'running', health: 'unhealthy' }
+  const good = { project, exitCode: 1, startupRejection: 'owned-keycloak-unhealthy', health, healthRecorded: true, cleaned: true, cancelled: false }
+  expect(() => assertBadReadinessResult(good)).not.toThrow()
+  for (const changed of [
+    { exitCode: 0 }, { startupRejection: 'unclassified' }, { startupRejection: undefined }, { exitCode: undefined }, { exitCode: null }, { exitCode: '1' }, { exitCode: 256 },
+    { health: undefined }, { healthRecorded: false }, { cleaned: false }, { cancelled: true },
+    { health: { ...health, health: 'healthy' } }, { health: { ...health, health: 'starting' } },
+    { health: { ...health, health: 'none' } }, { health: { ...health, status: 'exited' } },
+    { health: { ...health, project: 'foreign' } }, { health: { ...health, containerId: 'short' } },
+    { exitCode: 125, health: undefined },
+  ]) expect(() => assertBadReadinessResult({ ...good, ...changed })).toThrow()
+  const startup = Error('Expected controlled startup rejection')
+  expect(() => requireExpectedBadReadinessError(startup, startup, good)).not.toThrow()
+  const receiptFailure = Error('Health receipt write failed')
+  let retained: unknown
+  try { requireExpectedBadReadinessError(receiptFailure, startup, good) } catch (error) { retained = error }
+  expect(retained).toBe(receiptFailure)
+  const cleanupFailure = new AggregateError([startup, Error('Cleanup failed')])
+  try { requireExpectedBadReadinessError(cleanupFailure, startup, good) } catch (error) { retained = error }
+  expect(retained).toBe(cleanupFailure)
+})
+
+it('classifies only the exact owned terminal unhealthy rejection, without persisting CLI prose', () => {
+  const project = fixture().project
+  const expected = `container ${project}-keycloak-1 is unhealthy`
+  for (const line of [expected, `dependency failed to start: ${expected}`, `\u001b[31m${expected}\u001b[0m\n`]) expect(classifyBadReadinessRejection(project, line)).toBe('owned-keycloak-unhealthy')
+  for (const line of ['', 'unrelated transport rejection', `${expected}\nunrelated terminal rejection`, `container foreign-keycloak-1 is unhealthy`, `unexpected private prefix: ${expected}`]) expect(classifyBadReadinessRejection(project, line)).toBe('unclassified')
+})
+
+import nodeAssert from 'node:assert/strict'
+
+it('executes the actual bad-readiness orchestration with inert transports and refuses unrelated or missing evidence', async () => {
+  const source = fs.readFileSync(path.resolve(__dirname, '../auth-compatibility/run.mjs'), 'utf8')
+  const start = source.indexOf('async function readinessFailureControl(')
+  const end = source.indexOf('\nasync function main()', start)
+  expect(start).toBeGreaterThan(-1); expect(end).toBeGreaterThan(start)
+  const body = source.slice(start, end)
+  const images = Object.fromEntries(Object.entries(IMAGE_TAGS).map(([name, tag]) => [name, `${tag}@sha256:${'a'.repeat(64)}`]))
+  const modes = ['expected', 'dependency-wrapper', 'ansi', 'zero', 'unrelated-125', 'unrelated-1', 'missing-log', 'extra-terminal', 'wrong-project', 'missing-exit', 'missing-health', 'unknown-health', 'wrong-id', 'cancelled', 'health-receipt-failure', 'cleanup-failure', 'cleanup-receipt-failure']
+  for (const mode of modes) {
+    const c = { ...fixture(), directory: '/inert/group' }
+    const id = 'a'.repeat(64)
+    const files = new Map<string, string>()
+    const events: string[] = []
+    const memoryFs = {
+      writeFileSync(file: string, data: string) {
+        events.push(path.basename(file))
+        if (mode === 'health-receipt-failure' && file.endsWith('readiness-control-health.json')) throw Error('Health receipt failure')
+        if (mode === 'cleanup-receipt-failure' && file.endsWith('readiness-control-cleanup.json')) throw Error('Cleanup receipt failure')
+        files.set(file, data)
+      },
+      readFileSync(file: string) { if (!files.has(file)) throw Error('Missing inert file'); return files.get(file) },
+    }
+    const startupError = Error('Inert startup rejection')
+    const execute = async (_command: string, _args: string[], options: { name: string }) => {
+      events.push(options.name)
+      if (options.name === 'readiness-control-start') {
+        expect(_command).toBe('docker')
+        expect(_args[_args.indexOf('--wait-timeout') + 1]).toBe('20')
+        const exitCode = mode === 'zero' ? 0 : mode === 'unrelated-125' ? 125 : 1
+        if (mode !== 'missing-exit') files.set(path.join('/inert/output', 'readiness-control-start.receipt.json'), JSON.stringify({ exitCode }))
+        const expected = `container ${c.project}-keycloak-1 is unhealthy`
+        const terminal = mode.startsWith('unrelated-') ? 'Unrelated transport rejection' : mode === 'extra-terminal' ? `${expected}\nUnrelated final rejection` : mode === 'wrong-project' ? 'container foreign-keycloak-1 is unhealthy' : mode === 'dependency-wrapper' ? `dependency failed to start: ${expected}` : mode === 'ansi' ? `\u001b[31m${expected}\u001b[0m` : expected
+        if (mode !== 'missing-log') files.set(path.join('/inert/output', 'readiness-control-start.log'), terminal)
+        if (exitCode !== 0) throw startupError
+        return ''
+      }
+      if (options.name === 'readiness-control-owned-keycloak') return mode === 'missing-health' ? '' : id
+      if (options.name === 'readiness-control-owned-keycloak-health') return `${mode === 'wrong-id' ? 'b'.repeat(64) : id} running ${mode === 'unknown-health' ? 'private-unknown' : 'unhealthy'}`
+      if (options.name === 'readiness-control-cleanup' && mode === 'cleanup-failure') throw Error('Cleanup failure')
+      return ''
+    }
+    // Only the trusted function body is evaluated; every transport and fs effect
+    // is injected. main(), Docker, browsers and the real filesystem never execute.
+    const dependencies = { newFixture: async () => c, path, badReadinessDocument, sourceRoot: '/inert/source', fs: memoryFs, output: '/inert/output', ownedLifecycle, resources: async () => [], execute, assert: nodeAssert, attemptCleanup, observeBadKeycloakHealth, cancelled: mode === 'cancelled', classifyBadReadinessRejection, requireExpectedBadReadinessError, READINESS_CONTROL_WAIT_SECONDS }
+    const control = new Function(...Object.keys(dependencies), `${body}\nreturn readinessFailureControl`)(...Object.values(dependencies)) as (root: string, images: Record<string, string>) => Promise<Record<string, unknown>>
+    if (['expected', 'dependency-wrapper', 'ansi'].includes(mode)) {
+      const result = await control('/inert', images)
+      expect(result, mode).toMatchObject({ deliberateReadinessFailure: true, authOperationsStarted: false, cleanupPassed: true, exitCode: 1, startupRejection: 'owned-keycloak-unhealthy' })
+      expect(events.indexOf('readiness-control-health.json'), mode).toBeLessThan(events.indexOf('readiness-control-cleanup'))
+    } else await expect(control('/inert', images), mode).rejects.toBeDefined()
+    expect(events, mode).toContain('readiness-control-cleanup')
+    expect(events, mode).toContain('readiness-control-cleanup.json')
+  }
+})
