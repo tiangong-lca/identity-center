@@ -12,8 +12,8 @@ checkPaths:
   - docs/implementation/README.md
   - docs/implementation/definition-of-done.md
 lastReviewedAt: 2026-10-27
-lastReviewedCommit: 761511d3798c0609b53433d780b3e10eaf60bea5
-lastReviewedNote: "Identity46 prepared scoped YAML Worker facade and unmount disposer using frozen Monaco0.55.1 initialization/public API. Manifest/lock and React44 remain unchanged. Six boundary units, lint/typecheck and focused bundle-only build pass; initial generic type error fixed and retained. Independent review corrections tighten legacy cause/schema update and host deadlines. Real browser worker, Portal Apply/lifecycle, full hosted qualification and Main publication review remain pending. No strict-zero relaxation, production or Docker operation; design bodies unchanged."
+lastReviewedCommit: b0e4297edbe76c8565d589a24d898c94ae00498c
+lastReviewedNote: "Identity46 catalog-yaml hosted support: immutable Main64055a2 exact graph/product source, rename-safe whole-tree fence, actual entrypoint and inert runner/archive wiring negatives, known-defective baseline UI unexecuted, strict-zero candidate Registry schema/Apply/worker disposal-reopen, then unchanged auth/transport/outage and both-image runtime proof. Necessary b68 readiness/privacy helpers retain strict semantics and provenance. Focused32cases/types/lint pass; source review descriptor evidence gap fixed. Product/graph unchanged from a463 focused browser and113-unit/standalone proof. Hosted qualification/publication/merge remain pending; no local Docker/build/browser rerun or design-body changes."
 ---
 
 # GOAL — 统一身份平台一期全量交付
