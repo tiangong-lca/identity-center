@@ -468,6 +468,10 @@ rules:
     scope: repo
     repo: identity-center
     triggers:
+      - path: identity-portal/scripts/monaco-worker-regression.mjs
+        kind: worker-regression-runner
+      - path: docs/references/2026-10-27-catalog-yaml-worker.md
+        kind: worker-compatibility-record
       - path: identity-portal/tests/**
         kind: repo-test
       - path: identity-portal/package.json

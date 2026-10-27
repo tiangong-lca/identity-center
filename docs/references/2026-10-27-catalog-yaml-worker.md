@@ -1,0 +1,69 @@
+# Catalog YAML worker compatibility — Identity46
+
+The frozen Main64055a2 graph uses monaco-editor0.55.1, monaco-yaml5.5.1 and
+monaco-worker-manager2.0.1. The manager forwards legacy moduleId/createData while
+Monaco's public createWebWorker requires Worker|Promise<Worker>. A broad peer
+range is insufficient runtime compatibility evidence. No dependency changes are
+part of this repair.
+
+Context7 retrieval was quota-blocked. Exact versioned primary sources and the
+installed frozen package were used:
+
+- [Monaco0.55.1 compatibility initialization](https://github.com/microsoft/monaco-editor/blob/v0.55.1/src/common/workers.ts#L84-L102)
+  resolves the native worker, sends bootstrap then createData, then calls public
+  editor.createWebWorker with the worker promise. The installed counterpart is
+  esm/vs/common/workers.js; the source path is not a shipped module to import.
+- [Monaco package's vscodeRef API](https://github.com/microsoft/vscode/blob/86f5a62f058e3905f74a9fa65d04b2f3b533408e/src/vs/editor/standalone/browser/standaloneWebWorker.ts#L32-L65)
+  requires the worker and provides synchronization/disposal.
+- [Manager2.0.1 forwarding](https://github.com/remcohaszing/monaco-worker-manager/blob/v2.0.1/index.ts#L105-L119)
+  retains legacy options and owns restart/idle/disposal.
+- [YAML5.5.1 worker requirement](https://github.com/remcohaszing/monaco-yaml/blob/v5.5.1/README.md#is-the-web-worker-necessary)
+  explains why highlighting/typing alone does not prove schema-aware support.
+
+withCatalogYamlWorker supplies an application-scoped facade only to
+configureMonacoYaml. Its exact YAML legacy route is adapted to an initialized
+native worker through the public API. Modern worker options delegate unchanged;
+the original singleton and global API are not modified. Initialization failure
+terminates the created worker. Existing schema/CSP/loader policy is preserved.
+CatalogEditorImpl also disposes its YAML configuration on unmount, avoids
+configuring the same mounted editor twice, and ignores a late import after
+unmount. Actual Portal navigation/reopen cleanup remains a hosted acceptance
+requirement; the isolated fixture's explicit disposer alone does not prove it.
+
+The focused fixture bundles actual pinned Monaco/YAML plus the product adapter
+using existing tsx's esbuild0.28.2. Context7 was also quota-blocked for esbuild;
+[versioned build types](https://github.com/evanw/esbuild/blob/v0.28.2/lib/shared/types.ts)
+and the [official build API](https://esbuild.github.io/api/#build) were consulted.
+It is a separate component qualification, not the actual Next standalone bundle
+or authenticated Portal Apply proof.
+
+From identity-portal, with a new absolute owned output directory:
+
+```sh
+node scripts/monaco-worker-regression.mjs --build-only --output <new-owned-output>
+node scripts/monaco-worker-regression.mjs --run --output <different-new-owned-output>
+```
+
+The run command creates only an ephemeral127.0.0.1 server and fresh browser
+contexts; it never invokes default Playwright auth setup, a saved browser state,
+Next, Docker or services. No browser installation is automatic. Traces,
+screenshots and video are absent. Retained results contain only fixed booleans,
+counts, asset digests and a fixed failure phase, never raw browser error prose.
+All outbound requests must remain at the unique local origin. Browser/server
+cleanup is recorded even on failure.
+
+The legacy context must reject its actual provider call. Repaired contexts must
+produce a real schema marker, resolve an internal reference and actual boolean
+repair action, apply that edit, clear the marker with validation returning[],
+restart with changed options, remove a synchronized model, close native workers,
+and reopen without duplicate/stale providers. Unit doubles establish only the
+boundary contract; actual-worker and full standalone acceptance remain pending
+until their command results exist.
+
+React44/PR45 remains at b68c2d1 with failed immutable64055a2 baseline page3/
+console0. Hosted emitted bytes were not retained, and local chunk names differ;
+the structural source correlation does not identify exact error messages or
+establish React19.3 causality. Candidate/logout/transport did not run. This
+separate baseline repair neither qualifies React44 nor completes original29.
+After independently qualified delivery on Main, React44 needs an explicitly
+reviewed new immutable case and complete baseline/candidate UI/auth/image proof.
