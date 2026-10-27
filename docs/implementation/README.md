@@ -11,9 +11,9 @@ checkPaths:
   - docs/implementation/README.md
   - GOAL.md
   - docs/design/README.md
-lastReviewedAt: 2026-10-26
-lastReviewedCommit: 3161be477faf321632d19709465ade7a2ae1c9e2
-lastReviewedNote: "Identity #41: quality CI on 3161be4 failed despite 105 passing cases because four unhandled JSON parse errors exposed a fake-state truncation race. Both fake Docker writers now write a PID-unique sibling temporary file and rename it over the polled state. Parsing and assertions remain strict. Local lint/typecheck, 105 units and six concurrent-load cancellation repeats pass without unhandled errors. Windows skips only the eight POSIX controls; no native Windows proof claimed. Product/runtime/workflow unchanged; new exact-head hosted CI and artifact validation remain required."
+lastReviewedAt: 2026-10-27
+lastReviewedCommit: 761511d3798c0609b53433d780b3e10eaf60bea5
+lastReviewedNote: "Identity46 prepared scoped YAML Worker facade and unmount disposer using frozen Monaco0.55.1 initialization/public API. Manifest/lock and React44 remain unchanged. Six boundary units, lint/typecheck and focused bundle-only build pass; initial generic type error fixed and retained. Independent review corrections tighten legacy cause/schema update and host deadlines. Real browser worker, Portal Apply/lifecycle, full hosted qualification and Main publication review remain pending. No strict-zero relaxation, production or Docker operation; design bodies unchanged."
 ---
 
 # 统一身份平台实施方案

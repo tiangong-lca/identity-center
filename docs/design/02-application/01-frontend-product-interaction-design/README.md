@@ -10,8 +10,9 @@ whenToUpdate: 前端产品交互设计、页面结构或交互规范发生变化
 checkPaths:
   - docs/design/02-application/01-frontend-product-interaction-design/README.md
   - identity-portal/AGENTS.md
-lastReviewedAt: 2026-09-16
-lastReviewedCommit: 50eff892cd98671e2556cacebe5a72ec198ee0f9
+lastReviewedAt: 2026-10-27
+lastReviewedCommit: 761511d3798c0609b53433d780b3e10eaf60bea5
+lastReviewedNote: "Identity46 prepared scoped YAML Worker facade and unmount disposer using frozen Monaco0.55.1 initialization/public API. Manifest/lock and React44 remain unchanged. Six boundary units, lint/typecheck and focused bundle-only build pass; initial generic type error fixed and retained. Independent review corrections tighten legacy cause/schema update and host deadlines. Real browser worker, Portal Apply/lifecycle, full hosted qualification and Main publication review remain pending. No strict-zero relaxation, production or Docker operation; design bodies unchanged."
 ---
 
 # 06. 前端产品与交互设计

@@ -10,9 +10,9 @@ whenToUpdate: 设计文档集目录结构、评审状态或收录范围发生变
 checkPaths:
   - docs/design/README.md
   - docs/README.md
-lastReviewedAt: 2026-10-26
-lastReviewedCommit: 189707a3d384a2ebb9f43053a56f4121a40404f7
-lastReviewedNote: "Identity #41 review fixes: raw Git blob extraction preserves exact Dockerfile hashes; all hosted image Docker calls have deadlines and TERM/KILL escalation, cleanup attempts both targets and writes failed/incomplete receipts. Local lint, typecheck, 105 units including eight actual-workflow cleanup controls and syntax pass. Runtime24.22.1/types24.19.2/pnpm11.9 integrity and other dependencies remain unchanged. No Docker/services/production activation; final-head hosted image/auth proof, review, merge and integration remain required."
+lastReviewedAt: 2026-10-27
+lastReviewedCommit: 761511d3798c0609b53433d780b3e10eaf60bea5
+lastReviewedNote: "Identity46 prepared scoped YAML Worker facade and unmount disposer using frozen Monaco0.55.1 initialization/public API. Manifest/lock and React44 remain unchanged. Six boundary units, lint/typecheck and focused bundle-only build pass; initial generic type error fixed and retained. Independent review corrections tighten legacy cause/schema update and host deadlines. Real browser worker, Portal Apply/lifecycle, full hosted qualification and Main publication review remain pending. No strict-zero relaxation, production or Docker operation; design bodies unchanged."
 ---
 
 # 统一身份与用户门户设计文档集
