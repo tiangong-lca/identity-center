@@ -12,8 +12,8 @@ checkPaths:
   - GOAL.md
   - docs/design/README.md
 lastReviewedAt: 2026-10-27
-lastReviewedCommit: c36bae1cbfa033af97b0279225f91941dc6641a0
-lastReviewedNote: "Identity #44 independent review repair: React qualification now classifies every tracked changed path and rejects unknown product/config paths; explicit governance allowances preserve all but three review metadata fields. Actual entrypoint negatives cover business-apps YAML, Drizzle config and a new product path. Scoped21 harness cases, lint/typecheck and clean source preflight pass. Historical auth-client fence, application/build inputs and production boundaries unchanged. Earlier109-unit/build evidence retained; no new full-suite/build or hosted proof claimed."
+lastReviewedCommit: ba66ed6e182b407cead86f59883d7fac8ca06ab0
+lastReviewedNote: "Identity #44 second independent review repair: whole-tree React diff disables rename detection so deleted product sources cannot hide behind allowed support destinations. Real temporary Git R100 entrypoint exposure/rejection controls and existing config/new-path negatives pass in the21-case scoped harness; lint/typecheck and clean source preflight pass. Historical auth-client behavior and application/build inputs unchanged. No new full-suite/build or hosted qualification claimed; prior evidence retained."
 ---
 
 # 统一身份平台实施方案
