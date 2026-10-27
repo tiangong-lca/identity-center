@@ -1,7 +1,7 @@
 # Auth dependency interoperability proof
 
-Identity46 adds an explicit `AUTH_PROOF_CASE=catalog-yaml` owner case. The
-workflow selects this case for the catalog repair; the historical auth-client
+Historical Identity46 added an explicit `AUTH_PROOF_CASE=catalog-yaml` owner case.
+Its qualified repair workflow selected that case; the historical auth-client
 case remains available with its original baseline, graph and product assertions,
 and is not claimed executed by that selected workflow. React44's separate
 branch/case is unchanged and is not imported here.
@@ -137,7 +137,7 @@ remain required; the hosted protocol proof follows review and main's normal push
 
 ## Separate React 19.3 experiment (Identity #44)
 
-The PR workflow explicitly selects `AUTH_PROOF_CASE=react19.3`. Its immutable
+The historical PR experiment explicitly selected `AUTH_PROOF_CASE=react19.3`. Its immutable
 baseline is Main `64055a2cd05fa4056ea36fd9ab1b780a77e1690e`; candidate source must
 be the requested exact descendant head. The baseline manifest hash is fixed, and
 the candidate manifest may change only React/DOM19.2.4 to the exact19.3.1 pair.
@@ -285,3 +285,11 @@ remain pending phaseB/publication review. All previous failed runs remain failed
 Original29's106 provisional accounting gaps include normalization/qualified
 substitutions and genuinely unadopted records; Main owns the per-record final
 disposition after qualification. No blanket coverage or tooling-only claim.
+
+
+The150s browser budget is inherited from historical44 broader UI, not increased
+after a runtime failure. Case routing selects150s only for the React experiments
+and preserves qualified auth-client/catalog-yaml90s. Assertion/navigation
+defaults/retries are unchanged; no browser budget exceeds150s. Historical
+react19.3 broad-only runs still collect and persist their asset inventory;
+Catalog worker descriptor/evidence is collected only where Catalog actually runs.

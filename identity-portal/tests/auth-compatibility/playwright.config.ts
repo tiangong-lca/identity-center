@@ -1,11 +1,12 @@
 import { defineConfig, devices } from '@playwright/test'
 import { fixture } from './fixture'
+import { qualificationBrowserTimeout } from './ui-plan.mjs'
 
 const c = fixture()
 export default defineConfig({
   testDir: __dirname,
   testMatch: 'browser.proof.spec.ts',
-  timeout: 150_000,
+  timeout: qualificationBrowserTimeout(c.qualificationCase),
   retries: 0,
   workers: 1,
   reporter: [['list']],

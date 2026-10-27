@@ -241,12 +241,15 @@ async function variant(variant, root, images, head) {
       env = { ...env, KEYCLOAK_CLIENT_SECRET: c.portalSecret, KEYCLOAK_ADMIN_API_CLIENT_SECRET: c.adminApiSecret }
       await pnpm(['exec', 'vitest', 'run', '--project', 'integration', 'tests/integration/keycloak-admin.test.ts', 'tests/integration/keycloak-bootstrap.test.ts'], 'existing-admin-pkce')
       await pnpm(['build'], 'build')
-      if (qualificationUiPlan(selectedCase.name, variant).catalog) {
+      const uiPlan = qualificationUiPlan(selectedCase.name, variant)
+      if (uiPlan.broad || uiPlan.catalog) {
         c.browserAssets = emittedBrowserAssetPaths(app)
-        c.yamlWorker = emittedYamlWorker(app)
-        const workerEvidence = JSON.stringify({ qualificationCase: selectedCase.name, source: variant === 'baseline' ? BASELINE : head, descriptor: c.yamlWorker }, null, 2)
-        assert.ok(Buffer.byteLength(workerEvidence, 'utf8') <= 8192, 'Bound emitted worker identity evidence')
-        fs.writeFileSync(path.join(c.evidenceDirectory, 'yaml-worker-assets.json'), workerEvidence, { mode: 0o600 })
+        if (uiPlan.catalog) {
+          c.yamlWorker = emittedYamlWorker(app)
+          const workerEvidence = JSON.stringify({ qualificationCase: selectedCase.name, source: variant === 'baseline' ? BASELINE : head, descriptor: c.yamlWorker }, null, 2)
+          assert.ok(Buffer.byteLength(workerEvidence, 'utf8') <= 8192, 'Bound emitted worker identity evidence')
+          fs.writeFileSync(path.join(c.evidenceDirectory, 'yaml-worker-assets.json'), workerEvidence, { mode: 0o600 })
+        }
         fs.writeFileSync(configFile, JSON.stringify(c), { mode: 0o600 })
       }
       stopPortal = await startPortal(c, app, env)

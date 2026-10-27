@@ -82,6 +82,7 @@ export function reactChangedPathPolicy(file) {
   if (file === 'identity-portal/pnpm-lock.yaml') return 'lock'
   if (file.startsWith('identity-portal/tests/auth-compatibility/') ||
       file === 'identity-portal/tests/unit/auth-compatibility-harness.test.ts' ||
+      file === 'identity-portal/tests/unit/catalog-qualification.test.ts' ||
       file === '.github/workflows/auth-compatibility.yml') return 'qualification-support'
   if (qualificationDocs.has(file)) return 'qualification-doc'
   if (reviewMetadataPaths.has(file)) return 'review-metadata'

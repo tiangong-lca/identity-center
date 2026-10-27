@@ -217,7 +217,7 @@ it('preserves real Git blob newlines at the orchestrator extraction boundary', (
 })
 
 import { qualificationCase, assertQualificationSources, assertQualificationManifest, assertQualificationVersions, assertQualificationProductDelta, reactChangedPathPolicy } from '../auth-compatibility/qualification-case.mjs'
-import { qualificationUiPlan, combinedReactUi, assertFixedReactUiReceipts } from '../auth-compatibility/ui-plan.mjs'
+import { qualificationUiPlan, qualificationBrowserTimeout, combinedReactUi, assertFixedReactUiReceipts } from '../auth-compatibility/ui-plan.mjs'
 import ts from 'typescript'
 
 const fixedName = 'react19.3-catalog-fixed'
@@ -266,6 +266,18 @@ it('rejects the actual silent-merge duplicate YAML selector and selects exactly 
   expect(() => load(source.replace(key, key + '\n          AUTH_PROOF_CASE: catalog-yaml'))).toThrow(/duplicat/i)
 })
 
+it('executes the actual Playwright timeout routing without changing historical auth/catalog budgets', () => {
+  const source = fs.readFileSync(path.resolve(__dirname, '../auth-compatibility/playwright.config.ts'), 'utf8')
+  const body = source.replace(/^import .*\n/gm, '').replace('export default', 'return')
+  for (const [name, timeout] of [['auth-client', 90_000], ['catalog-yaml', 90_000], ['react19.3', 150_000], [fixedName, 150_000]] as const) {
+    expect(qualificationBrowserTimeout(name)).toBe(timeout)
+    const config = new Function('fixture', 'defineConfig', 'devices', 'qualificationBrowserTimeout', '__dirname', body)(() => ({ qualificationCase: name, directory: '/inert', portalOrigin: 'http://localhost:21002' }), (value: unknown) => value, { 'Desktop Chrome': {} }, qualificationBrowserTimeout, '/inert')
+    expect(config.timeout).toBe(timeout)
+    expect(config.retries).toBe(0)
+    expect(config.use).toMatchObject({ trace: 'off', screenshot: 'off', video: 'off' })
+  }
+})
+
 it('executes actual browser orchestration for both variants with distinct awaited suite receipts', async () => {
   const source = fs.readFileSync(path.resolve(__dirname, '../auth-compatibility/browser.proof.spec.ts'), 'utf8')
   const start = source.indexOf('    if (ui) {'); const end = source.indexOf('\n    await admin.logoutUserSessions', start)
@@ -286,17 +298,27 @@ it('executes actual browser orchestration for both variants with distinct awaite
   }
 })
 
-it('persists worker descriptor evidence against the actual baseline or candidate source', () => {
+it('executes actual broad-only and Catalog asset selection, persisting each actual source binding', () => {
   const source = fs.readFileSync(path.resolve(__dirname, '../auth-compatibility/run.mjs'), 'utf8')
-  const start = source.indexOf('        const workerEvidence = ')
-  const end = source.indexOf('\n      }', start)
+  const start = source.indexOf('      const uiPlan = qualificationUiPlan(')
+  const end = source.indexOf('\n      stopPortal = ', start)
   expect(start).toBeGreaterThan(-1); expect(end).toBeGreaterThan(start)
-  for (const variant of ['baseline', 'candidate']) {
+  for (const name of ['react19.3', fixedName, 'catalog-yaml', 'auth-client']) for (const variant of ['baseline', 'candidate']) {
     const files = new Map<string, string>()
-    const c = { evidenceDirectory: '/inert', yamlWorker: { bootstrap: '/_next/static/chunks/owned.js', chunks: [], digests: {} } }
-    const deps = { selectedCase: qualificationCase(fixedName), variant, BASELINE: fixedBase, head: 'a'.repeat(40), c, assert: nodeAssert, Buffer, path, configFile: '/inert/config.json', fs: { writeFileSync: (name: string, data: string) => files.set(name, data) } }
+    const c: { evidenceDirectory: string; browserAssets?: string[]; yamlWorker?: unknown } = { evidenceDirectory: '/inert' }
+    let descriptors = 0
+    const deps = { selectedCase: qualificationCase(name), variant, BASELINE: qualificationCase(name).baseline, head: 'a'.repeat(40), c, assert: nodeAssert, Buffer, path, app: '/inert/app', configFile: '/inert/config.json', qualificationUiPlan,
+      emittedBrowserAssetPaths: () => ['/owned.js'], emittedYamlWorker: () => { descriptors++; return { bootstrap: '/owned-worker.js', chunks: [], digests: {} } },
+      fs: { writeFileSync: (file: string, data: string) => files.set(file, data) } }
     new Function(...Object.keys(deps), source.slice(start,end))(...Object.values(deps))
-    expect(JSON.parse(files.get('/inert/yaml-worker-assets.json')!)).toMatchObject({ qualificationCase: fixedName, source: variant === 'baseline' ? fixedBase : 'a'.repeat(40) })
+    const hasAssets = name === 'react19.3' || name === fixedName || name === 'catalog-yaml' && variant === 'candidate'
+    const hasDescriptor = name === fixedName || name === 'catalog-yaml' && variant === 'candidate'
+    expect(c.browserAssets).toEqual(hasAssets ? ['/owned.js'] : undefined)
+    expect(files.has('/inert/config.json')).toBe(hasAssets)
+    expect(descriptors).toBe(hasDescriptor ? 1 : 0)
+    expect(files.has('/inert/yaml-worker-assets.json')).toBe(hasDescriptor)
+    if (hasDescriptor) expect(JSON.parse(files.get('/inert/yaml-worker-assets.json')!)).toMatchObject({ qualificationCase: name, source: variant === 'baseline' ? qualificationCase(name).baseline : 'a'.repeat(40) })
+    if (name === 'react19.3') expect(JSON.parse(files.get('/inert/config.json')!).browserAssets.length).toBeGreaterThan(0)
   }
 })
 
@@ -451,6 +473,8 @@ else if (args[0] === 'show') {
     return execFileSync(process.execPath, [path.resolve(__dirname, '../auth-compatibility/run.mjs'), '--validate-sources'], { env: { ...env, ...changed }, encoding: 'utf8', stdio: 'pipe' })
   }
     expect(JSON.parse(run())).toEqual({ validationOnly: true, qualificationCase: caseName, baseline: selected.baseline, head, dockerAccessed: false })
+    expect(JSON.parse(run({ TEST_CHANGED_PATH: 'identity-portal/tests/unit/catalog-qualification.test.ts' }))).toMatchObject({ validationOnly: true, dockerAccessed: false })
+    expect(() => run({ TEST_CHANGED_PATH: 'identity-portal/tests/unit/catalog-qualification-unreviewed.test.ts' })).toThrow('Unreviewed React qualification path')
     const invoked = fs.readFileSync(calls, 'utf8').trim().split('\n').map(line => JSON.parse(line) as string[])
     expect(invoked).toContainEqual(['show', `${selected.baseline}:${file}`])
     expect(invoked).toContainEqual(['show', `${head}:${file}`])
@@ -471,6 +495,8 @@ it('classifies the entire React changed tree with explicit allowances and review
   expect(reactChangedPathPolicy('identity-portal/package.json')).toBe('manifest')
   expect(reactChangedPathPolicy('identity-portal/pnpm-lock.yaml')).toBe('lock')
   expect(reactChangedPathPolicy('identity-portal/tests/auth-compatibility/new-control.ts')).toBe('qualification-support')
+  expect(reactChangedPathPolicy('identity-portal/tests/unit/catalog-qualification.test.ts')).toBe('qualification-support')
+  expect(() => reactChangedPathPolicy('identity-portal/tests/unit/catalog-qualification-unreviewed.test.ts')).toThrow('Unreviewed React qualification path')
   expect(reactChangedPathPolicy('docs/guides/dependency-maintenance.md')).toBe('qualification-doc')
   expect(reactChangedPathPolicy('.docpact/config.yaml')).toBe('review-metadata')
   expect(() => assertQualificationProductDelta('react19.3', '.docpact/config.yaml', 'lastReviewedAt: old\nrules: strict\n', 'lastReviewedAt: new\nrules: strict\n')).not.toThrow()

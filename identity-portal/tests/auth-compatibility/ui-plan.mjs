@@ -9,6 +9,11 @@ export function qualificationUiPlan(name, variant) {
     knownDefectiveSkip: name === 'catalog-yaml' && variant === 'baseline' }
 }
 
+export function qualificationBrowserTimeout(name = 'auth-client') {
+  qualificationCase(name)
+  return name === 'react19.3' || name === 'react19.3-catalog-fixed' ? 150_000 : 90_000
+}
+
 export function combinedReactUi(name, variant, broad, catalog, errors) {
   assert.equal(name, 'react19.3-catalog-fixed')
   assert.deepEqual(qualificationUiPlan(name, variant), { broad: true, catalog: true, knownDefectiveSkip: false })
