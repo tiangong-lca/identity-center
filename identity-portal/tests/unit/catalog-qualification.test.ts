@@ -3,6 +3,8 @@ import fs from 'node:fs'
 import path from 'node:path'
 import os from 'node:os'
 import { execFileSync } from 'node:child_process'
+import { createHash } from 'node:crypto'
+import { gunzipSync } from 'node:zlib'
 import { load } from 'js-yaml'
 import { IMAGE_TAGS, composeDocument, ownedLifecycle, attemptCleanup } from '../auth-compatibility/contract.mjs'
 import { proofCase, CATALOG_BASELINE, assertCatalogVersions, assertCatalogUiReceipts, syntheticCatalogDocument } from '../auth-compatibility/catalog-case.mjs'
@@ -58,28 +60,58 @@ it('the actual entrypoint validates a real Git tree and rejects unrelated paths,
   try {
     const checkout = path.join(temp, 'git-source')
     const realGit = execFileSync('which', ['git'], { encoding: 'utf8' }).trim()
-    execFileSync(realGit, ['clone', '--quiet', '--shared', '--no-checkout', sourceRoot, checkout])
-    const git = (...args: string[]) => execFileSync(realGit, ['-C', checkout, ...args], { encoding: 'utf8', env: { ...process.env, GIT_CONFIG_NOSYSTEM: '1' }, stdio: 'pipe' }).trim()
-    const accepted = 'a463281239bde6e24ad962bc7333c76a1a1782f8'
-    git('checkout', '--quiet', '--detach', accepted)
+    fs.mkdirSync(checkout)
+    const git = (...args: string[]) => execFileSync(realGit, ['-C', checkout, ...args], { encoding: 'utf8', env: { PATH: process.env.PATH, HOME: temp, NODE_ENV: 'test', GIT_CONFIG_NOSYSTEM: '1' }, stdio: 'pipe' }).trim()
+    git('init', '--quiet'); git('config', 'diff.renames', 'true')
+    const snapshots = JSON.parse(fs.readFileSync(path.resolve(__dirname, '../auth-compatibility/fixtures/catalog-source.json'), 'utf8')) as {
+      immutableBaseline: string; reviewedProduct: string
+      files: Record<string, { sourceCommit: string; sourcePath: string; sha256: string; byteLength: number; encoding: string; content: string }>
+    }
+    expect(snapshots.immutableBaseline).toBe(CATALOG_BASELINE)
+    expect(snapshots.reviewedProduct).toBe('a463281239bde6e24ad962bc7333c76a1a1782f8')
+    const bytes = (name: string) => {
+      const entry = snapshots.files[name]
+      expect(['utf8', 'gzip-base64']).toContain(entry.encoding)
+      expect(entry.sourceCommit).toBe(['afterEditor', 'adapter'].includes(name) ? snapshots.reviewedProduct : CATALOG_BASELINE)
+      const value = entry.encoding === 'gzip-base64' ? gunzipSync(Buffer.from(entry.content, 'base64')) : Buffer.from(entry.content)
+      expect(value.length).toBe(entry.byteLength)
+      expect(createHash('sha256').update(value).digest('hex')).toBe(entry.sha256)
+      return value
+    }
+    const write = (file: string, value: string | Buffer) => { fs.mkdirSync(path.dirname(path.join(checkout, file)), { recursive: true }); fs.writeFileSync(path.join(checkout, file), value) }
+    const commit = () => { git('add', '--all'); git('-c', 'user.name=Inert test', '-c', 'user.email=test@invalid', 'commit', '--quiet', '-m', 'inert fixture delta'); return git('rev-parse', 'HEAD') }
+    write('identity-portal/package.json', bytes('manifest'))
+    write('identity-portal/pnpm-lock.yaml', bytes('lock'))
+    write('identity-portal/features/catalog/catalog-editor-impl.tsx', bytes('beforeEditor'))
+    write('identity-portal/lib/catalog/diff.ts', 'export const syntheticRenameControl = true\n')
+    write('docs/README.md', '---\nlastReviewedAt: old\n---\nSynthetic unchanged policy\n')
+    const fixtureBaseline = commit()
+    write('identity-portal/features/catalog/catalog-editor-impl.tsx', bytes('afterEditor'))
+    write('identity-portal/features/catalog/yaml-worker-adapter.ts', bytes('adapter'))
+    write('docs/README.md', '---\nlastReviewedAt: new\n---\nSynthetic unchanged policy\n')
+    const accepted = commit()
     const calls = path.join(temp, 'git-calls'); const state = path.join(temp, 'state'); const marker = path.join(temp, 'docker-called')
     const bin = path.join(temp, 'bin'); fs.mkdirSync(bin)
-    fs.writeFileSync(path.join(bin, 'git'), `#!${process.execPath}\nconst fs=require('node:fs'),cp=require('node:child_process');const raw=process.argv.slice(2);let args=raw[0]==='-C'?raw.slice(2):raw;fs.appendFileSync(${JSON.stringify(calls)},JSON.stringify(args)+'\\n');if(fs.readFileSync(${JSON.stringify(state)},'utf8')==='old')args=args.filter(x=>x!=='--no-renames');process.stdout.write(cp.execFileSync(${JSON.stringify(realGit)},['-C',${JSON.stringify(checkout)},...args]));\n`, { mode: 0o700 })
+    // Only the immutable baseline reference is mapped to the owned synthetic
+    // commit. All tree/diff/rename/ancestry operations still run real Git. This
+    // unit seam is not the real clean-source hosted qualification preflight.
+    fs.writeFileSync(path.join(bin, 'git'), `#!${process.execPath}\nconst fs=require('node:fs'),cp=require('node:child_process');const raw=process.argv.slice(2);let args=raw[0]==='-C'?raw.slice(2):raw;fs.appendFileSync(${JSON.stringify(calls)},JSON.stringify(args)+'\\n');if(fs.readFileSync(${JSON.stringify(state)},'utf8')==='old')args=args.filter(x=>x!=='--no-renames');const baseline=${JSON.stringify(CATALOG_BASELINE)},owned=${JSON.stringify(fixtureBaseline)};const mapped=args.map(x=>x===baseline?owned:x.startsWith(baseline+':')?owned+x.slice(baseline.length):x);const result=cp.execFileSync(${JSON.stringify(realGit)},['-C',${JSON.stringify(checkout)},...mapped]);if(args[0]==='merge-base'&&args.includes(baseline)){if(result.toString().trim()!==owned)process.exit(3);process.stdout.write(baseline+'\\n')}else process.stdout.write(result);\n`, { mode: 0o700 })
     fs.writeFileSync(path.join(bin, 'docker'), `#!/bin/sh\n: > '${marker}'\n`, { mode: 0o700 })
     execFileSync(path.join(bin, 'docker')); expect(fs.existsSync(marker)).toBe(true); fs.unlinkSync(marker)
     const run = (head = git('rev-parse', 'HEAD'), extra: Record<string, string> = {}) => { fs.writeFileSync(state, extra.TEST_OLD_RENAME === '1' ? 'old' : 'new'); return execFileSync(process.execPath, [path.join(sourceRoot, 'identity-portal/tests/auth-compatibility/run.mjs'), '--validate-sources'], {
       env: { PATH: `${bin}:${process.env.PATH}`, HOME: temp, NODE_ENV: 'test', AUTH_PROOF_CASE: 'catalog-yaml', AUTH_PROOF_HEAD: head, ...extra }, encoding: 'utf8', stdio: 'pipe',
     }) }
     expect(JSON.parse(run())).toMatchObject({ qualificationCase: 'catalog-yaml', baseline: CATALOG_BASELINE, head: accepted, dockerAccessed: false })
-    const commit = () => { git('add', '--all'); git('-c', 'user.name=Inert test', '-c', 'user.email=test@invalid', 'commit', '--quiet', '-m', 'inert fixture delta'); return git('rev-parse', 'HEAD') }
-    for (const file of ['identity-portal/config/business-apps.yaml', 'identity-portal/drizzle.config.ts', 'identity-portal/new-product-surface.ts', 'identity-portal/features/catalog/catalog-editor-impl.tsx', 'identity-portal/package.json']) {
+    for (const file of ['identity-portal/config/business-apps.yaml', 'identity-portal/drizzle.config.ts', 'identity-portal/new-product-surface.ts', 'identity-portal/features/catalog/catalog-editor-impl.tsx', 'identity-portal/package.json', 'docs/README.md']) {
       git('reset', '--hard', accepted)
+      fs.mkdirSync(path.dirname(path.join(checkout, file)), { recursive: true })
       fs.appendFileSync(path.join(checkout, file), '\n// unexpected fixture mutation\n')
       const changed = commit()
       expect(() => run(changed), file).toThrow()
     }
     git('reset', '--hard', accepted)
     const before = 'identity-portal/lib/catalog/diff.ts'; const after = 'identity-portal/tests/auth-compatibility/moved-product.ts'
+    fs.mkdirSync(path.dirname(path.join(checkout, after)), { recursive: true })
     git('mv', before, after); const renamed = commit()
     expect(git('diff', '--name-status', '-M', accepted, renamed)).toBe(`R100\t${before}\t${after}`)
     expect(JSON.parse(run(renamed, { TEST_OLD_RENAME: '1' }))).toMatchObject({ dockerAccessed: false })

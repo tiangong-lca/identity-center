@@ -15,6 +15,15 @@ tests route inert Git executables to a real temporary repository, including R100
 rename exposure/rejection and unknown/source/config controls. Actual main/archive
 function seams separately prove selected baseline/case reach runner/comparison.
 
+The unit control is hermetic under the quality workflow's depth-one checkout.
+Its minimal source fixture records64055a2 graph/editor and a463281 reviewed
+product provenance/hashes; only the lock is gzip/base64 encoded. The fixture is
+unit data and is never read by the production source fence. Tests initialize a
+real temporary Git graph and map only the immutable baseline reference to that
+owned test commit; all actual diff/rename/ancestry operations still execute Git.
+This seam is distinct from the real clean-head hosted preflight. No historical
+object fetch, checkout deepening, skipped control or source-fence change is used.
+
 Both runtime variants keep Main's React/DOM19.2.4/jose6.2.12/admin26.8.1 graph.
 Baseline auth/transport remains real, while its UI receipt explicitly records
 executed:false/passed:false/known-defective and retains run40474716057 as prior

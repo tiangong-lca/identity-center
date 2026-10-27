@@ -99,3 +99,18 @@ contract are documented in the [proof README](../../identity-portal/tests/auth-c
 Baseline UI is explicitly unexecuted/known-defective, never passed. Future hosted
 proof must bind the final exact support source; no local Docker or repeated
 product build/browser execution is authorized merely by these support edits.
+
+First hosted PR47 attempt at af1a641 remains failed. Quality passed129/130 but
+could not initialize a unit fixture from a463281, absent in its depth-one
+checkout. The correction supplies minimal immutable unit snapshots and a real
+temporary Git graph with only a baseline-ref seam; actual source/rename controls
+also pass in a genuine shallow checkout with both historical objects absent.
+
+The same hosted auth run40493262977 completed baseline auth/transport/outage and
+both image/runtime/cleanup stages, with baseline UI explicitly unexecuted. The
+candidate produced one real YAML worker and schema warning with page/console0,
+but warning-decoration hover was intercepted by visible false text. Apply,
+reopen and candidate logout/transport did not run. The reviewed test correction
+keeps warning count/tooltip/strict-zero gates and ordinary hover on the single
+visible controlled token, without force or timeout changes. This is preparation
+for a future reviewed source push; no successful hosted qualification is claimed.
