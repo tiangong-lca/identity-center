@@ -303,8 +303,8 @@ async function main() {
   assertQualificationSources(selectedCase.name, { baseline: BASELINE, head, requestedHead: process.env.AUTH_PROOF_HEAD, ancestor: git('merge-base', BASELINE, head) === BASELINE })
   assert.equal(git('status', '--porcelain'), '', 'Qualify a clean exact source checkout')
   if (selectedCase.name === 'react19.3') {
-    // Exhaustive tree comparison: new product/config paths cannot evade a pathspec.
-    const changedPaths = gitRaw('diff', '--name-only', '-z', BASELINE, head).split('\0').filter(Boolean)
+    // Include both sides of renames: an allowed destination cannot hide product deletion.
+    const changedPaths = gitRaw('diff', '--name-only', '--no-renames', '-z', BASELINE, head).split('\0').filter(Boolean)
     for (const file of changedPaths) assertReactSourcePathFromGit(file, BASELINE, head, { cwd: sourceRoot, env: infraEnv })
   } else {
     // Preserve the historical auth-client experiment's original product fence.

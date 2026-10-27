@@ -107,3 +107,11 @@ and newly introduced product directories. The historical auth-client experiment
 retains its original product-path fence. Actual entrypoint negatives cover
 `config/business-apps.yaml`, `drizzle.config.ts` and a new product path; a pure
 path-policy unit test also protects metadata/body boundaries.
+
+The exhaustive React scan uses `--no-renames`: a product file moved unchanged
+into an allowed support directory must expose both the deleted source and added
+destination. The entrypoint regression owns a real temporary Git repository,
+asserts its default `R100` destination-only projection, then forwards the actual
+entrypoint diff flags to Git. An old-projection exposure control passes while the
+normal rename-disabled path rejects the product deletion. This protects the
+command wiring as well as the pure path classifier; it creates no product rename.

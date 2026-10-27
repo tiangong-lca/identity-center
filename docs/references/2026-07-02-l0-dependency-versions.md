@@ -322,3 +322,13 @@ negatives reject both omitted configs and an unexpected new product directory;
 the historical auth-client path behavior stays unchanged. Only the scoped harness,
 lint and typecheck are rerun for this test-support repair; no application or build
 input changes, full-suite rerun or new build pass is claimed.
+
+A second independent P2 finding showed that default Git rename detection can
+hide a deleted product source when an unchanged file moves into allowed test
+support. The React whole-tree scan now disables rename detection so source and
+destination are both classified. A real temporary Git `R100` fixture is routed
+through the actual validate-only entrypoint: the old destination-only exposure
+control passes, whereas the fixed invocation rejects the product deletion.
+Existing configuration/new-path fences and historical auth-client behavior stay
+unchanged. Scoped21 harness tests, lint and typecheck pass; no actual application
+rename, full-suite rerun or build rerun occurred.

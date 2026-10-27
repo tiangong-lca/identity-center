@@ -292,8 +292,9 @@ describe('independent source-bound React qualification', () => {
 
 // The inert executable doubles use POSIX shebangs; hosted execution is Linux.
 const sourceWiringIt = process.platform === 'win32' ? it.skip : it
-sourceWiringIt('actual validate-only entrypoint wires the React baseline, manifest and product comparisons without Docker', () => {
+sourceWiringIt('actual validate-only entrypoint rejects unrelated configuration and real Git product renames without Docker', () => {
   const tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'identity44-source-wiring-'))
+  try {
   const selected = qualificationCase('react19.3')
   const head = 'a'.repeat(40)
   const original = JSON.parse(fs.readFileSync(path.resolve(__dirname, '../auth-compatibility/fixtures/manifest-react19.3.json'), 'utf8')).content as string
@@ -303,6 +304,28 @@ sourceWiringIt('actual validate-only entrypoint wires the React baseline, manife
   const calls = path.join(tmp, 'git-calls.jsonl')
   const state = path.join(tmp, 'state.json')
   const marker = path.join(tmp, 'docker-called')
+  const realGit = execFileSync('which', ['git'], { encoding: 'utf8' }).trim()
+  const renameRoot = path.join(tmp, 'real-rename-repo')
+  fs.mkdirSync(renameRoot)
+  const realEnv = { PATH: process.env.PATH, HOME: tmp, GIT_CONFIG_NOSYSTEM: '1', NODE_ENV: 'test' as const }
+  const git = (...args: string[]) => execFileSync(realGit, args, { cwd: renameRoot, env: realEnv, encoding: 'utf8' })
+  git('init', '--quiet')
+  git('config', 'diff.renames', 'true')
+  const source = 'identity-portal/lib/qualification-product.ts'
+  const destination = 'identity-portal/tests/auth-compatibility/renamed-product.ts'
+  fs.mkdirSync(path.dirname(path.join(renameRoot, source)), { recursive: true })
+  fs.mkdirSync(path.dirname(path.join(renameRoot, destination)), { recursive: true })
+  fs.writeFileSync(path.join(renameRoot, source), 'export const unchangedProduct = true\n')
+  git('add', '--', source)
+  const renameBefore = git('write-tree').trim()
+  fs.renameSync(path.join(renameRoot, source), path.join(renameRoot, destination))
+  git('add', '--all')
+  const renameAfter = git('write-tree').trim()
+  expect(git('diff', '--name-status', renameBefore, renameAfter).trim()).toBe(`R100\t${source}\t${destination}`)
+  expect(git('diff', '--name-only', '-z', renameBefore, renameAfter).split('\0').filter(Boolean)).toEqual([destination])
+  expect(git('diff', '--name-only', '--no-renames', '-z', renameBefore, renameAfter).split('\0').filter(Boolean).sort()).toEqual([source, destination].sort())
+  expect(reactChangedPathPolicy(destination)).toBe('qualification-support')
+  expect(() => reactChangedPathPolicy(source)).toThrow('Unreviewed React qualification path')
   const gitDouble = `#!${process.execPath}
 const fs = require('node:fs'); const raw = process.argv.slice(2); const args = raw[0] === '-C' ? raw.slice(2) : raw;
 fs.appendFileSync(${JSON.stringify(calls)}, JSON.stringify(args) + '\\n');
@@ -312,7 +335,13 @@ const fail = () => process.exit(3);
 if (args.join(' ') === 'rev-parse HEAD') console.log(head);
 else if (args.join(' ') === 'merge-base ' + baseline + ' ' + head) console.log(baseline);
 else if (args.join(' ') === 'status --porcelain') {}
-else if (args.join(' ') === 'diff --name-only -z ' + baseline + ' ' + head) {
+else if (args[0] === 'diff' && args[1] === '--name-only' && args.at(-2) === baseline && args.at(-1) === head) {
+  if (drift.TEST_REAL_RENAME) {
+    const flags = args.slice(1, -2).filter(flag => !drift.TEST_OLD_RENAME_DETECTION || flag !== '--no-renames');
+    const result = require('node:child_process').execFileSync(${JSON.stringify(realGit)}, ['-C', ${JSON.stringify(renameRoot)}, 'diff', ...flags, ${JSON.stringify(renameBefore)}, ${JSON.stringify(renameAfter)}]);
+    process.stdout.write(result);
+    process.exit(0);
+  }
   const changed = drift.TEST_CHANGED_PATH || (drift.TEST_PRODUCT_DRIFT ? 'identity-portal/lib/auth/auth-config.ts' : file);
   process.stdout.write(['identity-portal/package.json', 'identity-portal/tests/auth-compatibility/qualification-case.mjs', changed].join(String.fromCharCode(0)) + String.fromCharCode(0));
 }
@@ -339,13 +368,16 @@ else if (args[0] === 'show') {
     fs.writeFileSync(state, JSON.stringify(changed))
     return execFileSync(process.execPath, [path.resolve(__dirname, '../auth-compatibility/run.mjs'), '--validate-sources'], { env: { ...env, ...changed }, encoding: 'utf8', stdio: 'pipe' })
   }
-  try {
     expect(JSON.parse(run())).toEqual({ validationOnly: true, qualificationCase: 'react19.3', baseline: selected.baseline, head, dockerAccessed: false })
     const invoked = fs.readFileSync(calls, 'utf8').trim().split('\n').map(line => JSON.parse(line) as string[])
     expect(invoked).toContainEqual(['show', `${selected.baseline}:${file}`])
     expect(invoked).toContainEqual(['show', `${head}:${file}`])
-    expect(invoked).toContainEqual(['diff', '--name-only', '-z', selected.baseline, head])
+    expect(invoked).toContainEqual(['diff', '--name-only', '--no-renames', '-z', selected.baseline, head])
     for (const changed of [{ TEST_PRODUCT_DRIFT: '1' }, { TEST_MANIFEST_DRIFT: '1' }, { TEST_DOCS_BODY_DRIFT: '1' }, { TEST_CHANGED_PATH: 'identity-portal/config/business-apps.yaml' }, { TEST_CHANGED_PATH: 'identity-portal/drizzle.config.ts' }, { TEST_CHANGED_PATH: 'identity-portal/new-product-surface/runtime.ts' }, { AUTH_PROOF_HEAD: 'b'.repeat(40) }, { AUTH_PROOF_CASE: 'auth-client' }]) expect(() => run(changed)).toThrow()
+    // Exposure control: Git's old rename projection hides the product source and passes.
+    expect(JSON.parse(run({ TEST_REAL_RENAME: '1', TEST_OLD_RENAME_DETECTION: '1' }))).toMatchObject({ validationOnly: true, dockerAccessed: false })
+    // The actual entrypoint must forward --no-renames to real Git and reject the deletion.
+    expect(() => run({ TEST_REAL_RENAME: '1' })).toThrow('Unreviewed React qualification path')
     expect(fs.existsSync(marker)).toBe(false)
   } finally { fs.rmSync(tmp, { recursive: true, force: true }) }
 })
