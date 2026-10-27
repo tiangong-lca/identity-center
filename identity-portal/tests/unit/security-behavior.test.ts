@@ -7,7 +7,7 @@ import { createHash } from 'node:crypto'
 import ts from 'typescript'
 import { createRequire } from 'node:module'
 const z=createRequire(import.meta.url)('zod') as typeof import('zod')
-import { zodControl } from '../auth-compatibility/security-behavior'
+import { zodControl, executeSecurityBehavior } from '../auth-compatibility/security-behavior'
 import { SECURITY_BASELINE, SECURITY_ORIGINAL_ASSETS } from '../auth-compatibility/security-case.mjs'
 import { assertSecurityBehavior, assertSecurityBehaviorReceipts, securitySanitizerModules, securityZodIdentity } from '../auth-compatibility/security-behavior-source.mjs'
 const hash=(value:string|Buffer)=>createHash('sha256').update(value).digest('hex')
@@ -16,7 +16,11 @@ function summary(variant:'baseline'|'candidate') {
   const assets=Object.entries(SECURITY_ORIGINAL_ASSETS).map(([p,h])=>({path:p,sha256:variant==='baseline'?h:'a'.repeat(64)}))
   const source=variant==='baseline'?SECURITY_BASELINE:'b'.repeat(40)
   const work=(kind:string)=>({parsed:variant==='baseline'?(kind==='map'?6:3):0,issues:[{origin:kind,code:'too_big',maximum:2,inclusive:true,path:['payload'],message:'owned-size-bound'}],valid:true})
-  return {source,manifestSha256:'c'.repeat(64),lockSha256:'d'.repeat(64),securityAssets:{assets},securityParserSha256:'e'.repeat(64),securityZod:{format:'commonjs',version:variant==='baseline'?'4.4.3':'4.6.7',packageSha256:'e'.repeat(64),entrySha256:'f'.repeat(64),runtimeTreeSha256:'a'.repeat(64)},securityBehavior:{qualificationCase:'security-audit',variant,source,parserSha256:'e'.repeat(64),manifestSha256:'c'.repeat(64),lockSha256:'d'.repeat(64),stage:'complete',passed:true,contextsCreated:3,contextsClosed:3,errors:{page:0,console:0,forbiddenRequests:0},sanitizers:assets.map(a=>({...a,execution:a.path.startsWith('esm/')?'actual-esm-default':'embedded-library-extraction',controls:{hookRan:true,handlerSurvives:variant==='baseline',otherHandlerRemoved:true,validMarkup:true}})),zod:{format:'commonjs',version:variant==='baseline'?'4.4.3':'4.6.7',packageSha256:'e'.repeat(64),entrySha256:'f'.repeat(64),runtimeTreeSha256:'a'.repeat(64),modes:[true,false].map(jitless=>({jitless,restored:true,array:work('array'),set:work('set'),map:work('map')}))}}}
+  const identity={format:'commonjs',version:variant==='baseline'?'4.4.3':'4.6.7',entryPath:'index.cjs',esmEntryPath:'index.js',packageSha256:'e'.repeat(64),entrySha256:'f'.repeat(64),esmEntrySha256:'b'.repeat(64),runtimeTreeSha256:'a'.repeat(64)}
+  const modes=[true,false].map(jitless=>({jitless,restored:true,array:work('array'),set:work('set'),map:work('map')}))
+  const zod={...identity,modes,formats:[{...identity,modes:structuredClone(modes)},{...identity,format:'module',entryPath:'index.js',entrySha256:'b'.repeat(64),modes:structuredClone(modes)}]}
+  return {source,manifestSha256:'c'.repeat(64),lockSha256:'d'.repeat(64),securityAssets:{assets},securityParserSha256:'e'.repeat(64),securityZod:identity,securityBehavior:{qualificationCase:'security-audit',variant,source,parserSha256:'e'.repeat(64),manifestSha256:'c'.repeat(64),lockSha256:'d'.repeat(64),stage:'complete',passed:true,contextsCreated:3,contextsClosed:3,errors:{page:0,console:0,forbiddenRequests:0},sanitizers:assets.map(a=>({...a,execution:a.path.startsWith('esm/')?'actual-esm-default':'embedded-library-extraction',controls:{hookRan:true,handlerSurvives:variant==='baseline',otherHandlerRemoved:true,validMarkup:true}})),zod}}
+
 }
 
 it('requires complete exact-source behavior from both variants, preserving expected vulnerable controls separately',()=>{
@@ -35,6 +39,10 @@ it('requires complete exact-source behavior from both variants, preserving expec
     (s:ReturnType<typeof summary>)=>{s.securityBehavior.sanitizers[0].controls.handlerSurvives=true},
     (s:ReturnType<typeof summary>)=>{s.securityBehavior.zod.modes[0].array.parsed=3},
     (s:ReturnType<typeof summary>)=>{s.securityBehavior.zod.runtimeTreeSha256='0'.repeat(64)},
+    (s:ReturnType<typeof summary>)=>{s.securityBehavior.zod.formats.pop()},
+    (s:ReturnType<typeof summary>)=>{s.securityBehavior.zod.formats[1].format='commonjs'},
+    (s:ReturnType<typeof summary>)=>{s.securityBehavior.zod.formats[1].entrySha256='0'.repeat(64)},
+    (s:ReturnType<typeof summary>)=>{s.securityBehavior.zod.formats[1].modes[0].array.parsed=3},
     (s:ReturnType<typeof summary>)=>{s.securityBehavior.zod.modes[1].map.issues=[]},
     (s:ReturnType<typeof summary>)=>{s.securityBehavior.zod.modes[1].restored=false},
     (s:ReturnType<typeof summary>)=>{s.securityBehavior.errors.forbiddenRequests=1},
@@ -93,9 +101,25 @@ it('uses the actual own frozen Zod public object schemas in both jitless modes a
   expect(actual.modes.map(mode=>mode.jitless)).toEqual([true,false])
   for(const mode of actual.modes){
     expect(mode.restored).toBe(true)
-    for(const kind of ['array','set','map'])expect(mode[kind]).toEqual({parsed:0,issues:[{origin:kind,code:'too_big',maximum:2,inclusive:true,path:['payload'],message:'owned-size-bound'}],valid:true})
+    for(const kind of ['array','set','map'] as const)expect(mode[kind]).toEqual({parsed:0,issues:[{origin:kind,code:'too_big',maximum:2,inclusive:true,path:['payload'],message:'owned-size-bound'}],valid:true})
   }
   for(const key of new Set([...Object.keys(before),...Object.keys(z.config())]))expect(z.config()[key as keyof ReturnType<typeof z.config>]).toBe(before[key as keyof typeof before])
   expect(()=>zodControl(app,{...identity,entrySha256:'0'.repeat(64)})).toThrow('Zod must execute the source-bound frozen package')
   for(const key of new Set([...Object.keys(before),...Object.keys(z.config())]))expect(z.config()[key as keyof ReturnType<typeof z.config>]).toBe(before[key as keyof typeof before])
+})
+
+it('actual assembly validates and writes the SAME receipt snapshot with inert contexts and real Node controls',async()=>{
+  const app=path.resolve(__dirname,'../..');const source=summary('candidate');const identity=securityZodIdentity(app)
+  const c={qualificationCase:'security-audit',variant:'candidate',portalOrigin:'http://localhost:21002',nonce:'a'.repeat(20),securityBinding:{source:source.source,manifestSha256:source.manifestSha256,lockSha256:source.lockSha256,parserSha256:source.securityParserSha256,assets:source.securityAssets,zod:identity}} as unknown as ReturnType<typeof import('../auth-compatibility/fixture').fixture>
+  let created=0;let closed=0;let validated:unknown;let written:unknown
+  const portal={context:()=>({browser:()=>({newContext:async()=>{created++;return {route:async()=>{},newPage:async()=>({on:()=>{},goto:async()=>{},evaluate:async()=>({hookRan:true,handlerSurvives:false,otherHandlerRemoved:true,validMarkup:true})}),close:async()=>{closed++}}}})})} as unknown as Parameters<typeof executeSecurityBehavior>[0]
+  const deps={modules:async()=>source.securityBehavior.sanitizers.map(a=>({...a,module:'export default {}'})),zod:zodControl,validate:(s:Parameters<typeof assertSecurityBehavior>[0],v:string)=>{assertSecurityBehavior(s,v);validated=s.securityBehavior},write:(_name:string,data:unknown)=>{written=data}}
+  await executeSecurityBehavior(portal,c,app,deps)
+  expect(created).toBe(3);expect(closed).toBe(3);expect(written).toBe(validated)
+  expect((written as {parserSha256:string}).parserSha256).toBe(source.securityParserSha256)
+  expect((written as {zod:{formats:unknown[]}}).zod.formats).toHaveLength(2)
+  created=0;closed=0
+  const missing=structuredClone(c);delete (missing.securityBinding as unknown as Record<string,unknown>).parserSha256
+  await expect(executeSecurityBehavior(portal,missing,app,deps)).rejects.toThrow('Required exact behavior source binding')
+  expect(created).toBe(0);expect(closed).toBe(0)
 })

@@ -12,8 +12,8 @@ checkPaths:
   - docs/design/README.md
   - docs/implementation/README.md
 lastReviewedAt: 2026-10-28
-lastReviewedCommit: 83aa82c1a2a3d3b6058a33351cf54fc2011cfa8d
-lastReviewedNote: "Identity48 correction preparation: applied only independently reviewed30version/142record restorations and incoming edges, preserving mixed security edges. Frozen install and2143physicaldependency/298peer checks pass; sanitizer patch/runtime bytes unchanged. Added separate source-bound three-sanitizer/Zod behavioral fixture and mandatory both-variant receipt gates; actual DOM/browser execution remains unrun pending PhaseC. Scoped checks and earlier failed controls are retained in correction evidence. Full suite/build/audit/hosted qualification and source/root delivery remain Main-reviewed future phases; no provider or Docker action."
+lastReviewedCommit: 83643e49fe54a29fc371e1c428a746a03e19a2a8
+lastReviewedNote: "Identity48 preparation: one shared source-bound receipt snapshot is validated and persisted, including parserSha256, with actual assembly/missing-binding controls. Public CommonJS and rooted Node ESM Zod paths now both execute bounded controls and bind resolved format entries, package and implementation-tree hashes. Focused82 controls pass; return-type-only JSDoc correction makes types/lint pass; previous failure retained. No sanitizer/graph/runtime-byte change, DOM/browser/Next execution, full suite/build, audit or publication; B/C remain reviewed next phases."
 ---
 
 # Identity Platform 文档
