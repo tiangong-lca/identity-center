@@ -61,6 +61,7 @@ const supportPaths = new Set([
   'identity-portal/patches/upstream/dompurify-3.4.17.npm-provenance.json',
   'identity-portal/tests/unit/security-dependency-patch.test.ts',
   'identity-portal/tests/unit/image-security-proof.test.ts',
+  'identity-portal/tests/unit/auth-image-cleanup.test.ts',
   '.github/workflows/auth-compatibility.yml', 'identity-portal/tests/unit/auth-compatibility-harness.test.ts',
   'identity-portal/tests/unit/catalog-qualification.test.ts', 'identity-portal/tests/unit/security-qualification.test.ts', 'identity-portal/tests/unit/security-behavior.test.ts',
 ])

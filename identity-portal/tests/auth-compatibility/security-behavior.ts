@@ -1,7 +1,6 @@
 import assert from 'node:assert/strict'
 import path from 'node:path'
 import type { Page } from '@playwright/test'
-import { fileURLToPath } from 'node:url'
 import { fixture, receipt } from './fixture'
 import { securitySanitizerModules, assertSecurityBehavior, securityZodBothFormats, assertSecurityBehaviorBinding, securityBehaviorSnapshot } from './security-behavior-source.mjs'
 export const zodControl=securityZodBothFormats
@@ -59,4 +58,4 @@ export async function executeSecurityBehavior(portal:Page,c:ReturnType<typeof fi
   }
 }
 
-export async function qualifySecurityBehavior(portal:Page){return executeSecurityBehavior(portal,fixture(),path.resolve(path.dirname(fileURLToPath(import.meta.url)),'../..'))}
+export async function qualifySecurityBehavior(portal:Page){return executeSecurityBehavior(portal,fixture(),path.resolve(__dirname,'../..'))}

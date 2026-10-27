@@ -9,7 +9,7 @@ import { createRequire } from 'node:module'
 const z=createRequire(import.meta.url)('zod') as typeof import('zod')
 import { zodControl, executeSecurityBehavior } from '../auth-compatibility/security-behavior'
 import { SECURITY_BASELINE, SECURITY_ORIGINAL_ASSETS } from '../auth-compatibility/security-case.mjs'
-import { assertSecurityBehavior, assertSecurityBehaviorReceipts, securitySanitizerModules, securityZodIdentity } from '../auth-compatibility/security-behavior-source.mjs'
+import { assertSecurityBehavior, assertSecurityBehaviorReceipts, securitySanitizerModules, securityZodIdentity, securityParsedSource } from '../auth-compatibility/security-behavior-source.mjs'
 const hash=(value:string|Buffer)=>createHash('sha256').update(value).digest('hex')
 
 function summary(variant:'baseline'|'candidate') {
@@ -63,6 +63,90 @@ it('extracts every actual installed candidate library through parsed source-boun
   const changed=structuredClone(binding);changed.assets.assets[0].sha256='0'.repeat(64)
   await expect(securitySanitizerModules(app,'candidate',changed,parser)).rejects.toThrow('Actual behavior asset')
 })
+
+it('rejects malformed actual JavaScript through public syntax diagnostics without emission',()=>{
+  const source=securityParsedSource(ts,'const actual = (() => 1)(); export default actual;')
+  expect(source.statements).toHaveLength(2)
+  expect(()=>securityParsedSource(ts,'const actual = (() => ;')).toThrow('Actual asset must parse through public diagnostics')
+})
+
+function withPlaywrightStage(control:(staged:string,temporary:string,app:string)=>void){
+  const app=path.resolve(__dirname,'../..')
+  // Playwright excludes node_modules from its TS loader. Use an owned ignored
+  // output subdirectory so this exercises the same transform as hosted sources.
+  const cache=path.join(app,'.next');fs.mkdirSync(cache,{recursive:true})
+  const temporary=fs.mkdtempSync(path.join(cache,'identity48-collection-'))
+  const staged=path.join(temporary,'app');fs.mkdirSync(staged)
+  const copied=new Set<string>()
+  const copy=(relative:string)=>{
+    if(copied.has(relative))return
+    copied.add(relative)
+    const bytes=fs.readFileSync(path.join(app,relative));const target=path.join(staged,relative)
+    fs.mkdirSync(path.dirname(target),{recursive:true});fs.writeFileSync(target,bytes)
+    if(!/\.(?:[cm]?ts|tsx|[cm]?js)$/.test(relative))return
+    const tree=ts.createSourceFile(relative,bytes.toString(),ts.ScriptTarget.ESNext,true)
+    for(const statement of tree.statements){
+      if(!ts.isImportDeclaration(statement)||!ts.isStringLiteral(statement.moduleSpecifier))continue
+      const specifier=statement.moduleSpecifier.text
+      if(!specifier.startsWith('.')&&!specifier.startsWith('@/'))continue
+      const base=specifier.startsWith('@/')?specifier.slice(2):path.join(path.dirname(relative),specifier)
+      const resolved=[base,...['.ts','.tsx','.mjs','.js'].map(extension=>base+extension)].find(file=>fs.existsSync(path.join(app,file))&&fs.statSync(path.join(app,file)).isFile())
+      expect(resolved,`actual import closure: ${relative}`).toBeDefined();copy(resolved!)
+    }
+  }
+  try{
+    copy('package.json');copy('tsconfig.json');copy('tests/auth-compatibility/playwright.config.ts');copy('tests/auth-compatibility/browser.proof.spec.ts')
+    for(const relative of copied)expect(fs.readFileSync(path.join(staged,relative))).toEqual(fs.readFileSync(path.join(app,relative)))
+    const fixtureFile=path.join(staged,'tests/auth-compatibility/fixture.ts')
+    let adapter=fs.readFileSync(fixtureFile,'utf8')
+    const tree=ts.createSourceFile('fixture.ts',adapter,ts.ScriptTarget.ESNext,true)
+    const replacements=tree.statements.filter(ts.isFunctionDeclaration).filter(node=>['fixture','receipt'].includes(node.name?.text??'')).map(node=>({start:node.body!.getStart(tree),end:node.body!.end,text:node.name!.text==='fixture'?`{ return ${JSON.stringify({qualificationCase:'security-audit',variant:'candidate',portalOrigin:'http://localhost:21002',directory:temporary,evidenceDirectory:path.join(temporary,'never-written')})} as Fixture }`:`{ throw new Error('Collection-only adapter cannot write a runtime receipt') }`}))
+    expect(replacements).toHaveLength(2)
+    for(const replacement of replacements.sort((a,b)=>b.start-a.start))adapter=adapter.slice(0,replacement.start)+replacement.text+adapter.slice(replacement.end)
+    fs.writeFileSync(fixtureFile,'// Explicit synthetic collection adapter; never a hosted fixture.\n'+adapter)
+    control(staged,temporary,app)
+  }finally{fs.rmSync(temporary,{recursive:true,force:true})}
+}
+
+it('collects the actual Playwright config/spec/import closure and rejects the old CommonJS wrapper, without a browser',()=>withPlaywrightStage((staged,temporary)=>{
+    const cli=createRequire(import.meta.url).resolve('@playwright/test/cli')
+    const args=[cli,'test','--config',path.join(staged,'tests/auth-compatibility/playwright.config.ts'),'--list','--reporter=json']
+    const env={NODE_ENV:'test' as const,PATH:process.env.PATH,HOME:process.env.HOME,TMPDIR:temporary}
+    const result=JSON.parse(execFileSync(process.execPath,args,{cwd:staged,env,encoding:'utf8',timeout:4000,maxBuffer:128*1024}))
+    expect(result.errors).toEqual([])
+    const titles:string[]=[];const visit=(suite:{specs?:Array<{title:string}>;suites?:unknown[]})=>{for(const spec of suite.specs??[])titles.push(spec.title);for(const child of suite.suites??[])visit(child as typeof suite)}
+    for(const suite of result.suites)visit(suite)
+    expect(titles).toEqual(['real Keycloak PKCE/Auth.js session is denied after actual signed backchannel logout'])
+    expect(fs.existsSync(path.join(temporary,'never-written'))).toBe(false)
+    const wrapper=path.join(staged,'tests/auth-compatibility/security-behavior.ts')
+    const fixed=fs.readFileSync(wrapper,'utf8')
+    fs.writeFileSync(wrapper,"import { fileURLToPath } from 'node:url'\n"+fixed.replace("path.resolve(__dirname,'../..')","path.resolve(path.dirname(fileURLToPath(import.meta.url)),'../..')"))
+    let failure:unknown
+    try{execFileSync(process.execPath,args,{cwd:staged,env,encoding:'utf8',timeout:4000,maxBuffer:128*1024,stdio:'pipe'})}catch(error){failure=error}
+    expect(failure).toBeDefined()
+    const output=String((failure as {stdout?:string}).stdout??'')+String((failure as {stderr?:string}).stderr??'')
+    expect(output).toMatch(/Cannot use 'import.meta' outside a module/)
+    expect(fs.existsSync(path.join(temporary,'never-written'))).toBe(false)
+}))
+
+it('executes both public Zod formats and the dynamic parser under actual Playwright Node-only loading',()=>withPlaywrightStage((staged,temporary,app)=>{
+  const directory=path.join(staged,'tests/auth-compatibility')
+  const config=fs.readFileSync(path.join(directory,'playwright.config.ts'),'utf8')
+  expect(config).toContain("testMatch: 'browser.proof.spec.ts'")
+  fs.writeFileSync(path.join(directory,'node-only.config.ts'),config.replace("testMatch: 'browser.proof.spec.ts'","testMatch: 'node-only.proof.spec.ts'"))
+  fs.writeFileSync(path.join(directory,'node-only.proof.spec.ts'),`import {test,expect} from '@playwright/test';import{pathToFileURL}from'node:url';import{securityZodIdentity,securityZodBothFormats}from'./security-behavior-source.mjs';
+test('owned Node-only format control',async()=>{
+ const app=${JSON.stringify(app)};const identity=securityZodIdentity(app);const result=securityZodBothFormats(app,identity);
+ expect(result.formats.map(x=>x.format)).toEqual(['commonjs','module']);
+ for(const format of result.formats){expect(format.version).toBe('4.6.7');expect(format.modes.map(x=>x.jitless)).toEqual([true,false]);for(const mode of format.modes){expect(mode.restored).toBe(true);for(const kind of ['array','set','map']){expect(mode[kind]).toEqual({parsed:0,issues:[{origin:kind,code:'too_big',maximum:2,inclusive:true,path:['payload'],message:'owned-size-bound'}],valid:true})}}}
+ const parser=await import(pathToFileURL(app+'/scripts/security/monaco-purify-patch.mjs').href);expect(typeof parser.analyzeAmd).toBe('function');
+});`)
+  const cli=createRequire(import.meta.url).resolve('@playwright/test/cli')
+  const output=execFileSync(process.execPath,[cli,'test','--config',path.join(directory,'node-only.config.ts'),'--reporter=json'],{cwd:staged,env:{NODE_ENV:'test',PATH:process.env.PATH,HOME:process.env.HOME,TMPDIR:temporary},encoding:'utf8',timeout:4000,maxBuffer:128*1024})
+  const result=JSON.parse(output)
+  expect(result.errors).toEqual([]);expect(result.stats).toMatchObject({expected:1,unexpected:0,skipped:0})
+  expect(fs.existsSync(path.join(temporary,'never-written'))).toBe(false)
+}))
 
 it('executes the actual browser source hook before listener detachment and logout using inert async controls',async()=>{
   const source=fs.readFileSync(path.resolve(__dirname,'../auth-compatibility/browser.proof.spec.ts'),'utf8')

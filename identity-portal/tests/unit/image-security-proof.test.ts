@@ -3,13 +3,56 @@ import fs from 'node:fs'
 import path from 'node:path'
 import os from 'node:os'
 import { createHash } from 'node:crypto'
-import { execFileSync } from 'node:child_process'
+import { execFileSync, spawn } from 'node:child_process'
 import { load } from 'js-yaml'
 import { inspectImageFilesystem, buildExpected, runImageInspection, EXPECTED_PACKAGE_VERSIONS } from '../auth-compatibility/image-security-proof.mjs'
 import { SECURITY_CANDIDATE_PATHS, SECURITY_ORIGINAL_ASSETS, SECURITY_UPSTREAM, securityChangedPathPolicy } from '../auth-compatibility/security-case.mjs'
 const sha=(value:string|Buffer)=>createHash('sha256').update(value).digest('hex')
 const source='c'.repeat(40)
 const posixIt=process.platform==='win32'?it.skip:it
+
+posixIt('host-only TERM joins the actual image supervisor before reporting cancellation',async()=>{
+  const temporary=fs.mkdtempSync(path.join(os.tmpdir(),'identity48-image-join-'))
+  let transportPid:number|undefined;let host:ReturnType<typeof spawn>|undefined
+  let readiness:ReturnType<typeof setInterval>|undefined
+  try{
+    const helper=new URL('../auth-compatibility/image-security-proof.mjs',import.meta.url).href
+    const supervisor=path.resolve(__dirname,'../auth-compatibility/bounded-command.mjs')
+    const ready=path.join(temporary,'ready.json')
+    const program=`process.on('SIGTERM',()=>{});process.on('SIGINT',()=>{});require('node:fs').writeFileSync(${JSON.stringify(ready)},JSON.stringify({pid:process.pid}));setInterval(()=>{},1000)`
+    const script=path.join(temporary,'host.mjs')
+    fs.writeFileSync(script,`import{imageInspectionCommand}from${JSON.stringify(helper)};const result=await imageInspectionCommand(process.execPath,${JSON.stringify([supervisor,'60000','2000',process.execPath,'-e',program])},{timeout:65000,maxBuffer:128*1024});console.log(JSON.stringify(result));`)
+    host=spawn(process.execPath,[script],{stdio:['ignore','pipe','pipe']})
+    let output='';let signalled=false
+    host.stdout!.on('data',buffer=>{output+=buffer})
+    readiness=setInterval(()=>{if(fs.existsSync(ready)&&!signalled){transportPid=JSON.parse(fs.readFileSync(ready,'utf8')).pid;signalled=true;host!.kill('SIGTERM');clearInterval(readiness)}},10)
+    host.stderr!.resume()
+    const code=await new Promise((resolve,reject)=>{host!.on('error',reject);host!.on('close',resolve)})
+    expect(code).toBe(0);expect(signalled).toBe(true)
+    const result=JSON.parse(output.trim().split('\n').at(-1)!)
+    expect(result).toMatchObject({status:143,cancelCode:143})
+    expect(()=>process.kill(transportPid!,0)).toThrow()
+  }finally{
+    clearInterval(readiness)
+    if(host&&host.exitCode===null)host.kill('SIGKILL')
+    if(transportPid){try{process.kill(transportPid,'SIGKILL')}catch{}}
+    fs.rmSync(temporary,{recursive:true,force:true})
+  }
+})
+
+posixIt('the supervisor retains group escalation when its direct child exits before grace',async()=>{
+  const temporary=fs.mkdtempSync(path.join(os.tmpdir(),'identity48-supervisor-join-'))
+  let descendant:number|undefined;let supervisor:ReturnType<typeof spawn>|undefined
+  try{
+    const file=path.join(temporary,'ready.json')
+    const child=`const{spawn}=require('node:child_process');const fs=require('node:fs');const worker=spawn(process.execPath,['-e',"process.on('SIGTERM',()=>{});setInterval(()=>{},1000)"],{stdio:'inherit'});setTimeout(()=>fs.writeFileSync(${JSON.stringify(file)},JSON.stringify({child:process.pid,descendant:worker.pid})),100);process.on('SIGTERM',()=>process.exit(0));setInterval(()=>{},1000)`
+    supervisor=spawn(process.execPath,[path.resolve(__dirname,'../auth-compatibility/bounded-command.mjs'),'500','100',process.execPath,'-e',child],{stdio:'ignore'})
+    const code=await new Promise((resolve,reject)=>{supervisor!.on('error',reject);supervisor!.on('close',resolve)})
+    const ids=JSON.parse(fs.readFileSync(file,'utf8'));descendant=ids.descendant
+    expect(code).toBe(124);expect(()=>process.kill(ids.child,0)).toThrow();expect(()=>process.kill(ids.descendant,0)).toThrow()
+  }finally{if(supervisor&&supervisor.exitCode===null)supervisor.kill('SIGKILL');if(descendant){try{process.kill(descendant,'SIGKILL')}catch{}}fs.rmSync(temporary,{recursive:true,force:true})}
+})
+
 function fixture(){
   const temporary=fs.mkdtempSync(path.join(os.tmpdir(),'identity48-image-proof-'));const root=path.join(temporary,'app');fs.mkdirSync(root)
   const write=(file:string,value:string)=>{const target=path.join(root,file);fs.mkdirSync(path.dirname(target),{recursive:true});fs.writeFileSync(target,value);return target}
@@ -90,7 +133,7 @@ it('fails closed on association/path escape, framework namespace drift and overs
   }
 })
 
-it('uses guarded structured inspection argv and rejects malformed, stale or unsuccessful probe responses',()=>{
+it('uses guarded structured inspection argv and rejects malformed, stale or unsuccessful probe responses',async()=>{
   const repo=path.resolve(__dirname,'../../..');const temporary=fs.mkdtempSync(path.join(os.tmpdir(),'identity48-image-command-'))
   try{
     const imageId='sha256:'+'a'.repeat(64);const info=path.join(temporary,'runner-image.txt');fs.writeFileSync(info,imageId+' linux/amd64\n')
@@ -100,16 +143,19 @@ it('uses guarded structured inspection argv and rejects malformed, stale or unsu
     const options={target:'runner',image:'identity41-node24-123-2:runner',name:'identity41-node24-123-2-runner',evidence:temporary,source,imageInfo:info,root:repo}
     const calls:Array<{executable:string;args:string[];options:unknown}>=[]
     const transport=(executable:string,args:string[],spawnOptions:unknown)=>{calls.push({executable,args,options:spawnOptions});return {status:0,stdout:JSON.stringify(receipt),stderr:''}}
-    runImageInspection(options,transport)
+    await runImageInspection(options,transport)
     expect(calls).toHaveLength(1);const args=calls[0].args
     for(const flag of ['60000','2000','docker','run','--rm','--read-only'])expect(args).toContain(flag)
     const joined=args.join(' ');expect(joined).toMatch(/--cap-drop(?:=| )ALL/);expect(joined).toMatch(/--security-opt(?:=| )no-new-privileges/);expect(joined).toMatch(/--network(?:=| )none/)
     expect(args).toContain(options.name);expect(args).toContain(imageId);expect(args).not.toContain(options.image);expect(args).toContain('-e')
     expect(fs.readFileSync(path.join(temporary,'runner-node.txt'),'utf8').trim()).toBe('v24.22.1')
     expect(JSON.parse(fs.readFileSync(path.join(temporary,'runner-security.json'),'utf8')).source).toBe(source)
-    for(const mutation of [{source:'b'.repeat(40)},{imageId:'sha256:'+'b'.repeat(64)},{nodeVersion:'v22.0.0'},{arch:'arm64'}])expect(()=>runImageInspection(options,()=>({status:0,stdout:JSON.stringify({...receipt,...mutation}),stderr:''}))).toThrow()
-    expect(()=>runImageInspection(options,()=>({status:1,stdout:'',stderr:'synthetic failure'}))).toThrow()
-    expect(()=>runImageInspection(options,()=>({status:0,stdout:'not-json',stderr:''}))).toThrow()
+    for(const mutation of [{source:'b'.repeat(40)},{imageId:'sha256:'+'b'.repeat(64)},{nodeVersion:'v22.0.0'},{arch:'arm64'}])await expect(runImageInspection(options,()=>({status:0,stdout:JSON.stringify({...receipt,...mutation}),stderr:''}))).rejects.toThrow()
+    await expect(runImageInspection(options,()=>({status:1,stdout:'',stderr:'synthetic failure'}))).rejects.toThrow()
+    await expect(runImageInspection(options,()=>({status:0,stdout:'not-json',stderr:''}))).rejects.toThrow()
+    fs.unlinkSync(path.join(temporary,'runner-security.json'));fs.unlinkSync(path.join(temporary,'runner-node.txt'))
+    await expect(runImageInspection(options,()=>({status:143,cancelCode:143,stdout:JSON.stringify(receipt)}))).rejects.toMatchObject({exitCode:143})
+    expect(fs.existsSync(path.join(temporary,'runner-security.json'))).toBe(false);expect(fs.existsSync(path.join(temporary,'runner-node.txt'))).toBe(false)
   }finally{fs.rmSync(temporary,{recursive:true,force:true})}
 })
 
@@ -118,6 +164,8 @@ posixIt('the actual workflow invokes both image inspections before the unchanged
   const workflow=load(text) as {on:{pull_request:{paths:string[]}};jobs:Record<string,{steps:Array<{name?:string;run?:string}>}>}
   expect(workflow.on.pull_request.paths).toContain('identity-portal/tests/auth-compatibility/image-security-proof.mjs');expect(workflow.on.pull_request.paths).toContain('identity-portal/tests/unit/image-security-proof.test.ts')
   expect(securityChangedPathPolicy('identity-portal/tests/unit/image-security-proof.test.ts')).toBe('qualification-support')
+  expect(securityChangedPathPolicy('identity-portal/tests/unit/auth-image-cleanup.test.ts')).toBe('qualification-support')
+  expect(()=>securityChangedPathPolicy('identity-portal/tests/unit/auth-image-cleanup-extra.test.ts')).toThrow('Unreviewed security qualification path')
   const script=workflow.jobs['auth-compatibility'].steps.find(s=>s.name==='Build and inspect isolated Node24 Portal and Worker images')!.run!
   const temp=fs.mkdtempSync(path.join(os.tmpdir(),'identity48-workflow-proof-'));const bin=path.join(temp,'bin');fs.mkdirSync(bin);const events=path.join(temp,'events.jsonl')
   try{

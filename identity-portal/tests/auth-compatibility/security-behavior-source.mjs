@@ -10,6 +10,18 @@ function nodeEval(app,code){try{return execFileSync(process.execPath,['--input-t
 const nodeEnvironment=()=>Object.fromEntries(['PATH','LANG','TZ'].filter(key=>process.env[key]).map(key=>[key,process.env[key]]))
 const hash = bytes => createHash('sha256').update(bytes).digest('hex')
 
+// Syntax-only public compiler API: reuse the exact parsed text, without emitting
+// or reparsing multi-megabyte AMD bundles just to discard their generated output.
+export function securityParsedSource(ts, text) {
+  const name='actual-installed.js'
+  const source=ts.createSourceFile(name,text,ts.ScriptTarget.ESNext,true,ts.ScriptKind.JS)
+  const options={allowJs:true,noLib:true,noResolve:true,noEmit:true,target:ts.ScriptTarget.ESNext,module:ts.ModuleKind.ESNext}
+  const host={getSourceFile:file=>file===name?source:undefined,getDefaultLibFileName:()=>'',writeFile:()=>{throw new Error('Security syntax check must never emit')},getCurrentDirectory:()=>'',getDirectories:()=>[],fileExists:file=>file===name,readFile:file=>file===name?text:undefined,getCanonicalFileName:file=>file,useCaseSensitiveFileNames:()=>true,getNewLine:()=> '\n'}
+  const program=ts.createProgram([name],options,host)
+  assert.deepEqual(program.getSyntacticDiagnostics(source),[],'Actual asset must parse through public diagnostics')
+  return source
+}
+
 export async function securitySanitizerModules(app, variant, binding, parserFile) {
   assert.ok(['baseline','candidate'].includes(variant))
   const { default: ts } = await import('typescript')
@@ -38,8 +50,7 @@ export async function securitySanitizerModules(app, variant, binding, parserFile
     } else {
       const proof=provenance.assets.find(x=>x.path===relative)
       assert.equal(proof.patchedSha256,observed);assert.equal(proof.upstreamSha256,SECURITY_UPSTREAM)
-      const source=ts.createSourceFile('actual-installed.js',text,ts.ScriptTarget.ESNext,true,ts.ScriptKind.JS)
-      assert.deepEqual(ts.transpileModule(text,{reportDiagnostics:true,compilerOptions:{target:ts.ScriptTarget.ESNext,module:ts.ModuleKind.ESNext}}).diagnostics??[],[],'Actual asset must parse through public diagnostics')
+      const source=securityParsedSource(ts,text)
       const matches=[]
       const visit=node=>{if(ts.isVariableStatement(node)&&node.getStart(source)===proof.librarySpan[0])matches.push(node);ts.forEachChild(node,visit)};visit(source)
       assert.equal(matches.length,1,'Require exactly one parsed patched library statement')
@@ -151,7 +162,8 @@ export function securityZodModes(z) {
 export function securityZodBothFormats(app,expected) {
   const identity=securityZodIdentity(app);assert.deepEqual(identity,expected,'Zod must execute the source-bound frozen package')
   const require=createRequire(path.join(app,'package.json'));const cjs={...identity,modes:securityZodModes(require('zod'))}
-  const code=`import {securityZodIdentity,securityZodModes} from ${JSON.stringify(import.meta.url)};const z=await import('zod');const entry=import.meta.resolve('zod');process.stdout.write(JSON.stringify({...securityZodIdentity(process.cwd(),'module',entry),modes:securityZodModes(z)}));`
+  const helperUrl=pathToFileURL(path.join(app,'tests/auth-compatibility/security-behavior-source.mjs')).href
+  const code=`import {securityZodIdentity,securityZodModes} from ${JSON.stringify(helperUrl)};const z=await import('zod');const entry=import.meta.resolve('zod');process.stdout.write(JSON.stringify({...securityZodIdentity(process.cwd(),'module',entry),modes:securityZodModes(z)}));`
   let moduleResult
   try{moduleResult=JSON.parse(execFileSync(process.execPath,['--input-type=module','--eval',code],{cwd:app,encoding:'utf8',timeout:10000,maxBuffer:65536,stdio:['ignore','pipe','pipe'],env:nodeEnvironment()}))}catch{throw new Error('Owned ESM Zod behavior failed')}
   assert.equal(moduleResult.format,'module');assert.equal(moduleResult.entrySha256,identity.esmEntrySha256)

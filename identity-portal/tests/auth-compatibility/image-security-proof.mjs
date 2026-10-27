@@ -3,7 +3,7 @@ import path from 'node:path'
 import assert from 'node:assert/strict'
 import {createHash} from 'node:crypto'
 import {createRequire} from 'node:module'
-import {spawnSync,execFileSync} from 'node:child_process'
+import {spawn,execFileSync} from 'node:child_process'
 import {fileURLToPath} from 'node:url'
 const require=createRequire(import.meta.url)
 export const EXPECTED_PACKAGE_VERSIONS={express:[],shadcn:['4.23.0'],vitest:['4.1.12'],'@vitest/coverage-v8':['4.1.12'],esbuild:['0.18.20','0.25.12','0.28.2'],dompurify:['3.4.17'],'fast-uri':['3.1.9'],'ip-address':['10.7.5'],'brace-expansion':['1.1.21','5.0.12'],'source-map-js':['1.2.2'],'proxy-addr':[],'@modelcontextprotocol/sdk':[],handlebars:['4.7.10'],hono:[],vite:['8.3.5'],'@vitest/mocker':['4.1.12'],zod:['4.6.7'],'body-parser':[],undici:['7.30.1'],'postcss-selector-parser':['7.1.7'],next:['16.4.2'],react:['19.3.1'],'react-dom':['19.3.1'],'monaco-editor':['0.55.1'],'monaco-yaml':['5.5.1'],'monaco-worker-manager':['2.0.1']}
@@ -69,14 +69,36 @@ export function buildExpected(root,source){
  for(const[file,digest]of Object.entries(inputs.candidateHashes)){assert.match(digest,/^[a-f0-9]{64}$/);assert.equal(sha(fs.readFileSync(path.join(root,file))),digest,'Host expected source input mismatch')}
  return{source,inputHashes:inputs.candidateHashes,provenance:JSON.parse(fs.readFileSync(path.join(app,'patches/monaco-editor@0.55.1.provenance.json'),'utf8')),packageVersions:EXPECTED_PACKAGE_VERSIONS,zodSource:EXPECTED_ZOD_SOURCE,frameworkVendor:FRAMEWORK_VENDOR}
 }
-/** @param {(executable:string,args:string[],options:import('node:child_process').SpawnSyncOptionsWithStringEncoding)=>{status:number|null,stdout:string,stderr:string}} [transport] */
-export function runImageInspection(options,transport=spawnSync){
+// Join the existing bounded supervisor on every path, including host-only
+// signals. The shell cannot report cleanup while its detached transport lives.
+export function imageInspectionCommand(executable,args,{timeout,maxBuffer}) {
+ return new Promise((resolve,reject)=>{
+  const child=spawn(executable,args,{stdio:['ignore','pipe','pipe']})
+  let stdout='',bytes=0,failed=false,cancelCode=null
+  const stop=signal=>{try{child.kill(signal)}catch{}}
+  const onInt=()=>{cancelCode??=130;stop('SIGINT')},onTerm=()=>{cancelCode??=143;stop('SIGTERM')}
+  process.on('SIGINT',onInt);process.on('SIGTERM',onTerm)
+  // Reserve the unchanged 2s supervisor grace plus a 1s close margin inside
+  // the 65s host bound; the command itself still has its original 60s deadline.
+  const deadline=setTimeout(()=>{failed=true;stop('SIGTERM')},timeout-3000)
+  const ceiling=setTimeout(()=>{failed=true;stop('SIGKILL');child.stdout.destroy();child.stderr.destroy()},timeout)
+  const clean=()=>{clearTimeout(deadline);clearTimeout(ceiling);process.off('SIGINT',onInt);process.off('SIGTERM',onTerm)}
+  const data=(buffer,retain)=>{bytes+=buffer.length;if(bytes>maxBuffer){failed=true;stop('SIGTERM')}else if(retain&&!failed)stdout+=buffer.toString()}
+  child.stdout.on('data',buffer=>data(buffer,true));child.stderr.on('data',buffer=>data(buffer,false))
+  child.on('error',()=>{clean();reject(new Error('Owned image transport could not start'))})
+  child.on('close',(code,signal)=>{clean();resolve({status:cancelCode??(failed?1:code??(signal==='SIGINT'?130:143)),stdout,cancelCode})})
+ })
+}
+/** @param {(executable:string,args:string[],options:{timeout:number,maxBuffer:number})=>unknown} [transport] */
+export async function runImageInspection(options,transport=imageInspectionCommand){
  const{target,image,name,evidence,source,imageInfo,root}=options;assert.ok(['runner','worker'].includes(target));assert.match(image,/^identity41-node24-\d+-\d+:(runner|worker)$/);assert.match(name,/^identity41-node24-\d+-\d+-(runner|worker)$/);assert.ok(image.endsWith(':'+target)&&name.endsWith('-'+target));assert.ok(path.isAbsolute(evidence)&&path.isAbsolute(imageInfo));const expected=buildExpected(root,source)
  const info=fs.readFileSync(imageInfo,'utf8').trim();assert.match(info,/^sha256:[a-f0-9]{64} linux\/amd64$/);const imageId=info.split(' ')[0]
  assert.equal(expected.zodSource.sourceLockSha256,expected.inputHashes['identity-portal/pnpm-lock.yaml']);
  const program=`try{const assert=require('node:assert/strict');assert.equal(process.version,'v24.22.1');assert.equal(process.platform,'linux');assert.equal(process.arch,'x64');const input=JSON.parse(process.argv[1]);const filesystem=(${inspectImageFilesystem.toString()})(input.target,'/app',input.expected);process.stdout.write(JSON.stringify({schema:1,target:input.target,source:input.expected.source,imageId:input.imageId,nodeVersion:process.version,platform:process.platform,arch:process.arch,filesystem}));}catch{process.stderr.write('Owned image security inspection failed\\n');process.exitCode=1}`
  const args=[fileURLToPath(new URL('./bounded-command.mjs',import.meta.url)),'60000','2000','docker','run','--rm','--name',name,'--label',`org.tiangong.identity-proof=${image.split(':')[0]}`,'--network','none','--read-only','--cap-drop','ALL','--security-opt','no-new-privileges','--entrypoint','node',imageId,'-e',program,JSON.stringify({target,expected,imageId})]
- const response=transport(process.execPath,args,{encoding:'utf8',timeout:65000,maxBuffer:128*1024,stdio:['ignore','pipe','pipe']});assert.equal(response.status,0,'Image inspection command failed');assert.ok(response.stdout&&response.stdout.length<=128*1024,'Bound image receipt')
+ const response=await transport(process.execPath,args,{timeout:65000,maxBuffer:128*1024});
+ if(response.cancelCode)throw Object.assign(new Error('Owned image proof cancelled'),{exitCode:response.cancelCode})
+ assert.equal(response.status,0,'Image inspection command failed');assert.ok(response.stdout&&Buffer.byteLength(response.stdout)<=128*1024,'Bound image receipt')
  const result=JSON.parse(response.stdout);assert.equal(result.schema,1);assert.equal(result.target,target);assert.equal(result.source,source);assert.equal(result.imageId,imageId);assert.equal(result.nodeVersion,'v24.22.1');assert.equal(result.platform,'linux');assert.equal(result.arch,'x64');assert.equal(result.filesystem?.target,target);assert.equal(result.filesystem?.source,source);assert.equal(result.filesystem?.scope,'image-root-filesystem')
  fs.writeFileSync(path.join(evidence,`${target}-security.json`),JSON.stringify(result,null,2)+'\n',{mode:0o600});fs.writeFileSync(path.join(evidence,`${target}-node.txt`),result.nodeVersion+'\n',{mode:0o600});return result
 }
@@ -84,6 +106,6 @@ if(process.argv[1]&&path.resolve(process.argv[1])===fileURLToPath(import.meta.ur
  try{
   const args=process.argv.slice(2);assert.ok(args.length===12||args.length===14);const o={};for(let i=0;i<args.length;i+=2){assert.ok(['--target','--image','--name','--evidence','--source','--image-info','--root'].includes(args[i]));assert.ok(!Object.hasOwn(o,args[i]));o[args[i]]=args[i+1]}
   const root=o['--root']??path.resolve(path.dirname(fileURLToPath(import.meta.url)),'../../..');assert.equal(execFileSync('git',['-C',root,'rev-parse','HEAD'],{encoding:'utf8'}).trim(),o['--source']);assert.equal(execFileSync('git',['-C',root,'status','--porcelain'],{encoding:'utf8'}),'')
-  runImageInspection({target:o['--target'],image:o['--image'],name:o['--name'],evidence:o['--evidence'],source:o['--source'],imageInfo:o['--image-info'],root})
- }catch{process.stderr.write('Owned image proof failed\n');process.exitCode=1}
+  await runImageInspection({target:o['--target'],image:o['--image'],name:o['--name'],evidence:o['--evidence'],source:o['--source'],imageInfo:o['--image-info'],root})
+ }catch(error){process.stderr.write('Owned image proof failed\n');process.exitCode=[130,143].includes(error?.exitCode)?error.exitCode:1}
 }
