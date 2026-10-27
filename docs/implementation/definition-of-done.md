@@ -10,9 +10,9 @@ whenToUpdate: 完成定义条目、验收标准或核对证据发生变化时更
 checkPaths:
   - docs/implementation/definition-of-done.md
   - GOAL.md
-lastReviewedAt: 2026-10-27
-lastReviewedCommit: "afff0e9ed806ea9e3a08316dfe9881b420ab7e98"
-lastReviewedNote: "Identity44 afff hosted run40522175745 failed baseline Catalog navigation before worker/auth controls: href apps locator matched Applications and Application list. Broad UI passed with zero page/console errors; no actual URL snapshot establishes timing cause. Narrow support correction uses unique navigation Applications/count1 and awaits admin/apps URLs; actual-body positive and missing-wait/ambiguous-selector negatives,62 affected units, lint/typecheck pass. Product/graph/runtime unchanged; failed artifact and clean owned service/image receipts retained. Candidate UI/logout/transport unexecuted; no acceptance, rerun, local browser/Docker or merge claim."
+lastReviewedAt: 2026-10-28
+lastReviewedCommit: f0a0658568f07f5e3317817041acb4bd71676a72
+lastReviewedNote: "Identity48 cancellation proof closure: after unchanged TERM grace/KILL, require actual owned-group absence and direct-child reaping within a bounded one-second join; unknown observations fail closed. Host retains cancel metadata/no proof while preserving failed supervisor status. Existing immediate PID/deadline/trap checks remain, with actual descendant and unavailable-observation controls. Graph/product/patch/generator/formatter unchanged; fresh hosted qualification remains pending."
 ---
 
 # 完成定义(DoD)核对 — GOAL.md §7

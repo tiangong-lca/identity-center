@@ -10,9 +10,9 @@ whenToUpdate: 设计文档集目录结构、评审状态或收录范围发生变
 checkPaths:
   - docs/design/README.md
   - docs/README.md
-lastReviewedAt: 2026-10-27
-lastReviewedCommit: 4fa2150750647f9b088e4dfcffe2b8e73416a169
-lastReviewedNote: "Identity44 phaseA fixed-baseline composition: preserved b68 ancestry via exact b0c5baa merge; explicit four-case registry/new react19.3-catalog-fixed, one YAMLselector, BOTH source variants require broad and Catalog suites with distinct receipts/continuous errors/no skip. Source/archive/comparison/browser wiring and baseline/candidate descriptor bindings tested through actual entrypoints/inert bodies;60targeted controls/types/lint/frozen install pass. Initial trusted-TS body parse failure retained and corrected using installed TypeScript erasure. Product/runtime identical qualifiedMain, exact5package/79snapshot blobs and physical oneReact19.3.1 across8consumers; PostCSS8.5.30 preserved. No fullunit/build/browser/Docker/push or runtime claim; phaseB requires Main review.106original29 accounting entries remain provisional for Main exact disposition, not blanket tooling/unadopted coverage."
+lastReviewedAt: 2026-10-28
+lastReviewedCommit: 10083691f0872cdc225cca950ca47c374138cf47
+lastReviewedNote: "Identity48 image-proof support: existing one-off native Node image check now uses immutable image ID, read-only/network-none filesystem inspection before unchanged cleanup. Worker observes exact source inputs, all three sanitizer hashes, selected packages and trusted canonical app-Zod entry/implementation hashes. Runner binds actual sanitizer/client-Zod/server-Zod output and discovered loadable/NFT associations, distinct host expectations and framework vendor tracked-open49. Focused filesystem/inert workflow controls and retained B Runner positive exercised; host virtual-store old orphan rejection preserved, not an image failure. No Docker/image build/browser/network/audit/publication in support preparation; actual hosted image proof pending."
 ---
 
 # 统一身份与用户门户设计文档集

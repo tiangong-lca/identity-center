@@ -4,6 +4,7 @@ import path from 'node:path'
 import Redis from 'ioredis'
 import { createKeycloakAdmin } from '../../lib/keycloak/admin-client'
 import { fixture, receipt } from './fixture'
+import { qualifySecurityBehavior } from './security-behavior'
 import { qualifyCatalogUi } from './catalog-ui'
 import { qualifyStandaloneUi } from './ui-acceptance'
 import { qualificationUiPlan, combinedReactUi } from './ui-plan.mjs'
@@ -16,7 +17,7 @@ test('real Keycloak PKCE/Auth.js session is denied after actual signed backchann
   const admin = createKeycloakAdmin({ baseUrl: c.keycloakOrigin, realm: c.realm, clientId: 'user-portal-admin-api', clientSecret: c.adminApiSecret! })
   const redis = new Redis(process.env.REDIS_URL!, { maxRetriesPerRequest: 1, connectTimeout: 3000 })
   const plan = qualificationUiPlan(c.qualificationCase, c.variant)
-  const catalog = c.qualificationCase === 'catalog-yaml' || c.qualificationCase === 'react19.3-catalog-fixed'
+  const catalog = c.qualificationCase === 'catalog-yaml' || c.qualificationCase === 'react19.3-catalog-fixed' || c.qualificationCase === 'security-audit'
   const ui = plan.broad || plan.catalog
   const errors = { page: 0, console: 0 }
   const diagnostics = createBrowserDiagnostics({ portalOrigin: c.portalOrigin, builtAssetPaths: c.browserAssets ?? [],
@@ -46,13 +47,17 @@ test('real Keycloak PKCE/Auth.js session is denied after actual signed backchann
     expect((await before.json()).user.keycloakSub).toBe(c.userId)
     if (ui) {
       expect(c.browserAssets?.length).toBeGreaterThan(0)
-      if (c.qualificationCase === 'react19.3-catalog-fixed') {
+      if (c.qualificationCase === 'react19.3-catalog-fixed' || c.qualificationCase === 'security-audit') {
         await qualifyStandaloneUi(page, errors, diagnostics, 'ui-broad.json')
         await qualifyCatalogUi(page, errors, diagnostics, 'ui-catalog.json')
         const read = (name: string) => JSON.parse(readFileSync(path.join(c.evidenceDirectory, name), 'utf8'))
         receipt('ui.json', combinedReactUi(c.qualificationCase, c.variant, read('ui-broad.json'), read('ui-catalog.json'), errors))
       } else if (plan.broad) await qualifyStandaloneUi(page, errors, diagnostics)
       else await qualifyCatalogUi(page, errors, diagnostics)
+      if (c.qualificationCase === 'security-audit') {
+        await qualifySecurityBehavior(page)
+        expect(errors).toEqual({ page: 0, console: 0 })
+      }
       page.off('pageerror', pageError); page.off('console', consoleError)
     } else if (plan.knownDefectiveSkip) receipt('ui.json', { qualificationCase: 'catalog-yaml', executed: false, passed: false,
       reason: 'known-baseline-yaml-worker-defect', baseline: '64055a2cd05fa4056ea36fd9ab1b780a77e1690e', retainedFailureRun: 40474716057 })

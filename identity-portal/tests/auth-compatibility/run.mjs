@@ -11,7 +11,9 @@ import { assertHostedContext, assertFixture, IMAGE_TAGS, composeDocument, cleanE
 
 import { assertCatalogSources, assertCatalogUiReceipts } from './catalog-case.mjs'
 import { qualificationCase, assertQualificationSources, assertQualificationManifest, assertQualificationVersions, assertReactSourcePathFromGit } from './qualification-case.mjs'
-import { qualificationUiPlan, assertFixedReactUiReceipts } from './ui-plan.mjs'
+import { assertSecurityBehaviorReceipts, securityZodIdentity } from './security-behavior-source.mjs'
+import { assertSecuritySources, assertSecurityArchive, securityInstalledAssets } from './security-case.mjs'
+import { qualificationUiPlan, assertFixedReactUiReceipts, assertSecurityUiReceipts } from './ui-plan.mjs'
 import { emittedBrowserAssetPaths } from './browser-assets.mjs'
 import { emittedYamlWorker } from './catalog-worker-identity.mjs'
 import { badReadinessDocument, observeBadKeycloakHealth, classifyBadReadinessRejection, requireExpectedBadReadinessError, READINESS_CONTROL_WAIT_SECONDS } from './readiness-control.mjs'
@@ -186,15 +188,21 @@ async function resources(c, kind) {
   return text ? text.split('\n') : []
 }
 
-async function variant(variant, root, images, head) {
+async function variant(variant, root, images, head, securityInputs) {
   const c = await newFixture(variant, root)
   const checkout = path.join(c.directory, 'source')
   fs.mkdirSync(checkout)
   const archive = execFileSync('git', ['-C', sourceRoot, 'archive', variant === 'baseline' ? BASELINE : head], { env: { ...infraEnv, GIT_NO_LAZY_FETCH: '1' }, maxBuffer: 100 * 1024 * 1024 })
   execFileSync('tar', ['-xf', '-', '-C', checkout], { input: archive, env: infraEnv })
   const app = path.join(checkout, 'identity-portal')
+  if (selectedCase.name === 'security-audit') assertSecurityArchive(app, variant, securityInputs)
   // Identical test support runs against both exact application sources and frozen graphs.
   fs.cpSync(path.join(sourceRoot, 'identity-portal/tests/auth-compatibility'), path.join(app, 'tests/auth-compatibility'), { recursive: true })
+  if (selectedCase.name === 'security-audit') {
+    const parserPath = path.join(sourceRoot, 'identity-portal/scripts/security/monaco-purify-patch.mjs')
+    assert.equal(hash(parserPath), securityInputs.candidateHashes['identity-portal/scripts/security/monaco-purify-patch.mjs'])
+    fs.copyFileSync(parserPath, path.join(app, 'tests/auth-compatibility/security-proof-parser.mjs'))
+  }
   fs.copyFileSync(path.join(sourceRoot, 'identity-portal/tests/integration/keycloak-bootstrap.test.ts'), path.join(app, 'tests/integration/keycloak-bootstrap.test.ts'))
   assert.equal(fs.readdirSync(app).some(name => /^\.env(?:\.|$)/.test(name)), false, 'Never load a pre-existing dotenv file')
   c.qualificationCase = selectedCase.name
@@ -220,15 +228,28 @@ async function variant(variant, root, images, head) {
       fs.writeFileSync(path.join(c.evidenceDirectory, 'startup.json'), inventory)
     }, async () => {
       await pnpm(['install', '--frozen-lockfile'], 'frozen')
+      if (selectedCase.name === 'security-audit') assertSecurityArchive(app, variant, securityInputs)
       const versions = Object.fromEntries(['next', 'react', 'react-dom', 'jose', '@keycloak/keycloak-admin-client'].map(name => [name, JSON.parse(fs.readFileSync(path.join(app, 'node_modules', name, 'package.json'))).version]))
       if (selectedCase.name !== 'auth-client') {
         for (const name of ['@types/react', '@types/react-dom']) versions[name] = JSON.parse(fs.readFileSync(path.join(app, 'node_modules', name, 'package.json'))).version
+        if (selectedCase.name === 'security-audit') for (const name of ['shadcn', 'zod', 'vitest', '@vitest/coverage-v8', 'monaco-editor', 'monaco-yaml']) versions[name] = JSON.parse(fs.readFileSync(path.join(app, 'node_modules', name, 'package.json'))).version
         assertQualificationVersions(selectedCase.name, variant, versions)
       }
       else {
         assert.equal(versions.next, '16.4.2'); assert.equal(versions.react, '19.2.4'); assert.equal(versions['react-dom'], '19.2.4')
         assert.equal(versions.jose, variant === 'baseline' ? '6.2.3' : '6.2.12')
         assert.equal(versions['@keycloak/keycloak-admin-client'], variant === 'baseline' ? '26.6.4' : '26.8.1')
+      }
+      if (selectedCase.name === 'security-audit') {
+        summary.securityAssets = securityInstalledAssets(app, variant, securityInputs)
+        fs.writeFileSync(path.join(c.evidenceDirectory, 'security-assets.json'), JSON.stringify(summary.securityAssets, null, 2), { mode: 0o600 })
+        summary.securityZod = securityZodIdentity(app)
+        summary.securityParserSha256 = securityInputs.candidateHashes['identity-portal/scripts/security/monaco-purify-patch.mjs']
+        c.securityBinding = { source: summary.source, manifestSha256: hash(path.join(app, 'package.json')), lockSha256: hash(path.join(app, 'pnpm-lock.yaml')), parserSha256: securityInputs.candidateHashes['identity-portal/scripts/security/monaco-purify-patch.mjs'], assets: summary.securityAssets, zod: summary.securityZod }
+        fs.writeFileSync(configFile, JSON.stringify(c), { mode: 0o600 })
+        summary.manifestSha256 = hash(path.join(app, 'package.json'))
+        summary.workspaceSha256 = hash(path.join(app, 'pnpm-workspace.yaml'))
+        if (variant === 'candidate') summary.patchSha256 = hash(path.join(app, 'patches/monaco-editor@0.55.1.patch'))
       }
       summary.qualificationCase = selectedCase.name
       summary.versions = versions; summary.fixtureMode = 'synthetic-owned-local-only'; summary.lockSha256 = hash(path.join(app, 'pnpm-lock.yaml'))
@@ -262,6 +283,7 @@ async function variant(variant, root, images, head) {
       await docker(['stop', 'redis'], 'owned-redis-stop')
       env = { ...env, AUTH_PROOF_REDIS_STOPPED: c.project }
       await pnpm(['exec', 'vitest', 'run', '--config', 'tests/auth-compatibility/vitest.config.ts', 'tests/auth-compatibility/redis-outage.integration.test.ts'], 'actual-redis-outage')
+      if (selectedCase.name === 'security-audit') summary.securityBehavior = JSON.parse(fs.readFileSync(path.join(c.evidenceDirectory, 'security-behavior.json')))
       if (selectedCase.name !== 'auth-client') summary.ui = JSON.parse(fs.readFileSync(path.join(c.evidenceDirectory, 'ui.json')))
       for (const name of ['browser', 'transport', 'outage']) summary[name] = JSON.parse(fs.readFileSync(path.join(c.evidenceDirectory, `${name}.json`)))
     }, async () => {
@@ -345,10 +367,12 @@ async function readinessFailureControl(root, images) {
 
 async function main() {
   const head = git('rev-parse', 'HEAD')
+  let securityInputs
   assert.equal(git('status', '--porcelain'), '', 'Run proof from clean exact source')
   const validateOnly = process.argv.slice(2).length === 1 && process.argv[2] === '--validate-sources'
   assert.ok(process.argv.length === 2 || validateOnly, 'Unknown proof arguments')
   if (selectedCase.name === 'catalog-yaml') assertCatalogSources({ baseline: BASELINE, head, requestedHead: process.env.AUTH_PROOF_HEAD, cwd: sourceRoot, env: infraEnv })
+  else if (selectedCase.name === 'security-audit') securityInputs = assertSecuritySources({ baseline: BASELINE, head, requestedHead: process.env.AUTH_PROOF_HEAD, cwd: sourceRoot, env: infraEnv })
   else if (selectedCase.name !== 'auth-client') {
     assertQualificationSources(selectedCase.name, { baseline: BASELINE, head, requestedHead: process.env.AUTH_PROOF_HEAD,
       ancestor: git('merge-base', BASELINE, head) === BASELINE })
@@ -383,7 +407,7 @@ async function main() {
   try {
     const pnpmVersion = await execute('pnpm', ['--version'], { name: 'pnpm-version' })
     assert.equal(pnpmVersion, '11.9.0')
-    fs.writeFileSync(path.join(output, 'source.json'), JSON.stringify({ qualificationCase: selectedCase.name, head, baseline: BASELINE, node: process.version, pnpm: pnpmVersion }, null, 2))
+    fs.writeFileSync(path.join(output, 'source.json'), JSON.stringify({ qualificationCase: selectedCase.name, head, baseline: BASELINE, node: process.version, pnpm: pnpmVersion, ...(securityInputs ? { securityInputs } : {}) }, null, 2))
     await execute('docker', ['version', '--format', '{{.Server.Version}}'], { name: 'docker-preflight' })
     await execute('docker', ['compose', 'version'], { name: 'compose-preflight' })
     for (const [name, tag] of Object.entries(IMAGE_TAGS)) {
@@ -395,13 +419,17 @@ async function main() {
       assert.match(platform, / linux\/amd64$/, 'Use native Linux x64 service images')
     }
     const readinessControl = await readinessFailureControl(root, images)
-    const baseline = await variant('baseline', root, images, head)
-    const candidate = await variant('candidate', root, images, head)
+    const baseline = await variant('baseline', root, images, head, securityInputs)
+    const candidate = await variant('candidate', root, images, head, securityInputs)
     assert.equal(cancelled, false, 'Cancelled proof cannot qualify')
     if (selectedCase.name === 'catalog-yaml') assertCatalogUiReceipts(baseline, candidate)
     if (selectedCase.name === 'react19.3-catalog-fixed') assertFixedReactUiReceipts(baseline, candidate)
+    if (selectedCase.name === 'security-audit') {
+      assertSecurityUiReceipts(baseline, candidate)
+      assertSecurityBehaviorReceipts(baseline, candidate)
+    }
     const comparison = compareReceipts(baseline, candidate)
-    fs.writeFileSync(path.join(output, 'qualification.json'), JSON.stringify({ qualificationCase: selectedCase.name, head, baseline: BASELINE, images, readinessControl, comparison, baselineReceipt: baseline, candidateReceipt: candidate }, null, 2))
+    fs.writeFileSync(path.join(output, 'qualification.json'), JSON.stringify({ qualificationCase: selectedCase.name, head, baseline: BASELINE, images, readinessControl, comparison, baselineReceipt: baseline, candidateReceipt: candidate, ...(securityInputs ? { securityInputs } : {}) }, null, 2))
     console.log(JSON.stringify({ qualificationCase: selectedCase.name, head, baseline: BASELINE, comparison, evidence: output }))
   } catch (e) {
     fs.writeFileSync(path.join(output, 'failure.json'), JSON.stringify({ qualificationCase: selectedCase.name, head, baseline: BASELINE, cancelled, message: redact(e instanceof Error ? e.message : e) }, null, 2))

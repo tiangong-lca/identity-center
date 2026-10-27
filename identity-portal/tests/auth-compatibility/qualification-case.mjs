@@ -2,6 +2,7 @@ import assert from 'node:assert/strict'
 import { execFileSync } from 'node:child_process'
 import { createHash } from 'node:crypto'
 import { BASELINE, assertProductDelta } from './contract.mjs'
+import { securityCase, assertSecurityManifest, assertSecurityVersions } from './security-case.mjs'
 import { proofCase, assertCatalogVersions } from './catalog-case.mjs'
 
 // Separate reviewed experiments. Never widen one experiment to admit another.
@@ -22,6 +23,7 @@ const cases = Object.freeze({
 
 export function qualificationCase(name = 'auth-client') {
   if (name === 'catalog-yaml') return proofCase(name)
+  if (name === 'security-audit') return securityCase()
   assert.ok(Object.hasOwn(cases, name), 'Unknown qualification case')
   return { name, ...cases[name] }
 }
@@ -35,6 +37,7 @@ export function assertQualificationSources(name, { baseline, head, requestedHead
 }
 
 export function assertQualificationManifest(name, baselineContent, candidate) {
+  if (name === 'security-audit') return assertSecurityManifest(baselineContent, candidate)
   const selected = qualificationCase(name)
   assert.equal(createHash('sha256').update(baselineContent).digest('hex'), selected.manifestSha256, 'Baseline manifest must match its immutable source')
   const expected = JSON.parse(baselineContent)
@@ -54,6 +57,7 @@ export function assertQualificationVersions(name, variant, versions) {
   qualificationCase(name)
   assert.ok(['baseline', 'candidate'].includes(variant))
   if (name === 'catalog-yaml') return assertCatalogVersions(Object.fromEntries(['next', 'react', 'react-dom', 'jose', '@keycloak/keycloak-admin-client'].map(key => [key, versions[key]])))
+  if (name === 'security-audit') return assertSecurityVersions(variant, versions)
   const historical = name === 'auth-client'
   const upgraded = !historical && variant === 'candidate'
   assert.equal(versions.next, '16.4.2')

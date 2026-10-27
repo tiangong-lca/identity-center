@@ -5,12 +5,17 @@ on:
     paths:
       - .nvmrc
       - identity-portal/deploy/docker/Dockerfile
+      - identity-portal/patches/**
       - identity-portal/pnpm-workspace.yaml
       - identity-portal/package.json
       - identity-portal/pnpm-lock.yaml
       - identity-portal/tests/auth-compatibility/**
+      - identity-portal/tests/auth-compatibility/image-security-proof.mjs
       - identity-portal/tests/unit/auth-compatibility-harness.test.ts
       - identity-portal/tests/unit/catalog-qualification.test.ts
+      - identity-portal/tests/unit/security-qualification.test.ts
+      - identity-portal/tests/unit/security-behavior.test.ts
+      - identity-portal/tests/unit/image-security-proof.test.ts
       - identity-portal/tests/unit/yaml-worker-adapter.test.ts
       - identity-portal/tests/monaco-worker/**
       - identity-portal/features/catalog/catalog-editor-impl.tsx
@@ -107,13 +112,13 @@ jobs:
           for target in runner worker; do
             bounded_docker 600000 build --label "org.tiangong.identity-proof=${image_prefix}" --target "$target" --tag "${image_prefix}:${target}" --file deploy/docker/Dockerfile .
             bounded_docker 15000 image inspect "${image_prefix}:${target}" --format '{{.Id}} {{.Os}}/{{.Architecture}}' > "$evidence_dir/${target}-image.txt"
-            bounded_docker 60000 run --rm --name "${image_prefix}-${target}" --label "org.tiangong.identity-proof=${image_prefix}" --entrypoint node "${image_prefix}:${target}" -e 'if (process.version !== "v24.22.1") process.exit(1); console.log(process.version)' > "$evidence_dir/${target}-node.txt"
+            node tests/auth-compatibility/image-security-proof.mjs --target "$target" --image "${image_prefix}:${target}" --name "${image_prefix}-${target}" --evidence "$evidence_dir" --source "$(git rev-parse HEAD)" --image-info "$evidence_dir/${target}-image.txt"
           done
       - name: Qualify isolated baseline and candidate auth transports
         env:
           AUTH_PROOF_HEAD: ${{ github.event.pull_request.head.sha }}
-          # Explicit fixed-Main React experiment; historical cases remain intact.
-          AUTH_PROOF_CASE: react19.3-catalog-fixed
+          # Explicit immutable security experiment; historical cases remain intact.
+          AUTH_PROOF_CASE: security-audit
         run: node tests/auth-compatibility/run.mjs
       - name: Preserve sanitized proof and cleanup receipts
         if: always()
