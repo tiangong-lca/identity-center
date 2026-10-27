@@ -159,3 +159,20 @@ and remains unqualified until that task delivers the required evidence.
 References: [GitHub options](https://docs.github.com/en/code-security/reference/supply-chain-security/dependabot-options-reference),
 [ecosystem support](https://docs.github.com/en/code-security/reference/supply-chain-security/supported-ecosystems-and-repositories),
 [updater pnpm selection](https://github.com/dependabot/dependabot-core/blob/main/npm_and_yarn/lib/dependabot/npm_and_yarn/helpers.rb).
+
+## Separate renderer qualification (Identity #44)
+
+The React case in the existing auth compatibility workflow is now explicitly
+selected against immutable Main64055a2. Its manifest boundary admits only the
+exact React/DOM19.3.1 pair; the frozen graph updates types19.3.0 and scheduler0.28.0
+with required peer substitutions. Existing `^19` type declarations and every
+other direct dependency/tool/runtime/product pin remain. Whole-lock comparison
+must account for every changed snapshot, including rejecting incidental refreshes.
+The old historical auth-client case retains its19.2.4 assertions and is not claimed
+to execute on this19.3 candidate. Actual standalone UI checks augment the same
+synthetic hosted auth flow; local/static validation does not replace them.
+
+Original PR29 also proposed many incidental transitive updates. The scoped React
+change does not implicitly deliver or retire those records: the coordinating
+owner must preserve a complete per-record contained/superseded/gap disposition
+and any required follow-up. Original29 remains closed unmerged.

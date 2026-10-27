@@ -4,6 +4,7 @@ import path from 'node:path'
 import Redis from 'ioredis'
 import { createKeycloakAdmin } from '../../lib/keycloak/admin-client'
 import { fixture, receipt } from './fixture'
+import { qualifyStandaloneUi } from './ui-acceptance'
 
 const c = fixture()
 
@@ -11,6 +12,13 @@ test('real Keycloak PKCE/Auth.js session is denied after actual signed backchann
   expect(c.adminApiSecret && c.userId).toBeTruthy()
   const admin = createKeycloakAdmin({ baseUrl: c.keycloakOrigin, realm: c.realm, clientId: 'user-portal-admin-api', clientSecret: c.adminApiSecret! })
   const redis = new Redis(process.env.REDIS_URL!, { maxRetriesPerRequest: 1, connectTimeout: 3000 })
+  const errors = { page: 0, console: 0 }
+  const pageError = () => { errors.page++ }
+  const consoleError = (message: { type(): string }) => { if (message.type() === 'error') errors.console++ }
+  if (process.env.AUTH_PROOF_CASE === 'react19.3') {
+    page.on('pageerror', pageError)
+    page.on('console', consoleError)
+  }
   try {
     await page.goto('/login')
     await page.waitForURL(u => u.origin === c.keycloakOrigin && u.pathname.includes(`/realms/${c.realm}/`))
@@ -23,6 +31,11 @@ test('real Keycloak PKCE/Auth.js session is denied after actual signed backchann
     const before = await page.request.get('/api/auth/session')
     expect(before.status()).toBe(200)
     expect((await before.json()).user.keycloakSub).toBe(c.userId)
+    if (process.env.AUTH_PROOF_CASE === 'react19.3') {
+      await qualifyStandaloneUi(page, errors)
+      page.off('pageerror', pageError)
+      page.off('console', consoleError)
+    }
     await admin.logoutUserSessions(c.userId!)
     const callbackFile = path.join(c.evidenceDirectory, 'callback.json')
     await expect.poll(() => {

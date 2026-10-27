@@ -61,3 +61,38 @@ secretless workflow scope, and real local-invocation refusal with a fake Docker
 transport that must never run. They do not execute Docker or establish runtime
 interoperability. Normal local install/lint/typecheck/unit/standalone-build gates
 remain required; the hosted protocol proof follows review and main's normal push.
+
+## Separate React 19.3 experiment (Identity #44)
+
+The PR workflow explicitly selects `AUTH_PROOF_CASE=react19.3`. Its immutable
+baseline is Main `64055a2cd05fa4056ea36fd9ab1b780a77e1690e`; candidate source must
+be the requested exact descendant head. The baseline manifest hash is fixed, and
+the candidate manifest may change only React/DOM19.2.4 to the exact19.3.1 pair.
+Installed baseline types19.2.17/19.2.3 and candidate types19.3.0/19.3.0 are asserted.
+Next16.4.2, accepted auth clients and Node24 remain fixed on both sides. Product,
+image, runtime/configuration changes fail this case; documentation may change
+review metadata only within protected product paths.
+
+The original default `auth-client` experiment remains bound to its historical
+baseline and both19.2.4 renderers. It intentionally rejects a19.3 candidate; the
+new workflow selection does not claim that historical experiment ran against the
+new renderer. Both cases retain the same actual auth and transport negatives,
+hosted-only execution guard, privacy/cleanup and recorded SID-only limitation.
+
+The React case additionally exercises the actual standalone Portal before logout:
+first render plus interactive locale/theme hydration, same-document Link
+navigation (a browser-memory sentinel must survive), a real synthetic organization
+form with server readback, Radix dialog focus trapping/Escape restoration, and
+Monaco typing with an actual no-op catalog apply request/response. Both zh/en and
+light/dark transitions are asserted after navigation. No route or backend API is
+mocked; writes are limited to the unique disposable synthetic database. UI
+receipts retain error counts only, never raw console text, URLs or browser state.
+This support remains unqualified until both hosted source variants actually pass.
+
+`node tests/auth-compatibility/run.mjs --validate-sources` performs only clean
+Git-source/baseline/manifest/product validation and exits before any Docker or
+service access. Set `AUTH_PROOF_CASE` and `AUTH_PROOF_HEAD` explicitly. It grants
+no hosted/runtime qualification. The no-argument runtime entrypoint still refuses
+local/self-hosted execution before Docker. An actual entrypoint regression uses
+positively verified inert command doubles and rejects wrong source/case,
+manifest and product deltas; pure helper tests alone cannot prove that wiring.

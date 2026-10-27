@@ -5,7 +5,7 @@ const c = fixture()
 export default defineConfig({
   testDir: __dirname,
   testMatch: 'browser.proof.spec.ts',
-  timeout: 90_000,
+  timeout: 150_000,
   retries: 0,
   workers: 1,
   reporter: [['list']],

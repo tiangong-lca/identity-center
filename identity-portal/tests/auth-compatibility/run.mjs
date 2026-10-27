@@ -7,8 +7,12 @@ import http from 'node:http'
 import net from 'node:net'
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
-import { assertHostedContext, assertFixture, BASELINE, IMAGE_TAGS, composeDocument, cleanEnvironment, redactor, lineRedactor, attemptCleanup, ownedLifecycle, compareReceipts, assertProductDeltaFromGit } from './contract.mjs'
+import { assertHostedContext, assertFixture, IMAGE_TAGS, composeDocument, cleanEnvironment, redactor, lineRedactor, attemptCleanup, ownedLifecycle, compareReceipts } from './contract.mjs'
 
+import { qualificationCase, assertQualificationSources, assertQualificationManifest, assertQualificationVersions, assertQualificationProductDeltaFromGit } from './qualification-case.mjs'
+
+const selectedCase = qualificationCase(process.env.AUTH_PROOF_CASE)
+const BASELINE = selectedCase.baseline
 const sourceRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../../..')
 const infraEnv = Object.fromEntries(['PATH', 'HOME', 'USER', 'LANG'].filter(k => process.env[k]).map(k => [k, process.env[k]]))
 const git = (...args) => execFileSync('git', ['-C', sourceRoot, ...args], { env: { ...infraEnv, GIT_NO_LAZY_FETCH: '1' } }).toString().trim()
@@ -191,7 +195,7 @@ async function variant(variant, root, images, head) {
   const configFile = path.join(c.directory, 'fixture.json')
   fs.writeFileSync(configFile, JSON.stringify(c), { mode: 0o600 })
   fs.writeFileSync(`${configFile}.env`, '', { mode: 0o600 })
-  let env = cleanEnvironment(process.env, c, configFile)
+  let env = { ...cleanEnvironment(process.env, c, configFile), AUTH_PROOF_CASE: selectedCase.name }
   const compose = path.join(c.directory, 'compose.json')
   fs.writeFileSync(compose, JSON.stringify(composeDocument(c, images, path.join(app, 'deploy/keycloak/themes'))), { mode: 0o600 })
   const docker = (args, name, cleanup = false) => execute('docker', ['compose', '-p', c.project, '-f', compose, ...args], { name: `${variant}-${name}`, timeout: cleanup ? 25_000 : 240_000, cleanup })
@@ -210,10 +214,8 @@ async function variant(variant, root, images, head) {
       fs.writeFileSync(path.join(c.evidenceDirectory, 'startup.json'), inventory)
     }, async () => {
       await pnpm(['install', '--frozen-lockfile'], 'frozen')
-      const versions = Object.fromEntries(['next', 'react', 'react-dom', 'jose', '@keycloak/keycloak-admin-client'].map(name => [name, JSON.parse(fs.readFileSync(path.join(app, 'node_modules', name, 'package.json'))).version]))
-      assert.equal(versions.next, '16.4.2'); assert.equal(versions.react, '19.2.4'); assert.equal(versions['react-dom'], '19.2.4')
-      assert.equal(versions.jose, variant === 'baseline' ? '6.2.3' : '6.2.12')
-      assert.equal(versions['@keycloak/keycloak-admin-client'], variant === 'baseline' ? '26.6.4' : '26.8.1')
+      const versions = Object.fromEntries(['next', 'react', 'react-dom', '@types/react', '@types/react-dom', 'jose', '@keycloak/keycloak-admin-client'].map(name => [name, JSON.parse(fs.readFileSync(path.join(app, 'node_modules', name, 'package.json'))).version]))
+      assertQualificationVersions(selectedCase.name, variant, versions)
       summary.versions = versions; summary.fixtureMode = 'synthetic-owned-local-only'; summary.lockSha256 = hash(path.join(app, 'pnpm-lock.yaml'))
       await docker(['exec', '-T', 'postgres', 'createdb', '-U', 'identityproof', 'identity_portal'], 'create-portal-db')
       await pnpm(['bootstrap:keycloak'], 'bootstrap')
@@ -234,7 +236,7 @@ async function variant(variant, root, images, head) {
       await docker(['stop', 'redis'], 'owned-redis-stop')
       env = { ...env, AUTH_PROOF_REDIS_STOPPED: c.project }
       await pnpm(['exec', 'vitest', 'run', '--config', 'tests/auth-compatibility/vitest.config.ts', 'tests/auth-compatibility/redis-outage.integration.test.ts'], 'actual-redis-outage')
-      for (const name of ['browser', 'transport', 'outage']) summary[name] = JSON.parse(fs.readFileSync(path.join(c.evidenceDirectory, `${name}.json`)))
+      for (const name of ['browser', 'transport', 'outage', ...(selectedCase.name === 'react19.3' ? ['ui'] : [])]) summary[name] = JSON.parse(fs.readFileSync(path.join(c.evidenceDirectory, `${name}.json`)))
     }, async () => {
       const actions = [['relay', stopRelay], ['portal', stopPortal]]
       if (owned) {
@@ -294,26 +296,30 @@ async function readinessFailureControl(root, images) {
 
 async function main() {
   const head = git('rev-parse', 'HEAD')
-  assertHostedContext(process.env, process.platform, head)
+  const validateOnly = process.argv.length === 3 && process.argv[2] === '--validate-sources'
+  assert.ok(process.argv.length === 2 || validateOnly, 'Unknown proof arguments')
+  if (!validateOnly) assertHostedContext(process.env, process.platform, head)
+  assertQualificationSources(selectedCase.name, { baseline: BASELINE, head, requestedHead: process.env.AUTH_PROOF_HEAD, ancestor: git('merge-base', BASELINE, head) === BASELINE })
+  assert.equal(git('status', '--porcelain'), '', 'Qualify a clean exact source checkout')
+  const changedProduct = git('diff', '--name-only', BASELINE, head, '--', 'identity-portal/app', 'identity-portal/lib', 'identity-portal/server', 'identity-portal/components', 'identity-portal/features', 'identity-portal/db', 'identity-portal/scripts', 'identity-portal/deploy', 'identity-portal/messages', 'identity-portal/next.config.ts', 'identity-portal/proxy.ts', ...(selectedCase.name === 'react19.3' ? ['identity-portal/i18n', 'identity-portal/types', 'identity-portal/public', 'identity-portal/pnpm-workspace.yaml', 'identity-portal/tsconfig.json', 'identity-portal/postcss.config.mjs', 'identity-portal/components.json', '.nvmrc'] : []))
+  for (const file of changedProduct ? changedProduct.split('\n') : []) {
+    assertQualificationProductDeltaFromGit(selectedCase.name, file, BASELINE, head, { cwd: sourceRoot, env: infraEnv })
+  }
+  const baselineManifest = execFileSync('git', ['-C', sourceRoot, 'show', `${BASELINE}:identity-portal/package.json`], { env: infraEnv }).toString()
+  assertQualificationManifest(selectedCase.name, baselineManifest, JSON.parse(git('show', `${head}:identity-portal/package.json`)))
+  if (validateOnly) {
+    console.log(JSON.stringify({ validationOnly: true, qualificationCase: selectedCase.name, baseline: BASELINE, head, dockerAccessed: false }))
+    return
+  }
   assert.equal(process.version, 'v24.22.1', 'Use the reviewed Node24 LTS runtime')
   output = path.join(process.env.RUNNER_TEMP, `identity34-evidence-${process.env.GITHUB_RUN_ID}-${process.env.GITHUB_RUN_ATTEMPT}`)
   fs.mkdirSync(output, { mode: 0o700 })
-  const changedProduct = git('diff', '--name-only', BASELINE, head, '--', 'identity-portal/app', 'identity-portal/lib', 'identity-portal/server', 'identity-portal/components', 'identity-portal/features', 'identity-portal/db', 'identity-portal/scripts', 'identity-portal/deploy', 'identity-portal/messages', 'identity-portal/next.config.ts', 'identity-portal/proxy.ts')
-  for (const file of changedProduct ? changedProduct.split('\n') : []) {
-    assertProductDeltaFromGit(file, BASELINE, head, { cwd: sourceRoot, env: infraEnv })
-  }
-  const expectedManifest = JSON.parse(git('show', `${BASELINE}:identity-portal/package.json`))
-  expectedManifest.dependencies['@keycloak/keycloak-admin-client'] = '^26.8.1'
-  expectedManifest.dependencies.jose = '^6.2.12'
-  expectedManifest.devDependencies['@types/node'] = '^24.19.2'
-  expectedManifest.engines = { node: '>=24.22.1 <25' }
-  assert.deepEqual(JSON.parse(fs.readFileSync(path.join(sourceRoot, 'identity-portal/package.json'))), expectedManifest)
   const root = fs.mkdtempSync(path.join(process.env.RUNNER_TEMP, 'identity34-owned-'))
   const images = {}
   try {
     const pnpmVersion = await execute('pnpm', ['--version'], { name: 'pnpm-version' })
     assert.equal(pnpmVersion, '11.9.0')
-    fs.writeFileSync(path.join(output, 'source.json'), JSON.stringify({ head, baseline: BASELINE, node: process.version, pnpm: pnpmVersion }, null, 2))
+    fs.writeFileSync(path.join(output, 'source.json'), JSON.stringify({ qualificationCase: selectedCase.name, head, baseline: BASELINE, node: process.version, pnpm: pnpmVersion }, null, 2))
     await execute('docker', ['version', '--format', '{{.Server.Version}}'], { name: 'docker-preflight' })
     await execute('docker', ['compose', 'version'], { name: 'compose-preflight' })
     for (const [name, tag] of Object.entries(IMAGE_TAGS)) {
@@ -329,10 +335,14 @@ async function main() {
     const candidate = await variant('candidate', root, images, head)
     assert.equal(cancelled, false, 'Cancelled proof cannot qualify')
     const comparison = compareReceipts(baseline, candidate)
-    fs.writeFileSync(path.join(output, 'qualification.json'), JSON.stringify({ head, baseline: BASELINE, images, readinessControl, comparison, baselineReceipt: baseline, candidateReceipt: candidate }, null, 2))
-    console.log(JSON.stringify({ head, baseline: BASELINE, comparison, evidence: output }))
+    if (selectedCase.name === 'react19.3') {
+      assert.equal(baseline.ui.passed, true); assert.equal(candidate.ui.passed, true)
+      assert.deepEqual(candidate.ui, baseline.ui, 'Unexpected standalone UI compatibility delta')
+    }
+    fs.writeFileSync(path.join(output, 'qualification.json'), JSON.stringify({ qualificationCase: selectedCase.name, head, baseline: BASELINE, images, readinessControl, comparison, baselineReceipt: baseline, candidateReceipt: candidate }, null, 2))
+    console.log(JSON.stringify({ qualificationCase: selectedCase.name, head, baseline: BASELINE, comparison, evidence: output }))
   } catch (e) {
-    fs.writeFileSync(path.join(output, 'failure.json'), JSON.stringify({ head, baseline: BASELINE, cancelled, message: redact(e instanceof Error ? e.message : e) }, null, 2))
+    fs.writeFileSync(path.join(output, 'failure.json'), JSON.stringify({ qualificationCase: selectedCase.name, head, baseline: BASELINE, cancelled, message: redact(e instanceof Error ? e.message : e) }, null, 2))
     throw e
   } finally { fs.rmSync(root, { recursive: true, force: true }) }
 }

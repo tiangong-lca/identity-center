@@ -105,6 +105,7 @@ jobs:
           done
       - name: Qualify isolated baseline and candidate auth transports
         env:
+          AUTH_PROOF_CASE: react19.3
           AUTH_PROOF_HEAD: ${{ github.event.pull_request.head.sha }}
         run: node tests/auth-compatibility/run.mjs
       - name: Preserve sanitized proof and cleanup receipts

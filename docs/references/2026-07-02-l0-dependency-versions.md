@@ -258,3 +258,56 @@ remove only those owned tags/containers and upload explicit cleanup receipts;
 intermediate build cache is retained only on the disposable GitHub-hosted runner.
 No host daemon is started, global prune performed or image published. Interrupted
 runner disposal is not reported as an explicit successful cleanup receipt.
+
+## 2026-10-27 React renderer and types qualification (Identity #44)
+
+The remaining renderer scope from closed-unmerged PR29 is composed on immutable
+Main `64055a2cd05fa4056ea36fd9ab1b780a77e1690e`. Context7's React19.3.0 source
+was read first; exact official registry metadata independently verified the latest
+stable [React](https://registry.npmjs.org/react/19.3.1) and
+[ReactDOM](https://registry.npmjs.org/react-dom/19.3.1) pair **19.3.1**, plus
+[@types/react](https://registry.npmjs.org/@types%2freact/19.3.0) and
+[@types/react-dom](https://registry.npmjs.org/@types%2freact-dom/19.3.0) **19.3.0**.
+DOM requires React^19.3.1 and scheduler^0.28.0; types-dom requires types-react^19.3.0.
+The installed Next16.4.2 navigation guide was read before adding UI acceptance.
+Playwright Context7 resolution succeeded but its documentation query hit quota;
+official API/assertion documentation and installed1.61.1 types supplied fallback.
+
+The manifest changes only the two exact runtime pins; existing `^19` type ranges
+remain. Complete normalized lock comparison proves exactly five package-record
+replacements (React, DOM, both types and scheduler0.27.0→0.28.0) and79 changed
+peer/dependency snapshot records, with every other record exact. The initial
+scoped update also refreshed PostCSS8.5.30→8.5.31; that unrelated drift was removed
+before the final frozen install. Next/eslint16.4.2, Auth.js beta.32, accepted
+admin/jose, Node24.22.1/types24.19.2, pnpm11.9 integrity, compiler1.0.0 and product
+0.1.0 stay fixed. Exact own tool archives match official Node SHA256 and the
+manifest's pnpm SHA512; no global runtime or sibling node_modules is used.
+
+A separate source-bound `react19.3` case preserves the historical auth-client
+experiment and old renderer assertions. The new case uses the same actual auth
+transport/negative/cleanup flow and adds real standalone UI assertions for
+hydration, client navigation, synthetic form/readback, Radix focus, Monaco edits,
+locales and themes. An actual validate-only entrypoint regression with verified
+inert commands checks the comparison wiring; it never accesses Docker. The new
+POSIX command-double control is explicitly skipped on Windows, like the existing
+POSIX image-cleanup controls; no native Windows execution is claimed.
+
+Local final frozen install, lint/typecheck, the109-case complete unit suite and
+the20-case final harness/entrypoint suite passed. The first standalone build was
+terminated by the6GiB aggregate-RSS lease (observed6,508,052,480bytes), not reported
+as a pass. A reviewed12GiB attempt compiled but found a test-only missing
+`NODE_ENV` type annotation; this was corrected. The final normal standalone build
+passed. The inert drift tests also exposed deliberate environment filtering, so
+the doubles now use a private state file rather than weakening the environment
+allowlist. Prior failed attempts and their resource/stage evidence are retained.
+
+Fresh exact-head hosted quality, Portal/Worker image checks, both source variants'
+actual auth/UI receipts, independent review, source merge and exact workspace
+integration remain required. SID-only logout remains the recorded limitation;
+no product behavior, service version line or production operation changes.
+
+PR29's two-file proposal also contains478 changed lock records, including
+incidental non-renderer updates. A complete source-record inventory is retained
+for owner review; absent incidental records require proof or an explicit tracked
+disposition. This scoped change does not silently deliver or retire them and does
+not claim original29 or the coordinating issue complete.

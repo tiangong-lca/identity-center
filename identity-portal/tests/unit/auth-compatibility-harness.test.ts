@@ -98,7 +98,7 @@ it('keeps hosted auth proof secretless, PR-head bound and absent from unrelated 
   const workflow = load(source) as {
     on: Record<string, { paths: string[] }>
     permissions: Record<string, string>
-    jobs: Record<string, { 'runs-on': string; steps: Array<{ uses?: string; with?: Record<string, unknown> }> }>
+    jobs: Record<string, { 'runs-on': string; steps: Array<{ uses?: string; with?: Record<string, unknown>; env?: Record<string, string> }> }>
   }
   expect(Object.keys(workflow.on)).toEqual(['pull_request'])
   expect(workflow.on.pull_request.paths).not.toContain('identity-portal/**')
@@ -106,6 +106,7 @@ it('keeps hosted auth proof secretless, PR-head bound and absent from unrelated 
   expect(workflow.permissions).toEqual({ contents: 'read' })
   const job = workflow.jobs['auth-compatibility']
   expect(job['runs-on']).toBe('ubuntu-24.04')
+  expect(job.steps.find(step => step.env?.AUTH_PROOF_CASE)?.env?.AUTH_PROOF_CASE).toBe('react19.3')
   expect(job.steps.find(step => step.uses?.startsWith('actions/setup-node@'))?.with?.['node-version']).toBe('24.22.1')
   expect(job.steps[0].with?.ref).toBe('${{ github.event.pull_request.head.sha }}')
   expect(job.steps[0].with?.['persist-credentials']).toBe(false)
@@ -213,4 +214,135 @@ it('preserves real Git blob newlines at the orchestrator extraction boundary', (
     git('add', '--', file)
     expect(() => assertProductDeltaFromGit(file, oldRef, git('write-tree'), { cwd: root, env })).toThrow('Only the exact reviewed Node24 Dockerfile')
   } finally { fs.rmSync(root, { recursive: true, force: true }) }
+})
+
+import { qualificationCase, assertQualificationSources, assertQualificationManifest, assertQualificationVersions, assertQualificationProductDelta } from '../auth-compatibility/qualification-case.mjs'
+
+describe('independent source-bound React qualification', () => {
+  const baselineFixture = (name: string) => JSON.parse(fs.readFileSync(path.resolve(__dirname, `../auth-compatibility/fixtures/manifest-${name}.json`), 'utf8')) as { sourceCommit: string; sourcePath: string; content: string }
+  const manifest = (name: string) => {
+    const original = baselineFixture(name)
+    const candidate = JSON.parse(original.content)
+    if (name === 'auth-client') {
+      candidate.dependencies['@keycloak/keycloak-admin-client'] = '^26.8.1'
+      candidate.dependencies.jose = '^6.2.12'
+      candidate.devDependencies['@types/node'] = '^24.19.2'
+      candidate.engines = { node: '>=24.22.1 <25' }
+    } else {
+      candidate.dependencies.react = candidate.dependencies['react-dom'] = '19.3.1'
+    }
+    return { original, candidate }
+  }
+  const versions = (react = '19.3.1') => ({ next: '16.4.2', react, 'react-dom': react, '@types/react': '19.3.0', '@types/react-dom': '19.3.0', jose: '6.2.12', '@keycloak/keycloak-admin-client': '26.8.1' })
+
+  it('retains the historical auth case and admits only each case exact manifest delta', () => {
+    expect(qualificationCase().name).toBe('auth-client')
+    expect(() => qualificationCase('unknown')).toThrow()
+    for (const name of ['auth-client', 'react19.3']) {
+      const { original, candidate } = manifest(name)
+      expect(original.sourceCommit).toBe(qualificationCase(name).baseline)
+      expect(original.sourcePath).toBe('identity-portal/package.json')
+      expect(() => assertQualificationManifest(name, original.content, candidate)).not.toThrow()
+      expect(() => assertQualificationManifest(name, `${original.content} `, candidate)).toThrow()
+      for (const mutation of [
+        (m: typeof candidate) => { m.version = '0.2.0' },
+        (m: typeof candidate) => { m.dependencies.next = '16.4.3' },
+        (m: typeof candidate) => { m.devDependencies['@types/node'] = '^25.0.0' },
+        (m: typeof candidate) => { m.dependencies.react = '19.3.0' },
+        (m: typeof candidate) => { m.dependencies['react-dom'] = name === 'auth-client' ? '19.3.1' : '19.2.4' },
+      ]) {
+        const changed = structuredClone(candidate); mutation(changed)
+        expect(() => assertQualificationManifest(name, original.content, changed)).toThrow()
+      }
+    }
+    const historical = manifest('auth-client')
+    historical.candidate.dependencies.react = historical.candidate.dependencies['react-dom'] = '19.3.1'
+    expect(() => assertQualificationManifest('auth-client', historical.original.content, historical.candidate)).toThrow()
+  })
+
+  it('rejects substituted baseline, candidate, self-comparison and unrelated history', () => {
+    const baseline = qualificationCase('react19.3').baseline
+    const input = { baseline, head: 'a'.repeat(40), requestedHead: 'a'.repeat(40), ancestor: true }
+    expect(() => assertQualificationSources('react19.3', input)).not.toThrow()
+    for (const changed of [{ baseline: qualificationCase('auth-client').baseline }, { requestedHead: 'b'.repeat(40) }, { head: baseline, requestedHead: baseline }, { ancestor: false }]) {
+      expect(() => assertQualificationSources('react19.3', { ...input, ...changed })).toThrow()
+    }
+  })
+
+  it('enforces old and new renderer/type pairs and unchanged accepted auth/framework versions', () => {
+    expect(() => assertQualificationVersions('react19.3', 'candidate', versions())).not.toThrow()
+    const old = { ...versions('19.2.4'), '@types/react': '19.2.17', '@types/react-dom': '19.2.3' }
+    expect(() => assertQualificationVersions('react19.3', 'baseline', old)).not.toThrow()
+    expect(() => assertQualificationVersions('auth-client', 'candidate', old)).not.toThrow()
+    expect(() => assertQualificationVersions('auth-client', 'baseline', { ...old, jose: '6.2.3', '@keycloak/keycloak-admin-client': '26.6.4' })).not.toThrow()
+    expect(() => assertQualificationVersions('auth-client', 'candidate', versions())).toThrow()
+    expect(() => assertQualificationVersions('react19.3', 'baseline', versions())).toThrow()
+    for (const changed of [{ 'react-dom': '19.2.4' }, { react: '19.3.0', 'react-dom': '19.3.0' }, { '@types/react': '19.2.17' }, { next: '16.4.3' }, { jose: '6.2.3' }]) {
+      expect(() => assertQualificationVersions('react19.3', 'candidate', { ...versions(), ...changed })).toThrow()
+    }
+  })
+
+  it('refuses executable, image and documentation behavior drift in the React experiment', () => {
+    for (const file of ['identity-portal/lib/auth/auth-config.ts', 'identity-portal/deploy/docker/Dockerfile', 'identity-portal/deploy/runbooks/README.md']) {
+      expect(() => assertQualificationProductDelta('react19.3', file, 'old', 'new')).toThrow()
+    }
+    expect(() => assertQualificationProductDelta('react19.3', 'identity-portal/deploy/runbooks/README.md', '---\nreview: old\n---\nmanual deployment', '---\nreview: new\n---\nmanual deployment')).not.toThrow()
+  })
+})
+
+// The inert executable doubles use POSIX shebangs; hosted execution is Linux.
+const sourceWiringIt = process.platform === 'win32' ? it.skip : it
+sourceWiringIt('actual validate-only entrypoint wires the React baseline, manifest and product comparisons without Docker', () => {
+  const tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'identity44-source-wiring-'))
+  const selected = qualificationCase('react19.3')
+  const head = 'a'.repeat(40)
+  const original = JSON.parse(fs.readFileSync(path.resolve(__dirname, '../auth-compatibility/fixtures/manifest-react19.3.json'), 'utf8')).content as string
+  const candidate = JSON.parse(original)
+  candidate.dependencies.react = candidate.dependencies['react-dom'] = '19.3.1'
+  const file = 'identity-portal/lib/auth/auth-config.ts'
+  const calls = path.join(tmp, 'git-calls.jsonl')
+  const state = path.join(tmp, 'state.json')
+  const marker = path.join(tmp, 'docker-called')
+  const gitDouble = `#!${process.execPath}
+const fs = require('node:fs'); const raw = process.argv.slice(2); const args = raw[0] === '-C' ? raw.slice(2) : raw;
+fs.appendFileSync(${JSON.stringify(calls)}, JSON.stringify(args) + '\\n');
+const drift = JSON.parse(fs.readFileSync(${JSON.stringify(state)}, 'utf8'));
+const baseline = ${JSON.stringify(selected.baseline)}; const head = ${JSON.stringify(head)}; const file = ${JSON.stringify(file)};
+const fail = () => process.exit(3);
+if (args.join(' ') === 'rev-parse HEAD') console.log(head);
+else if (args.join(' ') === 'merge-base ' + baseline + ' ' + head) console.log(baseline);
+else if (args.join(' ') === 'status --porcelain') {}
+else if (args[0] === 'diff' && args[1] === '--name-only' && args[2] === baseline && args[3] === head && args[4] === '--') console.log(file);
+else if (args[0] === 'show') {
+  const source = args[1];
+  if (source === baseline + ':identity-portal/package.json') process.stdout.write(${JSON.stringify(original)});
+  else if (source === head + ':identity-portal/package.json') {
+    const candidate = ${JSON.stringify(candidate)};
+    if (drift.TEST_MANIFEST_DRIFT) candidate.version = '0.2.0';
+    console.log(JSON.stringify(candidate));
+  } else if (source === baseline + ':' + file) process.stdout.write('accepted\\n');
+  else if (source === head + ':' + file) process.stdout.write(drift.TEST_PRODUCT_DRIFT ? 'mutated\\n' : 'accepted\\n');
+  else fail();
+} else fail();
+`
+  fs.writeFileSync(path.join(tmp, 'git'), gitDouble, { mode: 0o700 })
+  fs.writeFileSync(path.join(tmp, 'docker'), `#!/bin/sh\ntouch '${marker}'\n`, { mode: 0o700 })
+  // Verify the owned inert executable before relying on its no-call marker.
+  execFileSync(path.join(tmp, 'docker'))
+  expect(fs.existsSync(marker)).toBe(true)
+  fs.unlinkSync(marker)
+  const env = { NODE_ENV: 'test' as const, PATH: `${tmp}:${process.env.PATH}`, AUTH_PROOF_CASE: 'react19.3', AUTH_PROOF_HEAD: head }
+  const run = (changed = {}) => {
+    fs.writeFileSync(state, JSON.stringify(changed))
+    return execFileSync(process.execPath, [path.resolve(__dirname, '../auth-compatibility/run.mjs'), '--validate-sources'], { env: { ...env, ...changed }, encoding: 'utf8', stdio: 'pipe' })
+  }
+  try {
+    expect(JSON.parse(run())).toEqual({ validationOnly: true, qualificationCase: 'react19.3', baseline: selected.baseline, head, dockerAccessed: false })
+    const invoked = fs.readFileSync(calls, 'utf8').trim().split('\n').map(line => JSON.parse(line) as string[])
+    expect(invoked).toContainEqual(['show', `${selected.baseline}:${file}`])
+    expect(invoked).toContainEqual(['show', `${head}:${file}`])
+    expect(invoked.some(args => args.slice(0, 5).join(' ') === `diff --name-only ${selected.baseline} ${head} --`)).toBe(true)
+    for (const changed of [{ TEST_PRODUCT_DRIFT: '1' }, { TEST_MANIFEST_DRIFT: '1' }, { AUTH_PROOF_HEAD: 'b'.repeat(40) }, { AUTH_PROOF_CASE: 'auth-client' }]) expect(() => run(changed)).toThrow()
+    expect(fs.existsSync(marker)).toBe(false)
+  } finally { fs.rmSync(tmp, { recursive: true, force: true }) }
 })
