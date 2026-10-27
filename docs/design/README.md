@@ -11,8 +11,8 @@ checkPaths:
   - docs/design/README.md
   - docs/README.md
 lastReviewedAt: 2026-10-27
-lastReviewedCommit: b0e4297edbe76c8565d589a24d898c94ae00498c
-lastReviewedNote: "Identity46 catalog-yaml hosted support: immutable Main64055a2 exact graph/product source, rename-safe whole-tree fence, actual entrypoint and inert runner/archive wiring negatives, known-defective baseline UI unexecuted, strict-zero candidate Registry schema/Apply/worker disposal-reopen, then unchanged auth/transport/outage and both-image runtime proof. Necessary b68 readiness/privacy helpers retain strict semantics and provenance. Focused32cases/types/lint pass; source review descriptor evidence gap fixed. Product/graph unchanged from a463 focused browser and113-unit/standalone proof. Hosted qualification/publication/merge remain pending; no local Docker/build/browser rerun or design-body changes."
+lastReviewedCommit: 4fa2150750647f9b088e4dfcffe2b8e73416a169
+lastReviewedNote: "Identity44 phaseA fixed-baseline composition: preserved b68 ancestry via exact b0c5baa merge; explicit four-case registry/new react19.3-catalog-fixed, one YAMLselector, BOTH source variants require broad and Catalog suites with distinct receipts/continuous errors/no skip. Source/archive/comparison/browser wiring and baseline/candidate descriptor bindings tested through actual entrypoints/inert bodies;60targeted controls/types/lint/frozen install pass. Initial trusted-TS body parse failure retained and corrected using installed TypeScript erasure. Product/runtime identical qualifiedMain, exact5package/79snapshot blobs and physical oneReact19.3.1 across8consumers; PostCSS8.5.30 preserved. No fullunit/build/browser/Docker/push or runtime claim; phaseB requires Main review.106original29 accounting entries remain provisional for Main exact disposition, not blanket tooling/unadopted coverage."
 ---
 
 # 统一身份与用户门户设计文档集

@@ -11,8 +11,8 @@ checkPaths:
   - docs/implementation/definition-of-done.md
   - GOAL.md
 lastReviewedAt: 2026-10-27
-lastReviewedCommit: 66189ab6d92c09e1e4308b4d0c1ee98f342c1b61
-lastReviewedNote: "Identity46 a0 hosted quality130/27 and CodeQL pass; auth remains failed at restored-buffer diagnostic clearance, before candidate Apply/reopen/logout/transport. Full image/source/protocol/cleanup/privacy artifacts verified and failed history retained. Native Mac focused diagnostics confirmed multiline input transformation, then fresh initial-invalid-Undo public EditContext equality restored exact bytes and final original no-op payload; unavailable/partial/wrong states never exact. Hosted restore is bounded8 normal Undo with whole nonempty exact selection, no hardcoded5/raw buffer/offset/length/hash/private hook/clipboard/setValue.3privacy/state plus20affected controls/types/lint pass. Product/graph/fence unchanged; no Linux/Portal acceptance or new CI push/rerun/full build/suite. Main final candidate review pending."
+lastReviewedCommit: 4fa2150750647f9b088e4dfcffe2b8e73416a169
+lastReviewedNote: "Identity44 phaseA fixed-baseline composition: preserved b68 ancestry via exact b0c5baa merge; explicit four-case registry/new react19.3-catalog-fixed, one YAMLselector, BOTH source variants require broad and Catalog suites with distinct receipts/continuous errors/no skip. Source/archive/comparison/browser wiring and baseline/candidate descriptor bindings tested through actual entrypoints/inert bodies;60targeted controls/types/lint/frozen install pass. Initial trusted-TS body parse failure retained and corrected using installed TypeScript erasure. Product/runtime identical qualifiedMain, exact5package/79snapshot blobs and physical oneReact19.3.1 across8consumers; PostCSS8.5.30 preserved. No fullunit/build/browser/Docker/push or runtime claim; phaseB requires Main review.106original29 accounting entries remain provisional for Main exact disposition, not blanket tooling/unadopted coverage."
 ---
 
 # 完成定义(DoD)核对 — GOAL.md §7
