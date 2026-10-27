@@ -311,3 +311,14 @@ incidental non-renderer updates. A complete source-record inventory is retained
 for owner review; absent incidental records require proof or an explicit tracked
 disposition. This scoped change does not silently deliver or retire them and does
 not claim original29 or the coordinating issue complete.
+
+Independent review found that the first React fence omitted executable
+`config/**` and `drizzle.config.ts`. Neither changes in this candidate, but the
+fence could have admitted future unrelated configuration. The repair replaces
+that finite product-path list with exhaustive NUL-separated tracked-tree
+classification and explicit qualification/doc allowances. Governance allowances
+preserve everything except the three review metadata fields. Actual entrypoint
+negatives reject both omitted configs and an unexpected new product directory;
+the historical auth-client path behavior stays unchanged. Only the scoped harness,
+lint and typecheck are rerun for this test-support repair; no application or build
+input changes, full-suite rerun or new build pass is claimed.

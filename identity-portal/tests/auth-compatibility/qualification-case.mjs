@@ -58,12 +58,49 @@ export function assertQualificationVersions(name, variant, versions) {
   assert.equal(versions['@keycloak/keycloak-admin-client'], historical && variant === 'baseline' ? '26.6.4' : '26.8.1')
 }
 
+const reviewMetadataPaths = new Set([
+  '.docpact/config.yaml', 'AGENTS.md', 'GOAL.md', 'identity-portal/AGENTS.md',
+  'docs/README.md', 'docs/design/README.md',
+  'docs/design/03-governance/02-deployment-operations-design/README.md',
+  'docs/implementation/README.md', 'docs/implementation/definition-of-done.md',
+  'identity-portal/deploy/runbooks/README.md',
+])
+const qualificationDocs = new Set([
+  'docs/guides/dependency-maintenance.md',
+  'docs/references/2026-07-02-l0-dependency-versions.md',
+])
+
+export function reactChangedPathPolicy(file) {
+  if (file === 'identity-portal/package.json') return 'manifest'
+  if (file === 'identity-portal/pnpm-lock.yaml') return 'lock'
+  if (file.startsWith('identity-portal/tests/auth-compatibility/') ||
+      file === 'identity-portal/tests/unit/auth-compatibility-harness.test.ts' ||
+      file === '.github/workflows/auth-compatibility.yml') return 'qualification-support'
+  if (qualificationDocs.has(file)) return 'qualification-doc'
+  if (reviewMetadataPaths.has(file)) return 'review-metadata'
+  assert.fail(`Unreviewed React qualification path: ${file}`)
+}
+
+function withoutReviewMetadata(file, content) {
+  const strip = value => value.replace(/^(?:lastReviewedAt|lastReviewedCommit|lastReviewedNote):[^\r\n]*(?:\r?\n|$)/gm, '')
+  return file.endsWith('.md')
+    ? content.replace(/^---\r?\n[\s\S]*?\r?\n---\r?\n/, strip)
+    : strip(content)
+}
+
 export function assertQualificationProductDelta(name, file, before, after) {
   qualificationCase(name)
   if (name === 'auth-client') return assertProductDelta(file, before, after)
-  // React qualification admits no executable/product change, including Node images.
-  const body = value => value.replace(/^---\r?\n[\s\S]*?\r?\n---\r?\n/, '')
-  assert.equal(file.endsWith('.md') ? body(after) : after, file.endsWith('.md') ? body(before) : before, 'React qualification cannot change product or deployment behavior')
+  const metadataOnly = reviewMetadataPaths.has(file)
+  assert.equal(metadataOnly ? withoutReviewMetadata(file, after) : after,
+    metadataOnly ? withoutReviewMetadata(file, before) : before,
+    'React qualification cannot change product or deployment behavior')
+}
+
+export function assertReactSourcePathFromGit(file, beforeRef, afterRef, options) {
+  const policy = reactChangedPathPolicy(file)
+  if (policy === 'review-metadata') assertQualificationProductDeltaFromGit('react19.3', file, beforeRef, afterRef, options)
+  return policy
 }
 
 export function assertQualificationProductDeltaFromGit(name, file, beforeRef, afterRef, options) {

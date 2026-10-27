@@ -96,3 +96,14 @@ no hosted/runtime qualification. The no-argument runtime entrypoint still refuse
 local/self-hosted execution before Docker. An actual entrypoint regression uses
 positively verified inert command doubles and rejects wrong source/case,
 manifest and product deltas; pure helper tests alone cannot prove that wiring.
+
+The React source fence enumerates the entire tracked Git delta with NUL-separated
+paths. It admits only the exact manifest/lock, this qualification support and its
+specific workflow/unit test, two qualification records, and enumerated governance
+documents. Governance files permit only `lastReviewedAt`, `lastReviewedCommit` and
+`lastReviewedNote` changes, preserving other frontmatter, routing rules and prose.
+Every unrecognized path fails closed, including executable YAML, database config
+and newly introduced product directories. The historical auth-client experiment
+retains its original product-path fence. Actual entrypoint negatives cover
+`config/business-apps.yaml`, `drizzle.config.ts` and a new product path; a pure
+path-policy unit test also protects metadata/body boundaries.

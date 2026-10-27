@@ -216,7 +216,7 @@ it('preserves real Git blob newlines at the orchestrator extraction boundary', (
   } finally { fs.rmSync(root, { recursive: true, force: true }) }
 })
 
-import { qualificationCase, assertQualificationSources, assertQualificationManifest, assertQualificationVersions, assertQualificationProductDelta } from '../auth-compatibility/qualification-case.mjs'
+import { qualificationCase, assertQualificationSources, assertQualificationManifest, assertQualificationVersions, assertQualificationProductDelta, reactChangedPathPolicy } from '../auth-compatibility/qualification-case.mjs'
 
 describe('independent source-bound React qualification', () => {
   const baselineFixture = (name: string) => JSON.parse(fs.readFileSync(path.resolve(__dirname, `../auth-compatibility/fixtures/manifest-${name}.json`), 'utf8')) as { sourceCommit: string; sourcePath: string; content: string }
@@ -286,7 +286,7 @@ describe('independent source-bound React qualification', () => {
     for (const file of ['identity-portal/lib/auth/auth-config.ts', 'identity-portal/deploy/docker/Dockerfile', 'identity-portal/deploy/runbooks/README.md']) {
       expect(() => assertQualificationProductDelta('react19.3', file, 'old', 'new')).toThrow()
     }
-    expect(() => assertQualificationProductDelta('react19.3', 'identity-portal/deploy/runbooks/README.md', '---\nreview: old\n---\nmanual deployment', '---\nreview: new\n---\nmanual deployment')).not.toThrow()
+    expect(() => assertQualificationProductDelta('react19.3', 'identity-portal/deploy/runbooks/README.md', '---\nlastReviewedAt: old\n---\nmanual deployment', '---\nlastReviewedAt: new\n---\nmanual deployment')).not.toThrow()
   })
 })
 
@@ -299,7 +299,7 @@ sourceWiringIt('actual validate-only entrypoint wires the React baseline, manife
   const original = JSON.parse(fs.readFileSync(path.resolve(__dirname, '../auth-compatibility/fixtures/manifest-react19.3.json'), 'utf8')).content as string
   const candidate = JSON.parse(original)
   candidate.dependencies.react = candidate.dependencies['react-dom'] = '19.3.1'
-  const file = 'identity-portal/lib/auth/auth-config.ts'
+  const file = 'docs/README.md'
   const calls = path.join(tmp, 'git-calls.jsonl')
   const state = path.join(tmp, 'state.json')
   const marker = path.join(tmp, 'docker-called')
@@ -312,7 +312,10 @@ const fail = () => process.exit(3);
 if (args.join(' ') === 'rev-parse HEAD') console.log(head);
 else if (args.join(' ') === 'merge-base ' + baseline + ' ' + head) console.log(baseline);
 else if (args.join(' ') === 'status --porcelain') {}
-else if (args[0] === 'diff' && args[1] === '--name-only' && args[2] === baseline && args[3] === head && args[4] === '--') console.log(file);
+else if (args.join(' ') === 'diff --name-only -z ' + baseline + ' ' + head) {
+  const changed = drift.TEST_CHANGED_PATH || (drift.TEST_PRODUCT_DRIFT ? 'identity-portal/lib/auth/auth-config.ts' : file);
+  process.stdout.write(['identity-portal/package.json', 'identity-portal/tests/auth-compatibility/qualification-case.mjs', changed].join(String.fromCharCode(0)) + String.fromCharCode(0));
+}
 else if (args[0] === 'show') {
   const source = args[1];
   if (source === baseline + ':identity-portal/package.json') process.stdout.write(${JSON.stringify(original)});
@@ -321,7 +324,7 @@ else if (args[0] === 'show') {
     if (drift.TEST_MANIFEST_DRIFT) candidate.version = '0.2.0';
     console.log(JSON.stringify(candidate));
   } else if (source === baseline + ':' + file) process.stdout.write('accepted\\n');
-  else if (source === head + ':' + file) process.stdout.write(drift.TEST_PRODUCT_DRIFT ? 'mutated\\n' : 'accepted\\n');
+  else if (source === head + ':' + file) process.stdout.write(drift.TEST_DOCS_BODY_DRIFT ? 'mutated\\n' : 'accepted\\n');
   else fail();
 } else fail();
 `
@@ -341,8 +344,26 @@ else if (args[0] === 'show') {
     const invoked = fs.readFileSync(calls, 'utf8').trim().split('\n').map(line => JSON.parse(line) as string[])
     expect(invoked).toContainEqual(['show', `${selected.baseline}:${file}`])
     expect(invoked).toContainEqual(['show', `${head}:${file}`])
-    expect(invoked.some(args => args.slice(0, 5).join(' ') === `diff --name-only ${selected.baseline} ${head} --`)).toBe(true)
-    for (const changed of [{ TEST_PRODUCT_DRIFT: '1' }, { TEST_MANIFEST_DRIFT: '1' }, { AUTH_PROOF_HEAD: 'b'.repeat(40) }, { AUTH_PROOF_CASE: 'auth-client' }]) expect(() => run(changed)).toThrow()
+    expect(invoked).toContainEqual(['diff', '--name-only', '-z', selected.baseline, head])
+    for (const changed of [{ TEST_PRODUCT_DRIFT: '1' }, { TEST_MANIFEST_DRIFT: '1' }, { TEST_DOCS_BODY_DRIFT: '1' }, { TEST_CHANGED_PATH: 'identity-portal/config/business-apps.yaml' }, { TEST_CHANGED_PATH: 'identity-portal/drizzle.config.ts' }, { TEST_CHANGED_PATH: 'identity-portal/new-product-surface/runtime.ts' }, { AUTH_PROOF_HEAD: 'b'.repeat(40) }, { AUTH_PROOF_CASE: 'auth-client' }]) expect(() => run(changed)).toThrow()
     expect(fs.existsSync(marker)).toBe(false)
   } finally { fs.rmSync(tmp, { recursive: true, force: true }) }
+})
+
+it('classifies the entire React changed tree with explicit allowances and review metadata only', () => {
+  for (const file of ['identity-portal/config/business-apps.yaml', 'identity-portal/drizzle.config.ts', 'identity-portal/new-product-surface/runtime.ts', '.github/workflows/ci.yml', 'docs/unreviewed-policy.md']) {
+    expect(() => reactChangedPathPolicy(file)).toThrow('Unreviewed React qualification path')
+  }
+  expect(reactChangedPathPolicy('identity-portal/package.json')).toBe('manifest')
+  expect(reactChangedPathPolicy('identity-portal/pnpm-lock.yaml')).toBe('lock')
+  expect(reactChangedPathPolicy('identity-portal/tests/auth-compatibility/new-control.ts')).toBe('qualification-support')
+  expect(reactChangedPathPolicy('docs/guides/dependency-maintenance.md')).toBe('qualification-doc')
+  expect(reactChangedPathPolicy('.docpact/config.yaml')).toBe('review-metadata')
+  expect(() => assertQualificationProductDelta('react19.3', '.docpact/config.yaml', 'lastReviewedAt: old\nrules: strict\n', 'lastReviewedAt: new\nrules: strict\n')).not.toThrow()
+  expect(() => assertQualificationProductDelta('react19.3', '.docpact/config.yaml', 'lastReviewedAt: old\nrules: strict\n', 'lastReviewedAt: new\nrules: relaxed\n')).toThrow()
+  const before = '---\nlastReviewedAt: old\nauthoritative: true\n---\npolicy unchanged\n'
+  const metadata = '---\nlastReviewedAt: new\nauthoritative: true\n---\npolicy unchanged\n'
+  expect(() => assertQualificationProductDelta('react19.3', 'GOAL.md', before, metadata)).not.toThrow()
+  expect(() => assertQualificationProductDelta('react19.3', 'GOAL.md', before, metadata.replace('authoritative: true', 'authoritative: false'))).toThrow()
+  expect(() => assertQualificationProductDelta('react19.3', 'GOAL.md', before, metadata.replace('policy unchanged', 'policy relaxed'))).toThrow()
 })

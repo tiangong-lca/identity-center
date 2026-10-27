@@ -9,13 +9,14 @@ import path from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { assertHostedContext, assertFixture, IMAGE_TAGS, composeDocument, cleanEnvironment, redactor, lineRedactor, attemptCleanup, ownedLifecycle, compareReceipts } from './contract.mjs'
 
-import { qualificationCase, assertQualificationSources, assertQualificationManifest, assertQualificationVersions, assertQualificationProductDeltaFromGit } from './qualification-case.mjs'
+import { qualificationCase, assertQualificationSources, assertQualificationManifest, assertQualificationVersions, assertQualificationProductDeltaFromGit, assertReactSourcePathFromGit } from './qualification-case.mjs'
 
 const selectedCase = qualificationCase(process.env.AUTH_PROOF_CASE)
 const BASELINE = selectedCase.baseline
 const sourceRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../../..')
 const infraEnv = Object.fromEntries(['PATH', 'HOME', 'USER', 'LANG'].filter(k => process.env[k]).map(k => [k, process.env[k]]))
-const git = (...args) => execFileSync('git', ['-C', sourceRoot, ...args], { env: { ...infraEnv, GIT_NO_LAZY_FETCH: '1' } }).toString().trim()
+const gitRaw = (...args) => execFileSync('git', ['-C', sourceRoot, ...args], { env: { ...infraEnv, GIT_NO_LAZY_FETCH: '1' } }).toString()
+const git = (...args) => gitRaw(...args).trim()
 const hash = file => createHash('sha256').update(fs.readFileSync(file)).digest('hex')
 const abort = new AbortController()
 const secrets = new Set()
@@ -301,9 +302,16 @@ async function main() {
   if (!validateOnly) assertHostedContext(process.env, process.platform, head)
   assertQualificationSources(selectedCase.name, { baseline: BASELINE, head, requestedHead: process.env.AUTH_PROOF_HEAD, ancestor: git('merge-base', BASELINE, head) === BASELINE })
   assert.equal(git('status', '--porcelain'), '', 'Qualify a clean exact source checkout')
-  const changedProduct = git('diff', '--name-only', BASELINE, head, '--', 'identity-portal/app', 'identity-portal/lib', 'identity-portal/server', 'identity-portal/components', 'identity-portal/features', 'identity-portal/db', 'identity-portal/scripts', 'identity-portal/deploy', 'identity-portal/messages', 'identity-portal/next.config.ts', 'identity-portal/proxy.ts', ...(selectedCase.name === 'react19.3' ? ['identity-portal/i18n', 'identity-portal/types', 'identity-portal/public', 'identity-portal/pnpm-workspace.yaml', 'identity-portal/tsconfig.json', 'identity-portal/postcss.config.mjs', 'identity-portal/components.json', '.nvmrc'] : []))
-  for (const file of changedProduct ? changedProduct.split('\n') : []) {
-    assertQualificationProductDeltaFromGit(selectedCase.name, file, BASELINE, head, { cwd: sourceRoot, env: infraEnv })
+  if (selectedCase.name === 'react19.3') {
+    // Exhaustive tree comparison: new product/config paths cannot evade a pathspec.
+    const changedPaths = gitRaw('diff', '--name-only', '-z', BASELINE, head).split('\0').filter(Boolean)
+    for (const file of changedPaths) assertReactSourcePathFromGit(file, BASELINE, head, { cwd: sourceRoot, env: infraEnv })
+  } else {
+    // Preserve the historical auth-client experiment's original product fence.
+    const changedProduct = git('diff', '--name-only', BASELINE, head, '--', 'identity-portal/app', 'identity-portal/lib', 'identity-portal/server', 'identity-portal/components', 'identity-portal/features', 'identity-portal/db', 'identity-portal/scripts', 'identity-portal/deploy', 'identity-portal/messages', 'identity-portal/next.config.ts', 'identity-portal/proxy.ts')
+    for (const file of changedProduct ? changedProduct.split('\n') : []) {
+      assertQualificationProductDeltaFromGit(selectedCase.name, file, BASELINE, head, { cwd: sourceRoot, env: infraEnv })
+    }
   }
   const baselineManifest = execFileSync('git', ['-C', sourceRoot, 'show', `${BASELINE}:identity-portal/package.json`], { env: infraEnv }).toString()
   assertQualificationManifest(selectedCase.name, baselineManifest, JSON.parse(git('show', `${head}:identity-portal/package.json`)))
