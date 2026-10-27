@@ -71,9 +71,11 @@ export async function qualifyStandaloneUi(page: Page, errors: { page: number; co
     const snapshot = await page.request.get('/api/admin/catalog')
     expect(snapshot.status()).toBe(200)
     const current = (await snapshot.json()).data as { yaml: string; version: number }
-    const editor = page.locator('.monaco-editor').getByRole('textbox')
+    const editor = page.locator('.monaco-editor[role="code"]')
+    await expect(editor).toHaveCount(1)
     await expect(editor).toBeVisible()
     await editor.click()
+    await expect.poll(() => editor.evaluate(el => el.contains(document.activeElement))).toBe(true)
     await page.keyboard.press('Control+End')
     const comment = `# synthetic-ui-${c.nonce}`
     await page.keyboard.insertText(`\n${comment}\n`)

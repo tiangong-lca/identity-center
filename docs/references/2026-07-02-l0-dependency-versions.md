@@ -351,3 +351,21 @@ ESLint/typecheck pass without a redundant local full-suite/build run. The failed
 artifact remains negative evidence; the canonical UI does not deliberately repeat
 the ambiguous click or assert a global duplicate-link count. The corrected head
 requires fresh quality, both images and both variants' actual auth/UI proof.
+
+The next hosted head5273930 passed Registry navigation, fresh111-unit quality,
+CodeQL and both image steps, then failed baseline Monaco textbox visibility.
+Chromium resolved the locator to Monaco0.55.1's hidden native EditContext input;
+this is another support-selector assumption on React19.2.4, not a demonstrated
+renderer defect. Artifact12714410285 matches uploaded SHA256; exact source/lock/
+runtime, image identities, empty cleanup inventories and privacy checks pass.
+Candidate, real logout/session denial and transport controls did not execute.
+
+Context7 is quota-blocked. Inspection of the exact installed Monaco0.55.1
+`view.js`, native EditContext JS/CSS and mouse handler shows a visible editor root
+with `role="code"`, a separate native input behind that view, content-click focus
+routing and text-update handling. The reviewed support correction selects the
+unique visible editor root, clicks normally and verifies contained DOM focus.
+Keyboard input and exact no-op apply payload/version/server-readback assertions
+remain. No forced input, internal model write, EditContext disabling, timeout
+increase or product change is used. Scoped ESLint/typecheck pass; fresh hosted
+qualification follows, without redundant local full-unit/build execution.

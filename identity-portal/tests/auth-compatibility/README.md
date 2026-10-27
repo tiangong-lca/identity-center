@@ -122,3 +122,10 @@ shipped apps page also has an “Edit in registry” CTA with the same href, so 
 uniqueness is not a valid assertion. The first hosted baseline's strict-mode
 failure is retained as evidence of that test defect; no product or renderer
 failure is inferred and no unexecuted candidate/auth result is claimed.
+
+Monaco interaction targets its unique visible `role="code"` editor root and
+checks contained DOM focus after a normal click. Modern Chromium's native
+EditContext textbox can be hidden behind that view; asserting textbox visibility
+misstates the shipped input behavior. Keyboard editing and exact apply payload,
+version and server-readback checks remain mandatory. No internal model mutation,
+forced hidden-element action, browser-option override or timeout inflation is used.
