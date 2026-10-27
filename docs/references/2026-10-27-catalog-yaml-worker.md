@@ -84,3 +84,18 @@ fixed substage enum, so another failure identifies the semantic stage without
 exporting caught error prose. This supports the corrected expectation; the
 first attempt's precise runtime assertion remains unknown. A second invocation
 has not yet run at this source checkpoint.
+
+The second authorized focused invocation at a463281 passed: schema warning,
+actual Boolean quickfix, cleared validation[], internal link, changed/restored
+schema semantics, mirror removal and dispose/reopen. All6 native workers closed;
+positive page/console/forbidden-request counts were0. That exact source also
+passed113units/26files and normal fresh standalone build. This evidence does not
+establish authenticated Portal Apply/unmount behavior.
+
+The approved next scope is the explicit catalog-yaml case in the existing hosted
+runner, preserving historical cases and graph assertions. Its source fence,
+candidate-only Registry UI, synthetic catalog and worker identity/strict cleanup
+contract are documented in the [proof README](../../identity-portal/tests/auth-compatibility/README.md).
+Baseline UI is explicitly unexecuted/known-defective, never passed. Future hosted
+proof must bind the final exact support source; no local Docker or repeated
+product build/browser execution is authorized merely by these support edits.

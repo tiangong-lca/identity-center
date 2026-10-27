@@ -10,6 +10,12 @@ on:
       - identity-portal/pnpm-lock.yaml
       - identity-portal/tests/auth-compatibility/**
       - identity-portal/tests/unit/auth-compatibility-harness.test.ts
+      - identity-portal/tests/unit/catalog-qualification.test.ts
+      - identity-portal/tests/unit/yaml-worker-adapter.test.ts
+      - identity-portal/tests/monaco-worker/**
+      - identity-portal/features/catalog/catalog-editor-impl.tsx
+      - identity-portal/features/catalog/yaml-worker-adapter.ts
+      - identity-portal/scripts/monaco-worker-regression.mjs
       - identity-portal/tests/integration/keycloak-admin.test.ts
       - identity-portal/tests/integration/keycloak-bootstrap.test.ts
       - .github/workflows/auth-compatibility.yml
@@ -106,6 +112,9 @@ jobs:
       - name: Qualify isolated baseline and candidate auth transports
         env:
           AUTH_PROOF_HEAD: ${{ github.event.pull_request.head.sha }}
+          # This owner repair uses unchanged React19.2.4 graphs. Historical
+          # auth-client remains available but is not this workflow invocation.
+          AUTH_PROOF_CASE: catalog-yaml
         run: node tests/auth-compatibility/run.mjs
       - name: Preserve sanitized proof and cleanup receipts
         if: always()
