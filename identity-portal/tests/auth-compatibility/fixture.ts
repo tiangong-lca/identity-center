@@ -23,6 +23,7 @@ export interface Fixture {
   appPort: number
   portalSecret?: string
   adminApiSecret?: string
+  browserAssets?: string[]
   userId?: string
 }
 

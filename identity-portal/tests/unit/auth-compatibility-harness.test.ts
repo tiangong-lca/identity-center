@@ -399,3 +399,109 @@ it('classifies the entire React changed tree with explicit allowances and review
   expect(() => assertQualificationProductDelta('react19.3', 'GOAL.md', before, metadata.replace('authoritative: true', 'authoritative: false'))).toThrow()
   expect(() => assertQualificationProductDelta('react19.3', 'GOAL.md', before, metadata.replace('policy unchanged', 'policy relaxed'))).toThrow()
 })
+
+import { createBrowserDiagnostics, type BrowserStage } from '../auth-compatibility/browser-diagnostics'
+import { emittedBrowserAssetPaths } from '../auth-compatibility/browser-assets.mjs'
+
+const diagnosticOrigin = 'http://localhost:21002'
+const diagnosticAsset = '/_next/static/chunks/owned.js'
+const diagnosticContext = () => ({ portalOrigin: diagnosticOrigin, builtAssetPaths: [diagnosticAsset], secrets: ['known-short-private', 'p@ss word/x', 'opaque-fixture-password-XYZ987654321'] })
+
+it('binds diagnostic frame inventory to emitted owned JS files without following links or maps', () => {
+  const root = fs.mkdtempSync(path.join(os.tmpdir(), 'identity44-browser-assets-'))
+  try {
+    fs.mkdirSync(path.join(root, '.next/static/chunks'), { recursive: true })
+    fs.mkdirSync(path.join(root, '.next/static/media'), { recursive: true })
+    fs.writeFileSync(path.join(root, '.next/static/chunks/owned.js'), 'export const owned = true\n')
+    fs.writeFileSync(path.join(root, '.next/static/media/yaml.worker.js'), 'export const worker = true\n')
+    fs.writeFileSync(path.join(root, '.next/static/chunks/owned.js.map'), 'private source map')
+    fs.writeFileSync(path.join(root, 'outside.js'), 'not an emitted asset')
+    if (process.platform !== 'win32') fs.symlinkSync(path.join(root, 'outside.js'), path.join(root, '.next/static/chunks/linked.js'))
+    expect(emittedBrowserAssetPaths(root)).toEqual([diagnosticAsset, '/_next/static/media/yaml.worker.js'])
+  } finally { fs.rmSync(root, { recursive: true, force: true }) }
+})
+
+it('retains only a known error category and exact emitted asset location with a safe fingerprint', () => {
+  const diagnostics = createBrowserDiagnostics(diagnosticContext())
+  diagnostics.setStage('monaco-load')
+  diagnostics.record({ name: 'Error', message: 'Unexpected usage', stack: `Error: Unexpected usage\n    at confidentialFunction (${diagnosticOrigin}${diagnosticAsset}:7:12)` })
+  const sample = diagnostics.snapshot().samples[0]
+  expect(sample).toMatchObject({ observedDuring: 'monaco-load', name: 'Error', category: 'unexpected-usage', frames: [{ asset: diagnosticAsset, line: 7, column: 12 }] })
+  expect(sample.fingerprint).toMatch(/^[a-f0-9]{64}$/)
+  expect(JSON.stringify(sample)).not.toMatch(/confidentialFunction|https?:|Unexpected usage|message|stack/)
+})
+
+it('discards secret-bearing prose, names, URLs and forged frames without secret-derived fingerprints', () => {
+  const jwt = 'eyJhbGciOiJSUzI1NiJ9.eyJzdWIiOiJwcml2YXRlIn0.signature-private'
+  const jwe = 'eyJhbGciOiJkaXIifQ.encryptedkey.privateiv.privateciphertext.privatetag'
+  const privateValues = ['known-short-private', 'p@ss word/x', encodeURIComponent('p@ss word/x'), 'xyz', 'private@example.test', 'opaque-token-XYZ654321ABC987654321', jwt, jwe, 'callback-secret', 'fragment-secret', 'username-private', 'password-private', 'privateFunction']
+  const make = (marker: string) => {
+    const diagnostics = createBrowserDiagnostics(diagnosticContext())
+    diagnostics.setStage('monaco-load')
+    diagnostics.record({ name: `PrivateError-${marker}`, message: `${marker} ${privateValues.join(' ')}\nAuthorization: Bearer ${jwt}\nCookie: ${jwe}`,
+      stack: [
+        `Error: ${marker}`,
+        `    at privateFunction (https://external.test${diagnosticAsset}:1:2)`,
+        `    at privateFunction (${diagnosticOrigin}${diagnosticAsset}?code=callback-secret:1:2)`,
+        `    at privateFunction (${diagnosticOrigin}${diagnosticAsset}#fragment-secret:1:2)`,
+        `    at privateFunction (http://username-private:password-private@localhost:21002${diagnosticAsset}:1:2)`,
+        `    at privateFunction (${diagnosticOrigin}/_next/static/chunks/forged-private.js:1:2)`,
+        `    at privateFunction (blob:${diagnosticOrigin}${diagnosticAsset}:1:2)`,
+        `    at privateFunction (file://${diagnosticAsset}:1:2)`,
+        `    at privateFunction (data:text/javascript,opaque-token-XYZ654321ABC987654321:1:2)`,
+        `    at eval (eval at privateFunction (${diagnosticOrigin}${diagnosticAsset}:1:2))`,
+      ].join('\n') })
+    return diagnostics.snapshot().samples[0]
+  }
+  const first = make('first-private-marker')
+  const second = make('second-private-marker')
+  expect(first).toEqual(second)
+  expect(first).toMatchObject({ observedDuring: 'monaco-load', name: 'OtherError', category: 'unclassified', frames: [] })
+  const serialized = JSON.stringify(first)
+  for (const secret of [...privateValues, 'first-private-marker', 'second-private-marker', 'external.test', 'forged-private', 'PrivateError']) expect(serialized).not.toContain(secret)
+})
+
+it('keeps full error totals and safe failure fallback while bounding records, bytes and frame coordinates', () => {
+  const diagnostics = createBrowserDiagnostics(diagnosticContext())
+  const broken = Object.defineProperty({}, 'message', { get() { throw Error('never retain this private error') } })
+  expect(() => diagnostics.record(broken)).not.toThrow()
+  for (let index = 0; index < 100; index++) diagnostics.record({ name: 'Error', message: 'Unexpected usage', stack: `    at privateFunction (${diagnosticOrigin}${diagnosticAsset}:7:12)` })
+  const snapshot = diagnostics.snapshot()
+  expect(snapshot.totalObserved).toBe(101)
+  expect(snapshot.projectionFailures).toBe(1)
+  expect(snapshot.samples).toHaveLength(8)
+  expect(snapshot.droppedSamples).toBe(93)
+  expect(snapshot.samples[0]).toMatchObject({ name: 'OtherError', category: 'projection-failed', frames: [], fingerprint: 'unavailable' })
+  expect(Buffer.byteLength(JSON.stringify(snapshot), 'utf8')).toBeLessThanOrEqual(8192)
+  expect(JSON.stringify(snapshot)).not.toContain('never retain')
+  const invalid = createBrowserDiagnostics(diagnosticContext())
+  invalid.setStage('private-stage-value' as BrowserStage)
+  invalid.record({ name: 'custom-private-name', message: 'private', stack: `    at privateFunction (${diagnosticOrigin}${diagnosticAsset}:0:1)\n    at privateFunction (${diagnosticOrigin}${diagnosticAsset}:1:10000001)` })
+  expect(invalid.snapshot().samples[0]).toMatchObject({ observedDuring: 'unknown', name: 'OtherError', frames: [] })
+})
+
+it('allows only fixed React diagnostic codes and scrubs fixture secrets before classification', () => {
+  const diagnostics = createBrowserDiagnostics(diagnosticContext())
+  diagnostics.record({ name: 'Error', message: 'Minified React error #418; visit https://react.dev/errors/418?code=callback-secret', stack: '' })
+  diagnostics.record({ name: 'Error', message: 'Minified React error #99999; private opaque value', stack: '' })
+  expect(diagnostics.snapshot().samples[0]).toMatchObject({ category: 'react-minified', reactCode: 418 })
+  expect(diagnostics.snapshot().samples[1]).not.toHaveProperty('reactCode')
+  const secretCode = createBrowserDiagnostics({ ...diagnosticContext(), secrets: ['418', 'Error'] })
+  secretCode.record({ name: 'Error', message: 'Minified React error #418; private', stack: '' })
+  expect(secretCode.snapshot().samples[0]).toMatchObject({ name: 'OtherError', category: 'unclassified' })
+})
+
+it('enforces the total diagnostic byte budget before the sample cap for large trusted frames', () => {
+  const assets = Array.from({ length: 4 }, (_, index) => `/_next/static/chunks/${'a'.repeat(200)}${index}.js`)
+  const diagnostics = createBrowserDiagnostics({ ...diagnosticContext(), builtAssetPaths: assets })
+  diagnostics.setStage('monaco-edit-apply')
+  const stack = assets.map(asset => `    at ignoredPrivateFunction (${diagnosticOrigin}${asset}:9999999:9999999)`).join('\n')
+  for (let index = 0; index < 1000; index++) diagnostics.record({ name: 'TypeError', message: 'unknown private payload', stack })
+  const snapshot = diagnostics.snapshot()
+  expect(snapshot.totalObserved).toBe(1000)
+  expect(snapshot.samples.length).toBeLessThan(8)
+  expect(snapshot.droppedSamples).toBe(1000 - snapshot.samples.length)
+  expect(snapshot.samples.every(sample => sample.frames.length === 3)).toBe(true)
+  expect(Buffer.byteLength(JSON.stringify(snapshot), 'utf8')).toBeLessThanOrEqual(8192)
+  expect(JSON.stringify(snapshot)).not.toMatch(/ignoredPrivateFunction|unknown private payload|https?:/)
+})

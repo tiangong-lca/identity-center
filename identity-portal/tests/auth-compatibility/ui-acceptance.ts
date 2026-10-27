@@ -1,12 +1,14 @@
 import { expect, type Page } from '@playwright/test'
 import { fixture, receipt } from './fixture'
+import type { BrowserDiagnostics } from './browser-diagnostics'
 
 // Actual shipped routes/components and real APIs, exclusively in the owned fixture.
 // This runs before logout so deliberate transport-denial errors do not mask UI errors.
-export async function qualifyStandaloneUi(page: Page, errors: { page: number; console: number }) {
+export async function qualifyStandaloneUi(page: Page, errors: { page: number; console: number }, diagnostics: BrowserDiagnostics) {
   const c = fixture()
   let passed = false
   try {
+    diagnostics.setStage('hydration')
     await expect(page.locator('html')).toHaveAttribute('lang', 'zh-CN')
     const language = () => page.locator('select').filter({ has: page.locator('option[value="en"]') })
     const theme = () => page.locator('select').filter({ has: page.locator('option[value="dark"]') })
@@ -18,6 +20,7 @@ export async function qualifyStandaloneUi(page: Page, errors: { page: number; co
     await theme().selectOption('light')
     await expect(page.locator('html')).toHaveAttribute('data-theme', 'light')
 
+    diagnostics.setStage('navigation')
     // A full-document fallback loses the sentinel; URL-only checks cannot prove Link hydration.
     await page.evaluate(() => { Object.assign(window, { identityUiNavigationSentinel: 'same-document' }) })
     await page.locator('a[href="/admin"]').click()
@@ -27,6 +30,7 @@ export async function qualifyStandaloneUi(page: Page, errors: { page: number; co
     expect(await page.evaluate(() => Reflect.get(window, 'identityUiNavigationSentinel'))).toBe('same-document')
     await page.getByRole('link', { name: c.email, exact: true }).click()
     await page.getByRole('tab', { name: 'App access', exact: true }).click()
+    diagnostics.setStage('radix')
     const trigger = page.getByRole('button', { name: 'Assign application', exact: true })
     await trigger.click()
     const dialog = page.getByRole('dialog', { name: 'Assign application', exact: true })
@@ -41,6 +45,7 @@ export async function qualifyStandaloneUi(page: Page, errors: { page: number; co
     await expect(dialog).toBeHidden()
     await expect(trigger).toBeFocused()
 
+    diagnostics.setStage('organization')
     await page.locator('a[href="/admin/orgs"]').click()
     await expect(page.getByRole('heading', { name: 'Organizations', exact: true })).toBeVisible()
     await page.getByRole('button', { name: 'Create organization', exact: true }).click()
@@ -62,6 +67,7 @@ export async function qualifyStandaloneUi(page: Page, errors: { page: number; co
     expect(persisted.status()).toBe(200)
     expect((await persisted.json()).data.items).toEqual(expect.arrayContaining([expect.objectContaining({ code, name: `Synthetic ${code}` })]))
 
+    diagnostics.setStage('catalog')
     await page.locator('a[href="/admin/apps"]').click()
     const registryTab = page.getByRole('navigation').getByRole('link', { name: 'Registry', exact: true })
     await expect(registryTab).toHaveCount(1)
@@ -71,11 +77,13 @@ export async function qualifyStandaloneUi(page: Page, errors: { page: number; co
     const snapshot = await page.request.get('/api/admin/catalog')
     expect(snapshot.status()).toBe(200)
     const current = (await snapshot.json()).data as { yaml: string; version: number }
+    diagnostics.setStage('monaco-load')
     const editor = page.locator('.monaco-editor[role="code"]')
     await expect(editor).toHaveCount(1)
     await expect(editor).toBeVisible()
     await editor.click()
     await expect.poll(() => editor.evaluate(el => el.contains(document.activeElement))).toBe(true)
+    diagnostics.setStage('monaco-edit-apply')
     await page.keyboard.press('Control+End')
     const comment = `# synthetic-ui-${c.nonce}`
     await page.keyboard.insertText(`\n${comment}\n`)
@@ -90,6 +98,7 @@ export async function qualifyStandaloneUi(page: Page, errors: { page: number; co
     expect(unchanged.status()).toBe(200)
     expect((await unchanged.json()).data).toEqual(current)
 
+    diagnostics.setStage('locale-theme')
     // Reconcile locale and theme state again after navigation and editor/form work.
     await language().selectOption('zh-CN')
     await expect(page.locator('html')).toHaveAttribute('lang', 'zh-CN')

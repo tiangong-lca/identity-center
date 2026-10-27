@@ -85,8 +85,9 @@ navigation (a browser-memory sentinel must survive), a real synthetic organizati
 form with server readback, Radix dialog focus trapping/Escape restoration, and
 Monaco typing with an actual no-op catalog apply request/response. Both zh/en and
 light/dark transitions are asserted after navigation. No route or backend API is
-mocked; writes are limited to the unique disposable synthetic database. UI
-receipts retain error counts only, never raw console text, URLs or browser state.
+mocked; writes are limited to the unique disposable synthetic database. The UI
+receipt retains error counts only; a separate bounded structural error receipt
+is described below. Neither retains raw error/console prose, URLs or browser state.
 This support remains unqualified until both hosted source variants actually pass.
 
 `node tests/auth-compatibility/run.mjs --validate-sources` performs only clean
@@ -129,3 +130,30 @@ EditContext textbox can be hidden behind that view; asserting textbox visibility
 misstates the shipped input behavior. Keyboard editing and exact apply payload,
 version and server-readback checks remain mandatory. No internal model mutation,
 forced hidden-element action, browser-option override or timeout inflation is used.
+
+
+## Bounded structural page-error diagnostics
+
+`browser-errors.json` preserves only a fixed observation-stage enum, allowlisted
+error name, fixed known message category/allowlisted React code, and at most three
+locations from the exact owned build's emitted `/_next/static/*.js` inventory.
+Locations contain only the recognized public asset path and bounded line/column;
+raw URLs, queries, userinfo, function names, error messages and stack prose are
+discarded. Unknown values become fixed categories. Existing fixture-secret/JWT/
+header redaction runs before classification. Opaque, short or encoded values that
+are not recognized structural fields never enter a receipt. The fingerprint is
+computed only from that safe projection, never from raw secret-dependent text.
+
+At most eight samples and8KiB total JSON are retained, with total/overflow counts;
+caps never suppress error counters. Projection failures produce a fixed fallback.
+Stages identify when an error was observed, not its cause. Console observation
+remains type/count only. The strict zero-page/console-error assertion is unchanged.
+Observers are removed in `finally`, and a failed UI still preserves diagnostics
+while retaining its failure and Redis cleanup. No trace, screenshot, video, saved
+browser state, raw error dump, ignored error or product fix is introduced.
+
+Offline controls exercise emitted-asset ownership, forged URLs, fixture/encoded/
+short/opaque secrets, JWT/JWE, headers, custom names/function names, safe-equivalent
+fingerprints, throwing getters, invalid coordinates/stages and size overflow.
+These controls do not establish the actual hosted error cause or compatibility;
+fresh hosted evidence remains required.

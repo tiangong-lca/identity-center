@@ -9,6 +9,7 @@ import path from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { assertHostedContext, assertFixture, IMAGE_TAGS, composeDocument, cleanEnvironment, redactor, lineRedactor, attemptCleanup, ownedLifecycle, compareReceipts } from './contract.mjs'
 
+import { emittedBrowserAssetPaths } from './browser-assets.mjs'
 import { qualificationCase, assertQualificationSources, assertQualificationManifest, assertQualificationVersions, assertQualificationProductDeltaFromGit, assertReactSourcePathFromGit } from './qualification-case.mjs'
 
 const selectedCase = qualificationCase(process.env.AUTH_PROOF_CASE)
@@ -227,6 +228,10 @@ async function variant(variant, root, images, head) {
       env = { ...env, KEYCLOAK_CLIENT_SECRET: c.portalSecret, KEYCLOAK_ADMIN_API_CLIENT_SECRET: c.adminApiSecret }
       await pnpm(['exec', 'vitest', 'run', '--project', 'integration', 'tests/integration/keycloak-admin.test.ts', 'tests/integration/keycloak-bootstrap.test.ts'], 'existing-admin-pkce')
       await pnpm(['build'], 'build')
+      if (selectedCase.name === 'react19.3') {
+        c.browserAssets = emittedBrowserAssetPaths(app)
+        fs.writeFileSync(configFile, JSON.stringify(c), { mode: 0o600 })
+      }
       stopPortal = await startPortal(c, app, env)
       stopRelay = await startRelay(c)
       await pnpm(['exec', 'playwright', 'install', '--with-deps', 'chromium'], 'browser-install')

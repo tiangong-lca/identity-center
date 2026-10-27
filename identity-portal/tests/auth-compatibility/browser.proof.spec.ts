@@ -5,6 +5,7 @@ import Redis from 'ioredis'
 import { createKeycloakAdmin } from '../../lib/keycloak/admin-client'
 import { fixture, receipt } from './fixture'
 import { qualifyStandaloneUi } from './ui-acceptance'
+import { createBrowserDiagnostics } from './browser-diagnostics'
 
 const c = fixture()
 
@@ -13,7 +14,9 @@ test('real Keycloak PKCE/Auth.js session is denied after actual signed backchann
   const admin = createKeycloakAdmin({ baseUrl: c.keycloakOrigin, realm: c.realm, clientId: 'user-portal-admin-api', clientSecret: c.adminApiSecret! })
   const redis = new Redis(process.env.REDIS_URL!, { maxRetriesPerRequest: 1, connectTimeout: 3000 })
   const errors = { page: 0, console: 0 }
-  const pageError = () => { errors.page++ }
+  const diagnostics = createBrowserDiagnostics({ portalOrigin: c.portalOrigin, builtAssetPaths: c.browserAssets ?? [],
+    secrets: [c.masterPassword, c.redisPassword, c.postgresPassword, c.authSecret, c.userPassword, c.portalSecret ?? '', c.adminApiSecret ?? '', c.email, c.userId ?? ''] })
+  const pageError = (error: Error) => { errors.page++; diagnostics.record(error) }
   const consoleError = (message: { type(): string }) => { if (message.type() === 'error') errors.console++ }
   if (process.env.AUTH_PROOF_CASE === 'react19.3') {
     page.on('pageerror', pageError)
@@ -32,7 +35,8 @@ test('real Keycloak PKCE/Auth.js session is denied after actual signed backchann
     expect(before.status()).toBe(200)
     expect((await before.json()).user.keycloakSub).toBe(c.userId)
     if (process.env.AUTH_PROOF_CASE === 'react19.3') {
-      await qualifyStandaloneUi(page, errors)
+      expect(c.browserAssets?.length).toBeGreaterThan(0)
+      await qualifyStandaloneUi(page, errors, diagnostics)
       page.off('pageerror', pageError)
       page.off('console', consoleError)
     }
@@ -57,5 +61,11 @@ test('real Keycloak PKCE/Auth.js session is denied after actual signed backchann
       pkce: 'S256', sessionEstablished: true, backchannelObserved: true,
       tokenShape: callback.tokenShape, redisMarked: true, sessionDenied: true, protectedDenied: true,
     })
-  } finally { await redis.quit() }
+  } finally {
+    page.off('pageerror', pageError)
+    page.off('console', consoleError)
+    try {
+      if (process.env.AUTH_PROOF_CASE === 'react19.3') receipt('browser-errors.json', diagnostics.snapshot())
+    } finally { await redis.quit() }
+  }
 })

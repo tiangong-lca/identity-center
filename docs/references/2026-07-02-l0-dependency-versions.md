@@ -369,3 +369,23 @@ Keyboard input and exact no-op apply payload/version/server-readback assertions
 remain. No forced input, internal model write, EditContext disabling, timeout
 increase or product change is used. Scoped ESLint/typecheck pass; fresh hosted
 qualification follows, without redundant local full-unit/build execution.
+
+
+At hosted head1768f87 all baseline UI interaction assertions execute through
+Monaco keyboard editing, exact no-op apply/readback and locale/theme transitions,
+but the final strict error check reports3page errors/0console errors. Artifact
+12715146164 matches its uploaded checksum and exact source/lock/runtime; both
+image steps, empty cleanup inventories and privacy inspection pass. The UI receipt
+remains failed, and candidate/logout/session-denial/transport checks did not run.
+The counts-only collector cannot establish the three causes; no worker, product
+or renderer attribution is made.
+
+The reviewed diagnostic support retains structural fields only: fixed observed
+stage/name/category/code, exact emitted owned JS asset locations and bounded
+numeric coordinates. No raw message/stack/URL/function prose survives; fingerprints
+use only the safe projection. Eight samples/8KiB plus overflow counters and a
+fixed projection-failed fallback preserve strict zero-error acceptance. Offline
+privacy negatives and independent adversarial probes cover secret leakage, forged
+assets, malformed getters and byte caps. Independent review found no material
+issue. This is a diagnostic change, not a product fix or acceptance relaxation;
+actual error causes and both variants' full hosted proof remain pending.
