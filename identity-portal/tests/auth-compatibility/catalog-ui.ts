@@ -4,6 +4,7 @@ import { fixture, receipt } from './fixture'
 import { syntheticCatalogDocument } from './catalog-case.mjs'
 import { classifyYamlWorker } from './catalog-worker-identity.mjs'
 import type { BrowserDiagnostics } from './browser-diagnostics'
+import { nativeInputState } from './native-input-state'
 
 export async function qualifyCatalogUi(page: Page, errors: { page: number; console: number }, diagnostics: BrowserDiagnostics) {
   const c = fixture()
@@ -11,6 +12,7 @@ export async function qualifyCatalogUi(page: Page, errors: { page: number; conso
   const closed = new Set<Worker>()
   let unrecognizedWorkers = 0
   let passed = false
+  const undoSteps: number[] = []
   const workerCreated = (worker: Worker) => {
     const kind = classifyYamlWorker(worker.url(), c.portalOrigin, c.yamlWorker)
     if (kind === 'yaml') { workers.push(worker); worker.once('close', () => closed.add(worker)) }
@@ -54,7 +56,17 @@ export async function qualifyCatalogUi(page: Page, errors: { page: number; conso
       await value.hover()
       await expect(page.getByText('Incorrect type. Expected "array".', { exact: true })).toBeVisible()
       await page.keyboard.press('Escape')
-      await replace(current.yaml)
+      await focus()
+      let restored = false
+      for (let step = 1; step <= 8; step++) {
+        await page.keyboard.press('Control+Z')
+        await page.keyboard.press('Control+A')
+        const state = await page.evaluate(nativeInputState, current.yaml)
+        expect(state.available).toBe(true)
+        expect(state.wholeSelection).toBe(true)
+        if (state.exact) { restored = true; undoSteps.push(step); break }
+      }
+      expect(restored).toBe(true)
       await expect(editor().locator('.squiggly-warning, .squiggly-error')).toHaveCount(0)
     }
     diagnostics.setStage('monaco-load')
@@ -99,6 +111,6 @@ export async function qualifyCatalogUi(page: Page, errors: { page: number; conso
     page.off('worker', workerCreated)
     receipt('ui.json', { qualificationCase: 'catalog-yaml', executed: true, passed, errors,
       schemaWorker: passed, keyboardApplyReadback: passed, spaDisposalReopen: passed,
-      yamlWorkers: workers.length, yamlWorkersClosed: closed.size, unrecognizedWorkers, syntheticDataOnly: true })
+      yamlWorkers: workers.length, yamlWorkersClosed: closed.size, unrecognizedWorkers, exactBufferRestored: passed, undoSteps, syntheticDataOnly: true })
   }
 }

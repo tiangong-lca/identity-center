@@ -1,4 +1,4 @@
-import { expect, it } from 'vitest'
+import { expect, it, vi } from 'vitest'
 import fs from 'node:fs'
 import path from 'node:path'
 import os from 'node:os'
@@ -9,6 +9,42 @@ import { load } from 'js-yaml'
 import { IMAGE_TAGS, composeDocument, ownedLifecycle, attemptCleanup } from '../auth-compatibility/contract.mjs'
 import { proofCase, CATALOG_BASELINE, assertCatalogVersions, assertCatalogUiReceipts, syntheticCatalogDocument } from '../auth-compatibility/catalog-case.mjs'
 import { emittedYamlWorker, classifyYamlWorker } from '../auth-compatibility/catalog-worker-identity.mjs'
+import { nativeInputState } from '../auth-compatibility/native-input-state'
+
+it('compares only a complete nonempty native selection and never returns buffer data', () => {
+  const text = 'controlled-private-buffer\n'
+  try {
+    for (const [start, end] of [[0, text.length], [text.length, 0]]) {
+      vi.stubGlobal('document', { activeElement: { editContext: { text, selectionStart: start, selectionEnd: end } } })
+      const state = nativeInputState(text)
+      expect(state).toEqual({ available: true, wholeSelection: true, exact: true })
+      expect(Object.keys(state)).toEqual(['available', 'wholeSelection', 'exact'])
+      expect(JSON.stringify(state)).not.toMatch(/controlled|private|buffer|text|length|hash/)
+      expect(nativeInputState('wrong expected bytes').exact).toBe(false)
+    }
+  } finally { vi.unstubAllGlobals() }
+})
+
+it('cannot report exact from partial, collapsed, empty or malformed native selection', () => {
+  const text = 'controlled-private-buffer'
+  try {
+    for (const [selectionStart, selectionEnd] of [[0, 0], [0, text.length - 1], [1, text.length], [-1, text.length], [0.5, text.length], [0, text.length + 1]]) {
+      vi.stubGlobal('document', { activeElement: { editContext: { text, selectionStart, selectionEnd } } })
+      expect(nativeInputState(text)).toEqual({ available: true, wholeSelection: false, exact: false })
+    }
+    vi.stubGlobal('document', { activeElement: { editContext: { text: '', selectionStart: 0, selectionEnd: 0 } } })
+    expect(nativeInputState('')).toEqual({ available: true, wholeSelection: false, exact: false })
+  } finally { vi.unstubAllGlobals() }
+})
+
+it('fails closed without a supported active public EditContext, without coercion', () => {
+  try {
+    for (const activeElement of [null, {}, { editContext: null }, { editContext: { text: { toString() { throw Error('must not coerce') } }, selectionStart: 0, selectionEnd: 1 } }]) {
+      vi.stubGlobal('document', { activeElement })
+      expect(nativeInputState('controlled')).toEqual({ available: false, wholeSelection: false, exact: false })
+    }
+  } finally { vi.unstubAllGlobals() }
+})
 
 function fixture() {
  const nonce = 'a'.repeat(20)

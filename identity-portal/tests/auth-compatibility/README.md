@@ -24,6 +24,23 @@ owned test commit; all actual diff/rename/ancestry operations still execute Git.
 This seam is distinct from the real clean-head hosted preflight. No historical
 object fetch, checkout deepening, skipped control or source-fence change is used.
 
+After the controlled invalid schema edit, restore with at most8 normal Undo
+operations. Select all before reading the standard active HTMLElement.editContext
+state: Monaco exposes only selected lines in that context, so a collapsed caret
+is insufficient. The reader requires a complete nonempty selection and exact
+original bytes, returning only available/wholeSelection/exact booleans. No raw
+buffer, offsets, lengths or buffer hashes leave the browser. Unsupported,
+partial, malformed or wrong-text states cannot qualify. Marker clearance and the
+original keyboard comment/no-op request/version/readback gates still apply.
+
+Native macOS diagnostics with actual product options/schema/serializer confirmed
+full multiline typing can change indentation, while bounded Undo restores exact
+bytes and the unchanged comment payload is exact. A separate live public-reader
+check rejected unavailable/partial/wrong states, restored exact bytes and proved
+the final payload. Those checks used Meta shortcuts and no platform override;
+they are not Linux or Portal qualification. Hosted Linux uses its normal Control
+shortcuts and still requires a future exact-head complete run.
+
 Both runtime variants keep Main's React/DOM19.2.4/jose6.2.12/admin26.8.1 graph.
 Baseline auth/transport remains real, while its UI receipt explicitly records
 executed:false/passed:false/known-defective and retains run40474716057 as prior

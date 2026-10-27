@@ -114,3 +114,30 @@ reopen and candidate logout/transport did not run. The reviewed test correction
 keeps warning count/tooltip/strict-zero gates and ordinary hover on the single
 visible controlled token, without force or timeout changes. This is preparation
 for a future reviewed source push; no successful hosted qualification is claimed.
+
+The next a0b5a5f hosted attempt40496584208 also remains failed: quality130/27 and
+CodeQL passed, baseline auth/transport/outage and all image/source/cleanup checks
+passed, but restoring current.yaml through multiline keyboard typing left13
+diagnostic decorations. Candidate Apply/reopen/logout/transport did not run.
+The actual hosted buffer was not retained, so those decorations alone do not
+prove its contents or13 distinct diagnostics.
+
+Focused native macOS checks with the pinned real editor showed the delivered
+input string was exact but the resulting full snapshot differed only in leading
+whitespace and produced15 actual markers. Normal Undo restored exact original
+bytes and cleared markers; the original comment/no-op payload remained exact.
+The public EditContext reader was then checked from a fresh snapshot through the
+invalid edit and bounded Undo, with no prior failed retyping sequence: unavailable,
+partial and wrong text never reported exact; full restoration and final payload
+matched the public model oracle with zero markers. Only booleans/counts and
+source/tool/asset hashes were retained. The earlier pre-browser import setup
+failure was preserved separately and provides no product evidence.
+
+The [W3C EditContext API](https://w3c.github.io/edit-context/) defines its text,
+selection and HTMLElement association. Context7 was quota-blocked; this primary
+spec and frozen Monaco0.55.1 NativeEditContext/SelectAll/typing source were read.
+The hosted harness now uses a read-only whole-selection exact-byte predicate and
+at most8 normal Undo operations; it does not hardcode the5 steps observed on Mac.
+No private model hook, clipboard, setValue, product setting or platform spoof is
+used. Local Meta-key checks do not establish Linux Control-key/Portal acceptance;
+fresh complete hosted proof is still required.
