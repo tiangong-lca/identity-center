@@ -67,3 +67,20 @@ establish React19.3 causality. Candidate/logout/transport did not run. This
 separate baseline repair neither qualifies React44 nor completes original29.
 After independently qualified delivery on Main, React44 needs an explicitly
 reviewed new immutable case and complete baseline/candidate UI/auth/image proof.
+
+First focused browser invocation at49e6807 failed in the repaired phase; its
+exact substage was not retained. The legacy exact missing-handler negative
+passed. Repaired mode created/closed one native worker and recorded zero page/
+console errors and forbidden requests, but did not complete semantic assertions.
+All owned processes/server/browser/profile cleanup passed; no positive worker
+acceptance follows from this attempt.
+
+Offline pinned source shows schema type mismatch is a Warning (yaml.worker.js
+2943–2950), mapped by monaco-languageserver-types0.4.1 to Monaco Warning4 rather
+than Error8. The fixture correction requires the exact controlled Boolean
+warning at line1 columns10–16 and its fixed diagnostic condition, followed by the
+same actual repair, cleared markers and validation[]. It also projects only a
+fixed substage enum, so another failure identifies the semantic stage without
+exporting caught error prose. This supports the corrected expectation; the
+first attempt's precise runtime assertion remains unknown. A second invocation
+has not yet run at this source checkpoint.

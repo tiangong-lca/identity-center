@@ -6,6 +6,7 @@ import { mkdir, readFile, writeFile, readdir } from 'node:fs/promises'
 import { resolve, join, extname, isAbsolute } from 'node:path'
 import { fileURLToPath, pathToFileURL } from 'node:url'
 import { chromium } from '@playwright/test'
+import { projectWorkerStage } from '../tests/monaco-worker/stages.mjs'
 
 // Focused worker bundle only: never starts Next, Portal, Docker or authentication.
 const root = fileURLToPath(new URL('..', import.meta.url))
@@ -36,14 +37,24 @@ for (const name of files) {
 }
 const receipt = { mode: args[0], assets, inputCount: Object.keys(result.metafile.inputs).length, browserRun: false, cases: [] }
 
-async function evaluateOwned(page, context, mode) {
+async function evaluateOwned(page, context, mode, entry) {
+  delete entry.lastStage
+  delete entry.failureStage
   let timer
+  let timedOut = false
   try {
-    return await Promise.race([
-      page.evaluate((selected) => window.runMonacoWorkerRegression(selected), mode),
-      new Promise((_, reject) => { timer = setTimeout(() => reject(new Error('owned-evaluation-timeout')), 45_000) }),
+    const projection = await Promise.race([
+      page.evaluate(async (selected) => {
+        try { return { passed: true, result: await window.runMonacoWorkerRegression(selected) } }
+        catch { return { passed: false, stage: window.monacoWorkerRegressionStage } }
+      }, mode),
+      new Promise((_, reject) => { timer = setTimeout(() => { timedOut = true; reject(new Error('owned-evaluation-timeout')) }, 45_000) }),
     ])
+    entry.lastStage = projectWorkerStage(projection.stage ?? 'complete')
+    assert.equal(projection.passed, true)
+    return projection.result
   } catch {
+    entry.failureStage = timedOut ? 'host-evaluation-timeout' : entry.lastStage ?? 'host-evaluation-failed'
     // Closing the owned context terminates stalled worker RPC/evaluation as well.
     await context.close()
     throw new Error('owned-worker-evaluation-failed')
@@ -88,12 +99,12 @@ if (args[0] === '--build-only') {
       try {
         await page.goto(origin, { waitUntil: 'load' })
         await page.waitForFunction(() => typeof window.runMonacoWorkerRegression === 'function')
-        const result = await evaluateOwned(page, context, mode)
+        const result = await evaluateOwned(page, context, mode, entry)
         if (mode === 'legacy') assert.equal(result.legacyRejected, true)
         else {
           assert.equal(result.realWorkerAcceptance, true)
           // Same page remount: no stale providers/models or disposed manager reuse.
-          const reopened = await evaluateOwned(page, context, 'repaired')
+          const reopened = await evaluateOwned(page, context, 'repaired', entry)
           assert.equal(reopened.realWorkerAcceptance, true)
           const deadline = Date.now() + 5000
           while (counts.workersClosed < counts.workers && Date.now() < deadline) await new Promise((resolve) => setTimeout(resolve, 25))
