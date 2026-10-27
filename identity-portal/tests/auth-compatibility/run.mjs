@@ -11,6 +11,7 @@ import { assertHostedContext, assertFixture, IMAGE_TAGS, composeDocument, cleanE
 
 import { assertCatalogSources, assertCatalogUiReceipts } from './catalog-case.mjs'
 import { qualificationCase, assertQualificationSources, assertQualificationManifest, assertQualificationVersions, assertReactSourcePathFromGit } from './qualification-case.mjs'
+import { assertSecurityBehaviorReceipts, securityZodIdentity } from './security-behavior-source.mjs'
 import { assertSecuritySources, assertSecurityArchive, securityInstalledAssets } from './security-case.mjs'
 import { qualificationUiPlan, assertFixedReactUiReceipts, assertSecurityUiReceipts } from './ui-plan.mjs'
 import { emittedBrowserAssetPaths } from './browser-assets.mjs'
@@ -197,6 +198,11 @@ async function variant(variant, root, images, head, securityInputs) {
   if (selectedCase.name === 'security-audit') assertSecurityArchive(app, variant, securityInputs)
   // Identical test support runs against both exact application sources and frozen graphs.
   fs.cpSync(path.join(sourceRoot, 'identity-portal/tests/auth-compatibility'), path.join(app, 'tests/auth-compatibility'), { recursive: true })
+  if (selectedCase.name === 'security-audit') {
+    const parserPath = path.join(sourceRoot, 'identity-portal/scripts/security/monaco-purify-patch.mjs')
+    assert.equal(hash(parserPath), securityInputs.candidateHashes['identity-portal/scripts/security/monaco-purify-patch.mjs'])
+    fs.copyFileSync(parserPath, path.join(app, 'tests/auth-compatibility/security-proof-parser.mjs'))
+  }
   fs.copyFileSync(path.join(sourceRoot, 'identity-portal/tests/integration/keycloak-bootstrap.test.ts'), path.join(app, 'tests/integration/keycloak-bootstrap.test.ts'))
   assert.equal(fs.readdirSync(app).some(name => /^\.env(?:\.|$)/.test(name)), false, 'Never load a pre-existing dotenv file')
   c.qualificationCase = selectedCase.name
@@ -237,6 +243,10 @@ async function variant(variant, root, images, head, securityInputs) {
       if (selectedCase.name === 'security-audit') {
         summary.securityAssets = securityInstalledAssets(app, variant, securityInputs)
         fs.writeFileSync(path.join(c.evidenceDirectory, 'security-assets.json'), JSON.stringify(summary.securityAssets, null, 2), { mode: 0o600 })
+        summary.securityZod = securityZodIdentity(app)
+        summary.securityParserSha256 = securityInputs.candidateHashes['identity-portal/scripts/security/monaco-purify-patch.mjs']
+        c.securityBinding = { source: summary.source, manifestSha256: hash(path.join(app, 'package.json')), lockSha256: hash(path.join(app, 'pnpm-lock.yaml')), parserSha256: securityInputs.candidateHashes['identity-portal/scripts/security/monaco-purify-patch.mjs'], assets: summary.securityAssets, zod: summary.securityZod }
+        fs.writeFileSync(configFile, JSON.stringify(c), { mode: 0o600 })
         summary.manifestSha256 = hash(path.join(app, 'package.json'))
         summary.workspaceSha256 = hash(path.join(app, 'pnpm-workspace.yaml'))
         if (variant === 'candidate') summary.patchSha256 = hash(path.join(app, 'patches/monaco-editor@0.55.1.patch'))
@@ -273,6 +283,7 @@ async function variant(variant, root, images, head, securityInputs) {
       await docker(['stop', 'redis'], 'owned-redis-stop')
       env = { ...env, AUTH_PROOF_REDIS_STOPPED: c.project }
       await pnpm(['exec', 'vitest', 'run', '--config', 'tests/auth-compatibility/vitest.config.ts', 'tests/auth-compatibility/redis-outage.integration.test.ts'], 'actual-redis-outage')
+      if (selectedCase.name === 'security-audit') summary.securityBehavior = JSON.parse(fs.readFileSync(path.join(c.evidenceDirectory, 'security-behavior.json')))
       if (selectedCase.name !== 'auth-client') summary.ui = JSON.parse(fs.readFileSync(path.join(c.evidenceDirectory, 'ui.json')))
       for (const name of ['browser', 'transport', 'outage']) summary[name] = JSON.parse(fs.readFileSync(path.join(c.evidenceDirectory, `${name}.json`)))
     }, async () => {
@@ -413,7 +424,10 @@ async function main() {
     assert.equal(cancelled, false, 'Cancelled proof cannot qualify')
     if (selectedCase.name === 'catalog-yaml') assertCatalogUiReceipts(baseline, candidate)
     if (selectedCase.name === 'react19.3-catalog-fixed') assertFixedReactUiReceipts(baseline, candidate)
-    if (selectedCase.name === 'security-audit') assertSecurityUiReceipts(baseline, candidate)
+    if (selectedCase.name === 'security-audit') {
+      assertSecurityUiReceipts(baseline, candidate)
+      assertSecurityBehaviorReceipts(baseline, candidate)
+    }
     const comparison = compareReceipts(baseline, candidate)
     fs.writeFileSync(path.join(output, 'qualification.json'), JSON.stringify({ qualificationCase: selectedCase.name, head, baseline: BASELINE, images, readinessControl, comparison, baselineReceipt: baseline, candidateReceipt: candidate, ...(securityInputs ? { securityInputs } : {}) }, null, 2))
     console.log(JSON.stringify({ qualificationCase: selectedCase.name, head, baseline: BASELINE, comparison, evidence: output }))

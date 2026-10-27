@@ -61,7 +61,7 @@ it('executes the actual security browser-body suite selection without skips or r
   const body = source.slice(start,end).replace('(name: string)', '(name)')
   for (const variant of ['baseline','candidate']) {
     const files = new Map<string,string>(); const events: string[] = []
-    const deps = { c: { qualificationCase: 'security-audit', variant, evidenceDirectory: '/inert' }, plan: qualificationUiPlan('security-audit', variant), page: {}, errors: { page: 0, console: 0 }, diagnostics: {}, path,
+    const deps = { c: { qualificationCase: 'security-audit', variant, evidenceDirectory: '/inert' }, plan: qualificationUiPlan('security-audit', variant), page: {}, errors: { page: 0, console: 0 }, diagnostics: {}, path, expect, qualifySecurityBehavior:async()=>{events.push('behavior')},
       qualifyStandaloneUi: async (_p: unknown, _e: unknown, _d: unknown, name: string) => { expect(name).toBe('ui-broad.json'); events.push(name); files.set('/inert/'+name, '{}') },
       qualifyCatalogUi: async (_p: unknown, _e: unknown, _d: unknown, name: string) => { expect(name).toBe('ui-catalog.json'); events.push(name); files.set('/inert/'+name, '{}') },
       readFileSync: (file: string) => { expect(files.has(file)).toBe(true); return files.get(file) },
@@ -69,7 +69,7 @@ it('executes the actual security browser-body suite selection without skips or r
       receipt: (name: string) => { expect(name).toBe('ui.json'); events.push(name) },
     }
     await new Function(...Object.keys(deps), `return (async()=>{${body}})()`)(...Object.values(deps))
-    expect(events).toEqual(['ui-broad.json','ui-catalog.json','ui.json'])
+    expect(events).toEqual(['ui-broad.json','ui-catalog.json','ui.json','behavior'])
   }
 })
 
@@ -185,13 +185,13 @@ it('the actual runner writes source-bound installed-asset receipts for each secu
   const end = source.indexOf('      summary.qualificationCase', start)
   expect(start).toBeGreaterThan(-1);expect(end).toBeGreaterThan(start)
   for (const variant of ['baseline','candidate']) {
-    const writes: Array<{file:string;data:unknown;options:unknown}> = [];const summary: Record<string,unknown> = {};const bindings = { exact:'source-bound' };const observed = { qualificationCase:'security-audit',variant,assets:[{path:'owned.js',sha256:'a'.repeat(64)}] }
-    const deps = { selectedCase:{name:'security-audit'},summary,app:'/owned/app',variant,securityInputs:bindings,c:{evidenceDirectory:'/owned/evidence'},path,
+    const writes: Array<{file:string;data:unknown;options:unknown}> = [];const summary: Record<string,unknown> = {};const bindings = { exact:'source-bound',candidateHashes:{'identity-portal/scripts/security/monaco-purify-patch.mjs':'c'.repeat(64)} };const observed = { qualificationCase:'security-audit',variant,assets:[{path:'owned.js',sha256:'a'.repeat(64)}] }
+    const deps = { selectedCase:{name:'security-audit'},summary,app:'/owned/app',variant,securityInputs:bindings,c:{evidenceDirectory:'/owned/evidence'},configFile:'/owned/config.json',path,securityZodIdentity:()=>({format:'commonjs',version:'fixed'}),
       securityInstalledAssets:(app:string,v:string,input:unknown)=>{expect(app).toBe('/owned/app');expect(v).toBe(variant);expect(input).toBe(bindings);return observed},
       fs:{writeFileSync:(file:string,data:string,options:unknown)=>writes.push({file,data:JSON.parse(data),options})},hash:()=> 'b'.repeat(64),
     }
     new Function(...Object.keys(deps),source.slice(start,end))(...Object.values(deps))
-    expect(summary.securityAssets).toBe(observed);expect(writes).toEqual([{file:'/owned/evidence/security-assets.json',data:observed,options:{mode:0o600}}])
+    expect(summary.securityAssets).toBe(observed);expect(writes[0]).toEqual({file:'/owned/evidence/security-assets.json',data:observed,options:{mode:0o600}});expect(writes[1].file).toBe('/owned/config.json');expect((writes[1].data as {securityBinding:{assets:unknown}}).securityBinding.assets).toEqual(observed)
     expect(Object.hasOwn(summary,'patchSha256')).toBe(variant==='candidate')
   }
 })

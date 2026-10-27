@@ -180,3 +180,5 @@ and any required follow-up. Original29 remains closed unmerged.
 ## Identity48 security follow-up
 
 The separate [security qualification](../references/2026-10-28-dependency-security.md) records the exact Main68 baseline, compatible graph, required all-copy sanitizer patch and pending full qualification. No zero-vulnerability claim or legacy-esbuild waiver is made.
+
+Identity48 correction restores only the independently reviewed satisfied-range graph drift and adds mandatory source-bound behavioral fixture receipts. Actual DOM/browser and application-format security proof remain gated; CommonJS fixture checks do not claim ESM/Next execution. See the security qualification record for current limitations.
