@@ -332,3 +332,22 @@ control passes, whereas the fixed invocation rejects the product deletion.
 Existing configuration/new-path fences and historical auth-client behavior stay
 unchanged. Scoped21 harness tests, lint and typecheck pass; no actual application
 rename, full-suite rerun or build rerun occurred.
+
+The first hosted PR45 attempt at `cd26893f178d15fd255954ab534df3e88d6f5811`
+passed quality (111units/24files), CodeQL and both native Linuxamd64 image
+build/Node24.22.1 inspection steps. Its baseline standalone browser then failed
+at registry navigation: the href selector matched both the “Registry” tab and
+“Edit in registry” CTA. This is a new test-selector assumption contradicted by
+the shipped React19.2.4 baseline, not evidence of a renderer defect. Candidate,
+logout/session-denial and transport controls did not run. Artifact12712603673
+matches its uploaded SHA256 and binds the immutable baseline/lock/runtime;
+readiness, baseline and image cleanup receipts pass with empty inventories.
+Its privacy scan contains no raw JWT/credential URL/dotenv/browser media/state.
+
+The support-only correction selects the unique navigation-role link named
+“Registry”, asserts count1, exact destination and the existing same-document
+sentinel. Product behavior and all dependency/build inputs are unchanged; scoped
+ESLint/typecheck pass without a redundant local full-suite/build run. The failed
+artifact remains negative evidence; the canonical UI does not deliberately repeat
+the ambiguous click or assert a global duplicate-link count. The corrected head
+requires fresh quality, both images and both variants' actual auth/UI proof.

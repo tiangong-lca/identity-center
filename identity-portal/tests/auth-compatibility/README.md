@@ -115,3 +115,10 @@ asserts its default `R100` destination-only projection, then forwards the actual
 entrypoint diff flags to Git. An old-projection exposure control passes while the
 normal rename-disabled path rejects the product deletion. This protects the
 command wiring as well as the pure path classifier; it creates no product rename.
+
+The registry navigation selector uses the unique navigation-role link named
+“Registry”, then checks its exact destination and same-document sentinel. The
+shipped apps page also has an “Edit in registry” CTA with the same href, so href
+uniqueness is not a valid assertion. The first hosted baseline's strict-mode
+failure is retained as evidence of that test defect; no product or renderer
+failure is inferred and no unexecuted candidate/auth result is claimed.

@@ -63,7 +63,11 @@ export async function qualifyStandaloneUi(page: Page, errors: { page: number; co
     expect((await persisted.json()).data.items).toEqual(expect.arrayContaining([expect.objectContaining({ code, name: `Synthetic ${code}` })]))
 
     await page.locator('a[href="/admin/apps"]').click()
-    await page.locator('a[href="/admin/apps/registry"]').click()
+    const registryTab = page.getByRole('navigation').getByRole('link', { name: 'Registry', exact: true })
+    await expect(registryTab).toHaveCount(1)
+    await registryTab.click()
+    await expect(page).toHaveURL(`${c.portalOrigin}/admin/apps/registry`)
+    expect(await page.evaluate(() => Reflect.get(window, 'identityUiNavigationSentinel'))).toBe('same-document')
     const snapshot = await page.request.get('/api/admin/catalog')
     expect(snapshot.status()).toBe(200)
     const current = (await snapshot.json()).data as { yaml: string; version: number }
