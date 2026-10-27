@@ -11,9 +11,9 @@ checkPaths:
   - .github/dependabot.yml
   - identity-portal/pnpm-lock.yaml
   - docs/guides/dependency-maintenance.md
-lastReviewedAt: 2026-10-26
-lastReviewedCommit: 104135f3aae4d39cebef13a9f12abfc53daed376
-lastReviewedNote: "Identity #41: reviewed Node24.22.1 runtime/CI/image inputs and types24.19.2; exact pnpm11.9 integrity, other dependency versions, product semantics and manual production authorization remain. Local frozen install, lint, typecheck, 96 units and standalone build pass. Fresh hosted image/auth proof, independent review, merge and integration remain required."
+lastReviewedAt: 2026-10-27
+lastReviewedCommit: 6ef7c216075aae429d4c573d0c32a005f6fa9774
+lastReviewedNote: "Identity #44: reviewed exact React/DOM19.3.1 and types19.3.0 peer closure, separate immutable-baseline qualification, entrypoint negatives and synthetic standalone UI support. Frozen install, lint/typecheck, 109 full-suite units, final20 harness cases and standalone build pass locally. Prior memory-cap and test-type build failures retained and corrected. Hosted auth/UI/image proof, independent review, source merge and exact integration remain pending; old auth-client case, SID-only limitation, product and production authority unchanged."
 ---
 
 # Dependency maintenance

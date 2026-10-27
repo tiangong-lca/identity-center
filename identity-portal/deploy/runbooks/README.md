@@ -11,9 +11,9 @@ checkPaths:
   - identity-portal/deploy/runbooks/README.md
   - identity-portal/deploy/docker/**
   - identity-portal/deploy/runbooks/**
-lastReviewedAt: 2026-10-26
-lastReviewedCommit: 189707a3d384a2ebb9f43053a56f4121a40404f7
-lastReviewedNote: "Identity #41 review fixes: raw Git blob extraction preserves exact Dockerfile hashes; all hosted image Docker calls have deadlines and TERM/KILL escalation, cleanup attempts both targets and writes failed/incomplete receipts. Local lint, typecheck, 105 units including eight actual-workflow cleanup controls and syntax pass. Runtime24.22.1/types24.19.2/pnpm11.9 integrity and other dependencies remain unchanged. No Docker/services/production activation; final-head hosted image/auth proof, review, merge and integration remain required."
+lastReviewedAt: 2026-10-27
+lastReviewedCommit: 6ef7c216075aae429d4c573d0c32a005f6fa9774
+lastReviewedNote: "Identity #44: reviewed exact React/DOM19.3.1 and types19.3.0 peer closure, separate immutable-baseline qualification, entrypoint negatives and synthetic standalone UI support. Frozen install, lint/typecheck, 109 full-suite units, final20 harness cases and standalone build pass locally. Prior memory-cap and test-type build failures retained and corrected. Hosted auth/UI/image proof, independent review, source merge and exact integration remain pending; old auth-client case, SID-only limitation, product and production authority unchanged."
 ---
 
 # 统一身份平台 · 部署/启动/运行 Runbook

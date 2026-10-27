@@ -11,9 +11,9 @@ checkPaths:
   - docs/README.md
   - docs/design/README.md
   - docs/implementation/README.md
-lastReviewedAt: 2026-10-26
-lastReviewedCommit: 3161be477faf321632d19709465ade7a2ae1c9e2
-lastReviewedNote: "Identity #41: quality CI on 3161be4 failed despite 105 passing cases because four unhandled JSON parse errors exposed a fake-state truncation race. Both fake Docker writers now write a PID-unique sibling temporary file and rename it over the polled state. Parsing and assertions remain strict. Local lint/typecheck, 105 units and six concurrent-load cancellation repeats pass without unhandled errors. Windows skips only the eight POSIX controls; no native Windows proof claimed. Product/runtime/workflow unchanged; new exact-head hosted CI and artifact validation remain required."
+lastReviewedAt: 2026-10-27
+lastReviewedCommit: 6ef7c216075aae429d4c573d0c32a005f6fa9774
+lastReviewedNote: "Identity #44: reviewed exact React/DOM19.3.1 and types19.3.0 peer closure, separate immutable-baseline qualification, entrypoint negatives and synthetic standalone UI support. Frozen install, lint/typecheck, 109 full-suite units, final20 harness cases and standalone build pass locally. Prior memory-cap and test-type build failures retained and corrected. Hosted auth/UI/image proof, independent review, source merge and exact integration remain pending; old auth-client case, SID-only limitation, product and production authority unchanged."
 ---
 
 # Identity Platform 文档
