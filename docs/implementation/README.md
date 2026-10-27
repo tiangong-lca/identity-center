@@ -12,8 +12,8 @@ checkPaths:
   - GOAL.md
   - docs/design/README.md
 lastReviewedAt: 2026-10-27
-lastReviewedCommit: db802b633f5add1f639fd40cb695b69c7d5552f8
-lastReviewedNote: "Identity #44 Monaco baseline support correction: Main reviewed visible role-code editor/count1/normal click/DOM focus containment; keyboard and exact apply/version/readback assertions retained. Installed0.55.1 native EditContext source explains hidden textbox. Scoped ESLint/typecheck pass; no product/build input or full-suite/build rerun. Earlier527 quality111 and images passed, baseline UI failed before candidate/logout/transport; all failure/cleanup/privacy evidence retained. Corrected head needs fresh full hosted proof; no merge/production authority."
+lastReviewedCommit: 92faa0176e112725218fd34e61e1497390bd39f0
+lastReviewedNote: "Identity #44 structural page-error diagnostics: fixed stage/name/category/code, exact emitted owned JS frames,8samples/8KiB and safe-projection fingerprints; no raw message/stack/URL/function prose retained. Full counters and strict zero-error gate unchanged; fallback/observer/Redis cleanup preserved. Targeted27cases, lint/typecheck and independent adversarial privacy probes pass with no material findings. Published176 baseline causes remain unknown and candidate/logout/transport unexecuted. Diagnostic publication requires Main review; no product fix, full-build pass, merge or production authority claimed."
 ---
 
 # 统一身份平台实施方案
