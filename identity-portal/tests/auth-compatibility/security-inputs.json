@@ -8,7 +8,7 @@
   },
   "candidateHashes": {
     "identity-portal/package.json": "be36f46039451da304407df52293eb17b7617d8923e7e61046116a2d9eed67d5",
-    "identity-portal/pnpm-lock.yaml": "d263f5fe472802bce7068faab6dd9fc6f5455ad9b40eccb6b97317a00df7d01f",
+    "identity-portal/pnpm-lock.yaml": "3e443a164b8b26b18cff335d548c7ac9a13d4af349aebc2367bf7b5d778a2fa1",
     "identity-portal/pnpm-workspace.yaml": "12a1cdcc48f156b1a826a7146a26f8705e0286b95a6b29041c13c6b5ce3cb725",
     "identity-portal/patches/monaco-editor@0.55.1.patch": "cee9c1b977bb0b433b2f1f6e11eecd14795fa8311f644558276f64e9fa1dcb4e",
     "identity-portal/patches/monaco-editor@0.55.1.provenance.json": "0ac8c760a71acede2ddd11729c05902a9f63800d6956dde05d6ea3df25ba3a13",
