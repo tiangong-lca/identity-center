@@ -8,3 +8,12 @@ allowBuilds:
 ignoredBuiltDependencies:
   - sharp
   - unrs-resolver
+minimumReleaseAgeExclude:
+  - '@shadcn/registry@0.2.1'
+  - shadcn@4.23.0
+overrides:
+  "eslint-plugin-boundaries@6.0.2>handlebars": "4.7.10"
+  "@boundaries/elements@2.0.1>handlebars": "4.7.10"
+  "monaco-editor@0.55.1>dompurify": "3.4.17"
+patchedDependencies:
+  "monaco-editor@0.55.1": patches/monaco-editor@0.55.1.patch

@@ -11,9 +11,9 @@ checkPaths:
   - docs/implementation/README.md
   - GOAL.md
   - docs/design/README.md
-lastReviewedAt: 2026-10-27
-lastReviewedCommit: "afff0e9ed806ea9e3a08316dfe9881b420ab7e98"
-lastReviewedNote: "Identity44 afff hosted run40522175745 failed baseline Catalog navigation before worker/auth controls: href apps locator matched Applications and Application list. Broad UI passed with zero page/console errors; no actual URL snapshot establishes timing cause. Narrow support correction uses unique navigation Applications/count1 and awaits admin/apps URLs; actual-body positive and missing-wait/ambiguous-selector negatives,62 affected units, lint/typecheck pass. Product/graph/runtime unchanged; failed artifact and clean owned service/image receipts retained. Candidate UI/logout/transport unexecuted; no acceptance, rerun, local browser/Docker or merge claim."
+lastReviewedAt: 2026-10-28
+lastReviewedCommit: 68e1fafce35e7e931ee0e7c65b5c6e0b4ccf8e8b
+lastReviewedNote: "Identity48 PhaseA: exact Main68 security graph prepared with four caret changes, narrow overrides and AST/provenance-bound three-copy DOMPurify patch; Docker copies patches before frozen install. Baseline/updated frozen installs and focused provenance/source controls exercised; initial export-shape, historical-Docker fixture, workflow-selector and test env typing failures retained and corrected. Full units/build/browser/images/audit/hosted qualification remain pending Main review. Legacy esbuild Moderate remains explicit; no source deployment/provider action."
 ---
 
 # 统一身份平台实施方案

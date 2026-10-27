@@ -176,3 +176,7 @@ Original PR29 also proposed many incidental transitive updates. The scoped React
 change does not implicitly deliver or retire those records: the coordinating
 owner must preserve a complete per-record contained/superseded/gap disposition
 and any required follow-up. Original29 remains closed unmerged.
+
+## Identity48 security follow-up
+
+The separate [security qualification](../references/2026-10-28-dependency-security.md) records the exact Main68 baseline, compatible graph, required all-copy sanitizer patch and pending full qualification. No zero-vulnerability claim or legacy-esbuild waiver is made.

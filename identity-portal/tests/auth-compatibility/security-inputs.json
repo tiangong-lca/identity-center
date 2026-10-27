@@ -1,0 +1,20 @@
+{
+  "schema": 1,
+  "baseline": "68e1fafce35e7e931ee0e7c65b5c6e0b4ccf8e8b",
+  "baselineHashes": {
+    "identity-portal/package.json": "28ef5478336bb5ec9eab09625cd0f76c9677eb07c4777ce65ba1df7ecec58097",
+    "identity-portal/pnpm-lock.yaml": "0c12f17edeb59c30e0b1eab6dd0418f12bb28b2681f6c99e9ff2524b7122f802",
+    "identity-portal/pnpm-workspace.yaml": "17a80ef0f49fe9ffebb6aac8aed9376ef0dba533c3480f4d67cb78d4f2e748b5"
+  },
+  "candidateHashes": {
+    "identity-portal/package.json": "be36f46039451da304407df52293eb17b7617d8923e7e61046116a2d9eed67d5",
+    "identity-portal/pnpm-lock.yaml": "d263f5fe472802bce7068faab6dd9fc6f5455ad9b40eccb6b97317a00df7d01f",
+    "identity-portal/pnpm-workspace.yaml": "12a1cdcc48f156b1a826a7146a26f8705e0286b95a6b29041c13c6b5ce3cb725",
+    "identity-portal/patches/monaco-editor@0.55.1.patch": "cee9c1b977bb0b433b2f1f6e11eecd14795fa8311f644558276f64e9fa1dcb4e",
+    "identity-portal/patches/monaco-editor@0.55.1.provenance.json": "0ac8c760a71acede2ddd11729c05902a9f63800d6956dde05d6ea3df25ba3a13",
+    "identity-portal/scripts/security/monaco-purify-patch.mjs": "8f51de336090803e1c4dd472a5543574c49d11edb2e1f5ec66905c0dab1cecdc",
+    "identity-portal/patches/upstream/dompurify-3.4.17.purify.es.mjs": "60c5d5ccbb466de3de3ba863461a92bf134f8c156cef7992da43e0f659bc5cbd",
+    "identity-portal/patches/upstream/dompurify-3.4.17.LICENSE": "cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30",
+    "identity-portal/patches/upstream/dompurify-3.4.17.npm-provenance.json": "3660c73163cf646c3301d53ea277e26d0e815df833bfda7a3c735d36696aa105"
+  }
+}

@@ -10,9 +10,9 @@ whenToUpdate: Update when the managed nextjs-agent-rules block changes or portal
 checkPaths:
   - identity-portal/AGENTS.md
   - identity-portal/CLAUDE.md
-lastReviewedAt: 2026-10-27
-lastReviewedCommit: 761511d3798c0609b53433d780b3e10eaf60bea5
-lastReviewedNote: "Identity46 prepared scoped YAML Worker facade and unmount disposer using frozen Monaco0.55.1 initialization/public API. Manifest/lock and React44 remain unchanged. Six boundary units, lint/typecheck and focused bundle-only build pass; initial generic type error fixed and retained. Independent review corrections tighten legacy cause/schema update and host deadlines. Real browser worker, Portal Apply/lifecycle, full hosted qualification and Main publication review remain pending. No strict-zero relaxation, production or Docker operation; design bodies unchanged."
+lastReviewedAt: 2026-10-28
+lastReviewedCommit: 68e1fafce35e7e931ee0e7c65b5c6e0b4ccf8e8b
+lastReviewedNote: "Identity48 PhaseA: exact Main68 security graph prepared with four caret changes, narrow overrides and AST/provenance-bound three-copy DOMPurify patch; Docker copies patches before frozen install. Baseline/updated frozen installs and focused provenance/source controls exercised; initial export-shape, historical-Docker fixture, workflow-selector and test env typing failures retained and corrected. Full units/build/browser/images/audit/hosted qualification remain pending Main review. Legacy esbuild Moderate remains explicit; no source deployment/provider action."
 ---
 
 <!-- BEGIN:nextjs-agent-rules -->

@@ -11,9 +11,9 @@ checkPaths:
   - identity-portal/deploy/runbooks/README.md
   - identity-portal/deploy/docker/**
   - identity-portal/deploy/runbooks/**
-lastReviewedAt: 2026-10-27
-lastReviewedCommit: 4fa2150750647f9b088e4dfcffe2b8e73416a169
-lastReviewedNote: "Identity44 phaseA fixed-baseline composition: preserved b68 ancestry via exact b0c5baa merge; explicit four-case registry/new react19.3-catalog-fixed, one YAMLselector, BOTH source variants require broad and Catalog suites with distinct receipts/continuous errors/no skip. Source/archive/comparison/browser wiring and baseline/candidate descriptor bindings tested through actual entrypoints/inert bodies;60targeted controls/types/lint/frozen install pass. Initial trusted-TS body parse failure retained and corrected using installed TypeScript erasure. Product/runtime identical qualifiedMain, exact5package/79snapshot blobs and physical oneReact19.3.1 across8consumers; PostCSS8.5.30 preserved. No fullunit/build/browser/Docker/push or runtime claim; phaseB requires Main review.106original29 accounting entries remain provisional for Main exact disposition, not blanket tooling/unadopted coverage."
+lastReviewedAt: 2026-10-28
+lastReviewedCommit: 68e1fafce35e7e931ee0e7c65b5c6e0b4ccf8e8b
+lastReviewedNote: "Identity48 PhaseA: exact Main68 security graph prepared with four caret changes, narrow overrides and AST/provenance-bound three-copy DOMPurify patch; Docker copies patches before frozen install. Baseline/updated frozen installs and focused provenance/source controls exercised; initial export-shape, historical-Docker fixture, workflow-selector and test env typing failures retained and corrected. Full units/build/browser/images/audit/hosted qualification remain pending Main review. Legacy esbuild Moderate remains explicit; no source deployment/provider action."
 ---
 
 # 统一身份平台 · 部署/启动/运行 Runbook
