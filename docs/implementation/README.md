@@ -12,8 +12,8 @@ checkPaths:
   - GOAL.md
   - docs/design/README.md
 lastReviewedAt: 2026-10-27
-lastReviewedCommit: 92faa0176e112725218fd34e61e1497390bd39f0
-lastReviewedNote: "Identity #44 structural page-error diagnostics: fixed stage/name/category/code, exact emitted owned JS frames,8samples/8KiB and safe-projection fingerprints; no raw message/stack/URL/function prose retained. Full counters and strict zero-error gate unchanged; fallback/observer/Redis cleanup preserved. Targeted27cases, lint/typecheck and independent adversarial privacy probes pass with no material findings. Published176 baseline causes remain unknown and candidate/logout/transport unexecuted. Diagnostic publication requires Main review; no product fix, full-build pass, merge or production authority claimed."
+lastReviewedCommit: 2d9d0044bd5d0b6bc19a4c8d864331cf7fd9f851
+lastReviewedNote: "Identity #44 prepared bad-readiness correction: only intentional Keycloak false probe uses1retry/1s interval/1s timeout/zero start period; normal fixtures and20s deadline exact. Controlled failure requires owned full-ID running/unhealthy state plus exact startup rejection, retained health and cleanup, nonzero exit and no cancellation. Actual-function inert regressions reject unrelated1/125 and receipt/cleanup failures. Scoped33cases, lint/typecheck and independent re-review pass; draft cause gap resolved. No local Docker/product/Compose upgrade or page-error/auth relaxation; runtime and Main publication review pending."
 ---
 
 # 统一身份平台实施方案
