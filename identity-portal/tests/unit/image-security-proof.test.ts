@@ -53,6 +53,43 @@ posixIt('the supervisor retains group escalation when its direct child exits bef
   }finally{if(supervisor&&supervisor.exitCode===null)supervisor.kill('SIGKILL');if(descendant){try{process.kill(descendant,'SIGKILL')}catch{}}fs.rmSync(temporary,{recursive:true,force:true})}
 })
 
+posixIt('the actual async host preserves a failed supervisor status after observing cancellation',async()=>{
+  const temporary=fs.mkdtempSync(path.join(os.tmpdir(),'identity48-cancel-failure-'))
+  let host:ReturnType<typeof spawn>|undefined;let readiness:ReturnType<typeof setInterval>|undefined
+  let pid:number|undefined
+  try{
+    const ready=path.join(temporary,'ready.json'),script=path.join(temporary,'host.mjs')
+    // Inert supervisor boundary: a handled signal completes with a failure.
+    const program=`process.on('SIGTERM',()=>process.exit(1));require('node:fs').writeFileSync(${JSON.stringify(ready)},JSON.stringify({pid:process.pid}));setInterval(()=>{},1000)`
+    const helper=new URL('../auth-compatibility/image-security-proof.mjs',import.meta.url).href
+    fs.writeFileSync(script,`import{imageInspectionCommand}from${JSON.stringify(helper)};console.log(JSON.stringify(await imageInspectionCommand(process.execPath,${JSON.stringify(['-e',program])},{timeout:65000,maxBuffer:128*1024})));`)
+    host=spawn(process.execPath,[script],{stdio:['ignore','pipe','pipe']});let output=''
+    host.stdout!.on('data',buffer=>{output+=buffer});host.stderr!.resume()
+    readiness=setInterval(()=>{if(fs.existsSync(ready)){pid=JSON.parse(fs.readFileSync(ready,'utf8')).pid;host!.kill('SIGTERM');clearInterval(readiness)}},10)
+    const code=await new Promise((resolve,reject)=>{host!.on('error',reject);host!.on('close',resolve)})
+    expect(code).toBe(0);expect(JSON.parse(output)).toMatchObject({status:1,cancelCode:143});expect(()=>process.kill(pid!,0)).toThrow()
+  }finally{clearInterval(readiness);if(host&&host.exitCode===null)host.kill('SIGKILL');if(pid){try{process.kill(pid,'SIGKILL')}catch{}}fs.rmSync(temporary,{recursive:true,force:true})}
+})
+
+posixIt('the supervisor fails closed when group absence cannot be observed after actual teardown',async()=>{
+  const temporary=fs.mkdtempSync(path.join(os.tmpdir(),'identity48-group-observation-'))
+  let pid:number|undefined
+  try{
+    const original=fs.readFileSync(path.resolve(__dirname,'../auth-compatibility/bounded-command.mjs'),'utf8')
+    const script=path.join(temporary,'observed.mjs'),ready=path.join(temporary,'ready.json')
+    // Only the absence observation is unavailable. TERM/KILL still execute
+    // against the real owned child, so this cannot hide a surviving process.
+    fs.writeFileSync(script,`const actualKill=process.kill.bind(process);process.kill=(pid,signal)=>{if(pid<0&&signal===0)throw Object.assign(new Error('owned unavailable observation'),{code:'EPERM'});return actualKill(pid,signal)};\n`+original)
+    const program=`process.on('SIGTERM',()=>{});require('node:fs').writeFileSync(${JSON.stringify(ready)},JSON.stringify({pid:process.pid}));setInterval(()=>{},1000)`
+    const child=spawn(process.execPath,[script,'500','100',process.execPath,'-e',program],{stdio:['ignore','ignore','pipe']})
+    let stderr='';child.stderr!.on('data',buffer=>{stderr+=buffer})
+    const code=await new Promise((resolve,reject)=>{child.on('error',reject);child.on('close',resolve)})
+    pid=JSON.parse(fs.readFileSync(ready,'utf8')).pid
+    expect(code).toBe(1);expect(stderr).toContain('Owned command group absence or child reaping unproved')
+    expect(()=>process.kill(pid!,0)).toThrow()
+  }finally{if(pid){try{process.kill(pid,'SIGKILL')}catch{}}fs.rmSync(temporary,{recursive:true,force:true})}
+})
+
 function fixture(){
   const temporary=fs.mkdtempSync(path.join(os.tmpdir(),'identity48-image-proof-'));const root=path.join(temporary,'app');fs.mkdirSync(root)
   const write=(file:string,value:string)=>{const target=path.join(root,file);fs.mkdirSync(path.dirname(target),{recursive:true});fs.writeFileSync(target,value);return target}
@@ -155,6 +192,8 @@ it('uses guarded structured inspection argv and rejects malformed, stale or unsu
     await expect(runImageInspection(options,()=>({status:0,stdout:'not-json',stderr:''}))).rejects.toThrow()
     fs.unlinkSync(path.join(temporary,'runner-security.json'));fs.unlinkSync(path.join(temporary,'runner-node.txt'))
     await expect(runImageInspection(options,()=>({status:143,cancelCode:143,stdout:JSON.stringify(receipt)}))).rejects.toMatchObject({exitCode:143})
+    await expect(runImageInspection(options,()=>({status:1,cancelCode:143,stdout:JSON.stringify(receipt)}))).rejects.toMatchObject({exitCode:1})
+    await expect(runImageInspection(options,()=>({status:0,cancelCode:143,stdout:JSON.stringify(receipt)}))).rejects.toMatchObject({exitCode:143})
     expect(fs.existsSync(path.join(temporary,'runner-security.json'))).toBe(false);expect(fs.existsSync(path.join(temporary,'runner-node.txt'))).toBe(false)
   }finally{fs.rmSync(temporary,{recursive:true,force:true})}
 })

@@ -12,8 +12,8 @@ checkPaths:
   - GOAL.md
   - docs/design/README.md
 lastReviewedAt: 2026-10-28
-lastReviewedCommit: 602eafb9f5009506efe93283af7ddd8fff552368
-lastReviewedNote: "Identity48 hosted-harness correction: preserve 602 failed quality/collection and successful image facts. Reviewed CommonJS wrapper and selected-app ESM helper URL, public single-AST syntax checks, actual Playwright collection/Node-only controls, async signal-aware image join and supervisor reaping. Original cleanup/status/PID/deadline guards remain; graph/product/patch/generator unchanged. Full hosted Portal/auth remains pending exact-source qualification."
+lastReviewedCommit: f0a0658568f07f5e3317817041acb4bd71676a72
+lastReviewedNote: "Identity48 cancellation proof closure: after unchanged TERM grace/KILL, require actual owned-group absence and direct-child reaping within a bounded one-second join; unknown observations fail closed. Host retains cancel metadata/no proof while preserving failed supervisor status. Existing immediate PID/deadline/trap checks remain, with actual descendant and unavailable-observation controls. Graph/product/patch/generator/formatter unchanged; fresh hosted qualification remains pending."
 ---
 
 # 统一身份平台实施方案

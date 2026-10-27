@@ -86,7 +86,7 @@ export function imageInspectionCommand(executable,args,{timeout,maxBuffer}) {
   const data=(buffer,retain)=>{bytes+=buffer.length;if(bytes>maxBuffer){failed=true;stop('SIGTERM')}else if(retain&&!failed)stdout+=buffer.toString()}
   child.stdout.on('data',buffer=>data(buffer,true));child.stderr.on('data',buffer=>data(buffer,false))
   child.on('error',()=>{clean();reject(new Error('Owned image transport could not start'))})
-  child.on('close',(code,signal)=>{clean();resolve({status:cancelCode??(failed?1:code??(signal==='SIGINT'?130:143)),stdout,cancelCode})})
+  child.on('close',(code,signal)=>{clean();resolve({status:failed?1:code??(signal==='SIGINT'?130:signal==='SIGTERM'?143:1),stdout,cancelCode})})
  })
 }
 /** @param {(executable:string,args:string[],options:{timeout:number,maxBuffer:number})=>unknown} [transport] */
@@ -97,7 +97,7 @@ export async function runImageInspection(options,transport=imageInspectionComman
  const program=`try{const assert=require('node:assert/strict');assert.equal(process.version,'v24.22.1');assert.equal(process.platform,'linux');assert.equal(process.arch,'x64');const input=JSON.parse(process.argv[1]);const filesystem=(${inspectImageFilesystem.toString()})(input.target,'/app',input.expected);process.stdout.write(JSON.stringify({schema:1,target:input.target,source:input.expected.source,imageId:input.imageId,nodeVersion:process.version,platform:process.platform,arch:process.arch,filesystem}));}catch{process.stderr.write('Owned image security inspection failed\\n');process.exitCode=1}`
  const args=[fileURLToPath(new URL('./bounded-command.mjs',import.meta.url)),'60000','2000','docker','run','--rm','--name',name,'--label',`org.tiangong.identity-proof=${image.split(':')[0]}`,'--network','none','--read-only','--cap-drop','ALL','--security-opt','no-new-privileges','--entrypoint','node',imageId,'-e',program,JSON.stringify({target,expected,imageId})]
  const response=await transport(process.execPath,args,{timeout:65000,maxBuffer:128*1024});
- if(response.cancelCode)throw Object.assign(new Error('Owned image proof cancelled'),{exitCode:response.cancelCode})
+ if(response.cancelCode)throw Object.assign(new Error('Owned image proof cancelled'),{exitCode:response.status===0||response.status===response.cancelCode?response.cancelCode:1})
  assert.equal(response.status,0,'Image inspection command failed');assert.ok(response.stdout&&Buffer.byteLength(response.stdout)<=128*1024,'Bound image receipt')
  const result=JSON.parse(response.stdout);assert.equal(result.schema,1);assert.equal(result.target,target);assert.equal(result.source,source);assert.equal(result.imageId,imageId);assert.equal(result.nodeVersion,'v24.22.1');assert.equal(result.platform,'linux');assert.equal(result.arch,'x64');assert.equal(result.filesystem?.target,target);assert.equal(result.filesystem?.source,source);assert.equal(result.filesystem?.scope,'image-root-filesystem')
  fs.writeFileSync(path.join(evidence,`${target}-security.json`),JSON.stringify(result,null,2)+'\n',{mode:0o600});fs.writeFileSync(path.join(evidence,`${target}-node.txt`),result.nodeVersion+'\n',{mode:0o600});return result
