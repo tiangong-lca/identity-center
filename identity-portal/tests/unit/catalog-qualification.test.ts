@@ -9,6 +9,8 @@ import { load } from 'js-yaml'
 import { IMAGE_TAGS, composeDocument, ownedLifecycle, attemptCleanup } from '../auth-compatibility/contract.mjs'
 import { proofCase, CATALOG_BASELINE, assertCatalogVersions, assertCatalogUiReceipts, syntheticCatalogDocument } from '../auth-compatibility/catalog-case.mjs'
 import { emittedYamlWorker, classifyYamlWorker } from '../auth-compatibility/catalog-worker-identity.mjs'
+import { qualificationCase, assertQualificationManifest } from '../auth-compatibility/qualification-case.mjs'
+import { combinedReactUi, assertFixedReactUiReceipts } from '../auth-compatibility/ui-plan.mjs'
 import { nativeInputState } from '../auth-compatibility/native-input-state'
 
 it('compares only a complete nonempty native selection and never returns buffer data', () => {
@@ -172,26 +174,35 @@ it('activates only exact catalog owner paths on the secretless exact-head hosted
   expect(paths).not.toContain('identity-portal/**')
   const steps = workflow.jobs['auth-compatibility'].steps
   const runner = steps.find(step => step.env?.AUTH_PROOF_CASE)
-  expect(runner?.env).toEqual({ AUTH_PROOF_HEAD: '${{ github.event.pull_request.head.sha }}', AUTH_PROOF_CASE: 'catalog-yaml' })
+  expect(runner?.env).toEqual({ AUTH_PROOF_HEAD: '${{ github.event.pull_request.head.sha }}', AUTH_PROOF_CASE: 'react19.3-catalog-fixed' })
   expect(runner?.run).toBe('node tests/auth-compatibility/run.mjs')
   expect(steps[0].with?.ref).toBe('${{ github.event.pull_request.head.sha }}')
   expect(steps[0].with?.['persist-credentials']).toBe(false)
   expect(source).not.toMatch(/secrets\.|pull_request_target|workflow_dispatch/)
 })
 
-it('invokes actual runner source selection and comparison with the selected immutable catalog baseline using inert dependencies', async () => {
+it.each(['catalog-yaml', 'react19.3-catalog-fixed'])('invokes actual runner source selection and comparison with selected immutable baseline using inert dependencies: %s', async (caseName) => {
   const source = fs.readFileSync(path.resolve(__dirname, '../auth-compatibility/run.mjs'), 'utf8')
-  const selectedCase = proofCase('catalog-yaml')
+  const selectedCase = qualificationCase(caseName)
+  const fixed = caseName === 'react19.3-catalog-fixed'
+  const manifest = JSON.parse(fs.readFileSync(path.resolve(__dirname, '../auth-compatibility/fixtures/catalog-source.json'), 'utf8')).files.manifest.content as string
+  const targetManifest = JSON.parse(manifest); targetManifest.dependencies.react = targetManifest.dependencies['react-dom'] = '19.3.1'
+  const broad = { passed: true, errors: { page: 0, console: 0 }, firstRenderHydration: true, clientNavigation: true, realFormAndReadback: true, radixFocusTrapAndRestore: true, monacoEditAndApply: true, localesAndThemes: true, syntheticDataOnly: true }
+  const catalogUi = { executed: true, passed: true, errors: { page: 0, console: 0 }, schemaWorker: true, keyboardApplyReadback: true, spaDisposalReopen: true, exactBufferRestored: true, syntheticDataOnly: true, yamlWorkers: 2, yamlWorkersClosed: 2, unrecognizedWorkers: 0, undoSteps: [5,5] }
   const head = 'f'.repeat(40)
   const events: unknown[] = []
   const saved = new Map<string, string>()
-  const baseline = { source: CATALOG_BASELINE, ui: { executed: false, passed: false, reason: 'known-baseline-yaml-worker-defect' } }
-  const candidate = { source: head, ui: { executed: true, passed: true, errors: { page: 0, console: 0 }, schemaWorker: true, keyboardApplyReadback: true, spaDisposalReopen: true, yamlWorkers: 2, yamlWorkersClosed: 2, unrecognizedWorkers: 0 } }
+  const baseline = { source: selectedCase.baseline, ui: fixed ? combinedReactUi(caseName, 'baseline', broad, catalogUi, { page: 0, console: 0 }) : { executed: false, passed: false, reason: 'known-baseline-yaml-worker-defect' } }
+  const candidate = { source: head, ui: fixed ? combinedReactUi(caseName, 'candidate', broad, catalogUi, { page: 0, console: 0 }) : catalogUi }
   const start = source.indexOf('async function main()'); const end = source.indexOf('\nmain().catch', start)
   const dependencies = {
-    git: (...args: string[]) => args.join(' ') === 'rev-parse HEAD' ? head : args.join(' ') === 'status --porcelain' ? '' : (() => { throw Error('Unexpected real Git seam') })(),
+    git: (...args: string[]) => args.join(' ') === 'rev-parse HEAD' ? head : args.join(' ') === 'status --porcelain' ? '' : args[0] === 'merge-base' ? selectedCase.baseline : args[0] === 'show' ? JSON.stringify(targetManifest) : args[0] === 'diff' ? 'identity-portal/tests/auth-compatibility/ui-plan.mjs\0' : (() => { throw Error('Unexpected real Git seam') })(),
     assert: nodeAssert, selectedCase, BASELINE: selectedCase.baseline, sourceRoot: '/inert/source', infraEnv: {},
     process: { argv: ['node', 'run.mjs'], version: 'v24.22.1', platform: 'linux', env: { AUTH_PROOF_HEAD: head, RUNNER_TEMP: '/inert', GITHUB_RUN_ID: '1', GITHUB_RUN_ATTEMPT: '1' } },
+    assertQualificationSources: (name: string, binding: { baseline: string; head: string; ancestor: boolean }) => { expect(name).toBe(caseName); expect(binding).toMatchObject({ baseline: selectedCase.baseline, head, ancestor: true }); events.push(['source-validation', binding.baseline]) },
+    assertQualificationManifest,
+    assertReactSourcePathFromGit: (_file: string, before: string, after: string, _options: unknown, name: string) => { expect(before).toBe(selectedCase.baseline); expect(after).toBe(head); expect(name).toBe(caseName) },
+    execFileSync: (command: string, args: string[]) => { expect(command).toBe('git'); expect(args.at(-1)).toBe(selectedCase.baseline+':identity-portal/package.json'); return Buffer.from(manifest) },
     assertCatalogSources: (binding: { baseline: string; head: string }) => { expect(binding).toMatchObject({ baseline: CATALOG_BASELINE, head }); events.push(['source-validation', binding.baseline]) },
     assertHostedContext: () => events.push('hosted-guard'), path,
     fs: { mkdirSync: () => {}, mkdtempSync: () => '/inert/owned', writeFileSync: (file: string, data: string) => saved.set(file, data), rmSync: () => events.push('owned-cleanup') },
@@ -205,18 +216,18 @@ it('invokes actual runner source selection and comparison with the selected immu
     },
     IMAGE_TAGS, readinessFailureControl: async () => ({ controlled: true }), cancelled: false,
     variant: async (name: string, _root: string, _images: unknown, requested: string) => { expect(requested).toBe(head); events.push(['runner', name]); return name === 'baseline' ? baseline : candidate },
-    assertCatalogUiReceipts,
+    assertCatalogUiReceipts, assertFixedReactUiReceipts,
     compareReceipts: (before: unknown, after: unknown) => { expect(before).toBe(baseline); expect(after).toBe(candidate); events.push(['comparison', selectedCase.baseline]); return { passed: true } },
     console: { log: () => {} }, redact: () => 'fixed-error',
   }
   // Trusted actual function source; every transport/fs/process dependency is inert.
   const main = new Function(...Object.keys(dependencies), `let output;${source.slice(start, end)};return main`)(...Object.values(dependencies))
   await main()
-  expect(events).toContainEqual(['source-validation', CATALOG_BASELINE])
+  expect(events).toContainEqual(['source-validation', selectedCase.baseline])
   expect(events).toContainEqual(['runner', 'baseline'])
   expect(events).toContainEqual(['runner', 'candidate'])
-  expect(events).toContainEqual(['comparison', CATALOG_BASELINE])
-  expect(JSON.parse(saved.get('/inert/identity34-evidence-1-1/qualification.json')!)).toMatchObject({ qualificationCase: 'catalog-yaml', baseline: CATALOG_BASELINE, head })
+  expect(events).toContainEqual(['comparison', selectedCase.baseline])
+  expect(JSON.parse(saved.get('/inert/identity34-evidence-1-1/qualification.json')!)).toMatchObject({ qualificationCase: caseName, baseline: selectedCase.baseline, head })
   expect(events.at(-1)).toBe('owned-cleanup')
 
   // Exercise the actual archive-selection prefix as well: baseline/candidate
@@ -231,7 +242,7 @@ it('invokes actual runner source selection and comparison with the selected immu
   const runVariant = new Function(...Object.keys(prefixDependencies), `${source.slice(variantStart, prefixEnd)}\nreturn archive; } return variant`)(...Object.values(prefixDependencies))
   await runVariant('baseline', '/inert', {}, head)
   await runVariant('candidate', '/inert', {}, head)
-  expect(archives).toEqual([CATALOG_BASELINE, head])
+  expect(archives).toEqual([selectedCase.baseline, head])
 })
 import { createBrowserDiagnostics, type BrowserStage } from '../auth-compatibility/browser-diagnostics'
 import { emittedBrowserAssetPaths } from '../auth-compatibility/browser-assets.mjs'

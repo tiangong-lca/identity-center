@@ -258,3 +258,168 @@ remove only those owned tags/containers and upload explicit cleanup receipts;
 intermediate build cache is retained only on the disposable GitHub-hosted runner.
 No host daemon is started, global prune performed or image published. Interrupted
 runner disposal is not reported as an explicit successful cleanup receipt.
+
+## 2026-10-27 React renderer and types qualification (Identity #44)
+
+The remaining renderer scope from closed-unmerged PR29 is composed on immutable
+Main `64055a2cd05fa4056ea36fd9ab1b780a77e1690e`. Context7's React19.3.0 source
+was read first; exact official registry metadata independently verified the latest
+stable [React](https://registry.npmjs.org/react/19.3.1) and
+[ReactDOM](https://registry.npmjs.org/react-dom/19.3.1) pair **19.3.1**, plus
+[@types/react](https://registry.npmjs.org/@types%2freact/19.3.0) and
+[@types/react-dom](https://registry.npmjs.org/@types%2freact-dom/19.3.0) **19.3.0**.
+DOM requires React^19.3.1 and scheduler^0.28.0; types-dom requires types-react^19.3.0.
+The installed Next16.4.2 navigation guide was read before adding UI acceptance.
+Playwright Context7 resolution succeeded but its documentation query hit quota;
+official API/assertion documentation and installed1.61.1 types supplied fallback.
+
+The manifest changes only the two exact runtime pins; existing `^19` type ranges
+remain. Complete normalized lock comparison proves exactly five package-record
+replacements (React, DOM, both types and scheduler0.27.0→0.28.0) and79 changed
+peer/dependency snapshot records, with every other record exact. The initial
+scoped update also refreshed PostCSS8.5.30→8.5.31; that unrelated drift was removed
+before the final frozen install. Next/eslint16.4.2, Auth.js beta.32, accepted
+admin/jose, Node24.22.1/types24.19.2, pnpm11.9 integrity, compiler1.0.0 and product
+0.1.0 stay fixed. Exact own tool archives match official Node SHA256 and the
+manifest's pnpm SHA512; no global runtime or sibling node_modules is used.
+
+A separate source-bound `react19.3` case preserves the historical auth-client
+experiment and old renderer assertions. The new case uses the same actual auth
+transport/negative/cleanup flow and adds real standalone UI assertions for
+hydration, client navigation, synthetic form/readback, Radix focus, Monaco edits,
+locales and themes. An actual validate-only entrypoint regression with verified
+inert commands checks the comparison wiring; it never accesses Docker. The new
+POSIX command-double control is explicitly skipped on Windows, like the existing
+POSIX image-cleanup controls; no native Windows execution is claimed.
+
+Local final frozen install, lint/typecheck, the109-case complete unit suite and
+the20-case final harness/entrypoint suite passed. The first standalone build was
+terminated by the6GiB aggregate-RSS lease (observed6,508,052,480bytes), not reported
+as a pass. A reviewed12GiB attempt compiled but found a test-only missing
+`NODE_ENV` type annotation; this was corrected. The final normal standalone build
+passed. The inert drift tests also exposed deliberate environment filtering, so
+the doubles now use a private state file rather than weakening the environment
+allowlist. Prior failed attempts and their resource/stage evidence are retained.
+
+Fresh exact-head hosted quality, Portal/Worker image checks, both source variants'
+actual auth/UI receipts, independent review, source merge and exact workspace
+integration remain required. SID-only logout remains the recorded limitation;
+no product behavior, service version line or production operation changes.
+
+PR29's two-file proposal also contains478 changed lock records, including
+incidental non-renderer updates. A complete source-record inventory is retained
+for owner review; absent incidental records require proof or an explicit tracked
+disposition. This scoped change does not silently deliver or retire them and does
+not claim original29 or the coordinating issue complete.
+
+Independent review found that the first React fence omitted executable
+`config/**` and `drizzle.config.ts`. Neither changes in this candidate, but the
+fence could have admitted future unrelated configuration. The repair replaces
+that finite product-path list with exhaustive NUL-separated tracked-tree
+classification and explicit qualification/doc allowances. Governance allowances
+preserve everything except the three review metadata fields. Actual entrypoint
+negatives reject both omitted configs and an unexpected new product directory;
+the historical auth-client path behavior stays unchanged. Only the scoped harness,
+lint and typecheck are rerun for this test-support repair; no application or build
+input changes, full-suite rerun or new build pass is claimed.
+
+A second independent P2 finding showed that default Git rename detection can
+hide a deleted product source when an unchanged file moves into allowed test
+support. The React whole-tree scan now disables rename detection so source and
+destination are both classified. A real temporary Git `R100` fixture is routed
+through the actual validate-only entrypoint: the old destination-only exposure
+control passes, whereas the fixed invocation rejects the product deletion.
+Existing configuration/new-path fences and historical auth-client behavior stay
+unchanged. Scoped21 harness tests, lint and typecheck pass; no actual application
+rename, full-suite rerun or build rerun occurred.
+
+The first hosted PR45 attempt at `cd26893f178d15fd255954ab534df3e88d6f5811`
+passed quality (111units/24files), CodeQL and both native Linuxamd64 image
+build/Node24.22.1 inspection steps. Its baseline standalone browser then failed
+at registry navigation: the href selector matched both the “Registry” tab and
+“Edit in registry” CTA. This is a new test-selector assumption contradicted by
+the shipped React19.2.4 baseline, not evidence of a renderer defect. Candidate,
+logout/session-denial and transport controls did not run. Artifact12712603673
+matches its uploaded SHA256 and binds the immutable baseline/lock/runtime;
+readiness, baseline and image cleanup receipts pass with empty inventories.
+Its privacy scan contains no raw JWT/credential URL/dotenv/browser media/state.
+
+The support-only correction selects the unique navigation-role link named
+“Registry”, asserts count1, exact destination and the existing same-document
+sentinel. Product behavior and all dependency/build inputs are unchanged; scoped
+ESLint/typecheck pass without a redundant local full-suite/build run. The failed
+artifact remains negative evidence; the canonical UI does not deliberately repeat
+the ambiguous click or assert a global duplicate-link count. The corrected head
+requires fresh quality, both images and both variants' actual auth/UI proof.
+
+The next hosted head5273930 passed Registry navigation, fresh111-unit quality,
+CodeQL and both image steps, then failed baseline Monaco textbox visibility.
+Chromium resolved the locator to Monaco0.55.1's hidden native EditContext input;
+this is another support-selector assumption on React19.2.4, not a demonstrated
+renderer defect. Artifact12714410285 matches uploaded SHA256; exact source/lock/
+runtime, image identities, empty cleanup inventories and privacy checks pass.
+Candidate, real logout/session denial and transport controls did not execute.
+
+Context7 is quota-blocked. Inspection of the exact installed Monaco0.55.1
+`view.js`, native EditContext JS/CSS and mouse handler shows a visible editor root
+with `role="code"`, a separate native input behind that view, content-click focus
+routing and text-update handling. The reviewed support correction selects the
+unique visible editor root, clicks normally and verifies contained DOM focus.
+Keyboard input and exact no-op apply payload/version/server-readback assertions
+remain. No forced input, internal model write, EditContext disabling, timeout
+increase or product change is used. Scoped ESLint/typecheck pass; fresh hosted
+qualification follows, without redundant local full-unit/build execution.
+
+
+At hosted head1768f87 all baseline UI interaction assertions execute through
+Monaco keyboard editing, exact no-op apply/readback and locale/theme transitions,
+but the final strict error check reports3page errors/0console errors. Artifact
+12715146164 matches its uploaded checksum and exact source/lock/runtime; both
+image steps, empty cleanup inventories and privacy inspection pass. The UI receipt
+remains failed, and candidate/logout/session-denial/transport checks did not run.
+The counts-only collector cannot establish the three causes; no worker, product
+or renderer attribution is made.
+
+The reviewed diagnostic support retains structural fields only: fixed observed
+stage/name/category/code, exact emitted owned JS asset locations and bounded
+numeric coordinates. No raw message/stack/URL/function prose survives; fingerprints
+use only the safe projection. Eight samples/8KiB plus overflow counters and a
+fixed projection-failed fallback preserve strict zero-error acceptance. Offline
+privacy negatives and independent adversarial probes cover secret leakage, forged
+assets, malformed getters and byte caps. Independent review found no material
+issue. This is a diagnostic change, not a product fix or acceptance relaxation;
+actual error causes and both variants' full hosted proof remain pending.
+
+The first diagnostic head d6409d0 passed117-unit quality, CodeQL and both images,
+but stopped before either variant/browser: Compose2.38.2 returned0 after the20s
+wait while the intentionally false probe retained the normal60x3s retry policy.
+Artifact12717169330 is checksum/source/image/privacy/empty-cleanup verified; no
+browser-errors receipt exists and the original three page-error causes remain
+unknown. The [exact upstream wait loop](https://github.com/docker/compose/blob/v2.38.2/pkg/compose/convergence.go#L444-L445)
+returns nil when its context finishes, while [start's deadline mapping](https://github.com/docker/compose/blob/v2.38.2/pkg/compose/start.go#L133-L147)
+requires a non-nil dependency error, consistent with the observed timeout race.
+
+The narrow support correction makes only the bad health probe become unhealthy
+before that deadline (one retry/1s cadence/1s timeout/zero start period), retains
+unexpected-zero failure, and records actual owned full-ID running/unhealthy state
+before cleanup. A fixed expected rejection classification is also required;
+concurrent unhealthy state plus an unrelated nonzero startup error is insufficient.
+Independent extraction/replay caught that draft cause gap; it is fixed and covered
+by actual-function inert regressions, including unrelated1/125, unknown/missing
+state, cancellation and receipt/cleanup failures. All normal fixtures, service
+versions, page-error/auth gates and product behavior stay unchanged. Scoped tests,
+lint/typecheck and source/privacy review do not substitute for fresh hosted proof.
+
+
+### Identity44 fixed-baseline planning and composition (2026-10-27)
+
+New explicit react19.3-catalog-fixed comparison binds immutable qualified Main
+b0c5baa1e9119563dc2a8c0720390dd1ce3a5890; the old640/auth/catalog experiments and
+failures are preserved, not repointed. Both variants must run broad44 and Catalog
+schema/Undo/Apply/SPA worker lifecycle with strict-zero errors and distinct
+receipts before real auth/transport/outage. Exact b68 manifest/lock graph5/79 is
+retained, with no further upgrades. Registry metadata rechecked2026-10-27 still
+reports React/DOM19.3.1 and both types19.3.0. This records source composition only;
+full build/unit and exact-head hosted proof remain pending Main phase review.
+The106 original29 provisional gaps need Main's exact per-record disposition;
+they are not blanket unadopted tooling or a whole-proposal completion claim.

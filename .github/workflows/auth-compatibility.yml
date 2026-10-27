@@ -112,9 +112,8 @@ jobs:
       - name: Qualify isolated baseline and candidate auth transports
         env:
           AUTH_PROOF_HEAD: ${{ github.event.pull_request.head.sha }}
-          # This owner repair uses unchanged React19.2.4 graphs. Historical
-          # auth-client remains available but is not this workflow invocation.
-          AUTH_PROOF_CASE: catalog-yaml
+          # Explicit fixed-Main React experiment; historical cases remain intact.
+          AUTH_PROOF_CASE: react19.3-catalog-fixed
         run: node tests/auth-compatibility/run.mjs
       - name: Preserve sanitized proof and cleanup receipts
         if: always()

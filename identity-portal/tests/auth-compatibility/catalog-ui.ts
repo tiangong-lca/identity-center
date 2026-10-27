@@ -5,8 +5,9 @@ import { syntheticCatalogDocument } from './catalog-case.mjs'
 import { classifyYamlWorker } from './catalog-worker-identity.mjs'
 import type { BrowserDiagnostics } from './browser-diagnostics'
 import { nativeInputState } from './native-input-state'
+import { qualificationUiPlan } from './ui-plan.mjs'
 
-export async function qualifyCatalogUi(page: Page, errors: { page: number; console: number }, diagnostics: BrowserDiagnostics) {
+export async function qualifyCatalogUi(page: Page, errors: { page: number; console: number }, diagnostics: BrowserDiagnostics, receiptName: 'ui.json' | 'ui-catalog.json' = 'ui.json') {
   const c = fixture()
   const workers: Worker[] = []
   const closed = new Set<Worker>()
@@ -20,15 +21,18 @@ export async function qualifyCatalogUi(page: Page, errors: { page: number; conso
   }
   page.on('worker', workerCreated)
   try {
-    expect(c.qualificationCase).toBe('catalog-yaml')
-    expect(c.variant).toBe('candidate')
+    expect(qualificationUiPlan(c.qualificationCase, c.variant).catalog).toBe(true)
     expect(c.yamlWorker?.chunks.length).toBeGreaterThan(0)
     // Locale is a prerequisite for exact semantic controls, not a locale suite.
     await page.locator('select').filter({ has: page.locator('option[value="en"]') }).selectOption('en')
     diagnostics.setStage('navigation')
     await page.evaluate(() => { Object.assign(window, { identityCatalogSpa: 'same-document' }) })
     await page.locator('a[href="/admin"]').click()
-    await page.locator('a[href="/admin/apps"]').click()
+    await expect(page).toHaveURL(`${c.portalOrigin}/admin`)
+    const applications = page.getByRole('navigation').getByRole('link', { name: 'Applications', exact: true })
+    await expect(applications).toHaveCount(1)
+    await applications.click()
+    await expect(page).toHaveURL(`${c.portalOrigin}/admin/apps`)
     const registry = () => page.getByRole('navigation').getByRole('link', { name: 'Registry', exact: true })
     await expect(registry()).toHaveCount(1)
     await registry().click()
@@ -109,7 +113,7 @@ export async function qualifyCatalogUi(page: Page, errors: { page: number; conso
     passed = true
   } finally {
     page.off('worker', workerCreated)
-    receipt('ui.json', { qualificationCase: 'catalog-yaml', executed: true, passed, errors,
+    receipt(receiptName, { qualificationCase: c.qualificationCase, executed: true, passed, errors,
       schemaWorker: passed, keyboardApplyReadback: passed, spaDisposalReopen: passed,
       yamlWorkers: workers.length, yamlWorkersClosed: closed.size, unrecognizedWorkers, exactBufferRestored: passed, undoSteps, syntheticDataOnly: true })
   }

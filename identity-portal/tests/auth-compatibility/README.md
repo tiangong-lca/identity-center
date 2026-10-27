@@ -1,7 +1,7 @@
 # Auth dependency interoperability proof
 
-Identity46 adds an explicit `AUTH_PROOF_CASE=catalog-yaml` owner case. The
-workflow selects this case for the catalog repair; the historical auth-client
+Historical Identity46 added an explicit `AUTH_PROOF_CASE=catalog-yaml` owner case.
+Its qualified repair workflow selected that case; the historical auth-client
 case remains available with its original baseline, graph and product assertions,
 and is not claimed executed by that selected workflow. React44's separate
 branch/case is unchanged and is not imported here.
@@ -134,3 +134,162 @@ secretless workflow scope, and real local-invocation refusal with a fake Docker
 transport that must never run. They do not execute Docker or establish runtime
 interoperability. Normal local install/lint/typecheck/unit/standalone-build gates
 remain required; the hosted protocol proof follows review and main's normal push.
+
+## Separate React 19.3 experiment (Identity #44)
+
+The historical PR experiment explicitly selected `AUTH_PROOF_CASE=react19.3`. Its immutable
+baseline is Main `64055a2cd05fa4056ea36fd9ab1b780a77e1690e`; candidate source must
+be the requested exact descendant head. The baseline manifest hash is fixed, and
+the candidate manifest may change only React/DOM19.2.4 to the exact19.3.1 pair.
+Installed baseline types19.2.17/19.2.3 and candidate types19.3.0/19.3.0 are asserted.
+Next16.4.2, accepted auth clients and Node24 remain fixed on both sides. Product,
+image, runtime/configuration changes fail this case; documentation may change
+review metadata only within protected product paths.
+
+The original default `auth-client` experiment remains bound to its historical
+baseline and both19.2.4 renderers. It intentionally rejects a19.3 candidate; the
+new workflow selection does not claim that historical experiment ran against the
+new renderer. Both cases retain the same actual auth and transport negatives,
+hosted-only execution guard, privacy/cleanup and recorded SID-only limitation.
+
+The React case additionally exercises the actual standalone Portal before logout:
+first render plus interactive locale/theme hydration, same-document Link
+navigation (a browser-memory sentinel must survive), a real synthetic organization
+form with server readback, Radix dialog focus trapping/Escape restoration, and
+Monaco typing with an actual no-op catalog apply request/response. Both zh/en and
+light/dark transitions are asserted after navigation. No route or backend API is
+mocked; writes are limited to the unique disposable synthetic database. The UI
+receipt retains error counts only; a separate bounded structural error receipt
+is described below. Neither retains raw error/console prose, URLs or browser state.
+This support remains unqualified until both hosted source variants actually pass.
+
+`node tests/auth-compatibility/run.mjs --validate-sources` performs only clean
+Git-source/baseline/manifest/product validation and exits before any Docker or
+service access. Set `AUTH_PROOF_CASE` and `AUTH_PROOF_HEAD` explicitly. It grants
+no hosted/runtime qualification. The no-argument runtime entrypoint still refuses
+local/self-hosted execution before Docker. An actual entrypoint regression uses
+positively verified inert command doubles and rejects wrong source/case,
+manifest and product deltas; pure helper tests alone cannot prove that wiring.
+
+The React source fence enumerates the entire tracked Git delta with NUL-separated
+paths. It admits only the exact manifest/lock, this qualification support and its
+specific workflow/unit test, two qualification records, and enumerated governance
+documents. Governance files permit only `lastReviewedAt`, `lastReviewedCommit` and
+`lastReviewedNote` changes, preserving other frontmatter, routing rules and prose.
+Every unrecognized path fails closed, including executable YAML, database config
+and newly introduced product directories. The historical auth-client experiment
+retains its original product-path fence. Actual entrypoint negatives cover
+`config/business-apps.yaml`, `drizzle.config.ts` and a new product path; a pure
+path-policy unit test also protects metadata/body boundaries.
+
+The exhaustive React scan uses `--no-renames`: a product file moved unchanged
+into an allowed support directory must expose both the deleted source and added
+destination. The entrypoint regression owns a real temporary Git repository,
+asserts its default `R100` destination-only projection, then forwards the actual
+entrypoint diff flags to Git. An old-projection exposure control passes while the
+normal rename-disabled path rejects the product deletion. This protects the
+command wiring as well as the pure path classifier; it creates no product rename.
+
+The registry navigation selector uses the unique navigation-role link named
+“Registry”, then checks its exact destination and same-document sentinel. The
+shipped apps page also has an “Edit in registry” CTA with the same href, so href
+uniqueness is not a valid assertion. The first hosted baseline's strict-mode
+failure is retained as evidence of that test defect; no product or renderer
+failure is inferred and no unexecuted candidate/auth result is claimed.
+
+Monaco interaction targets its unique visible `role="code"` editor root and
+checks contained DOM focus after a normal click. Modern Chromium's native
+EditContext textbox can be hidden behind that view; asserting textbox visibility
+misstates the shipped input behavior. Keyboard editing and exact apply payload,
+version and server-readback checks remain mandatory. No internal model mutation,
+forced hidden-element action, browser-option override or timeout inflation is used.
+
+
+## Bounded structural page-error diagnostics
+
+`browser-errors.json` preserves only a fixed observation-stage enum, allowlisted
+error name, fixed known message category/allowlisted React code, and at most three
+locations from the exact owned build's emitted `/_next/static/*.js` inventory.
+Locations contain only the recognized public asset path and bounded line/column;
+raw URLs, queries, userinfo, function names, error messages and stack prose are
+discarded. Unknown values become fixed categories. Existing fixture-secret/JWT/
+header redaction runs before classification. Opaque, short or encoded values that
+are not recognized structural fields never enter a receipt. The fingerprint is
+computed only from that safe projection, never from raw secret-dependent text.
+
+At most eight samples and8KiB total JSON are retained, with total/overflow counts;
+caps never suppress error counters. Projection failures produce a fixed fallback.
+Stages identify when an error was observed, not its cause. Console observation
+remains type/count only. The strict zero-page/console-error assertion is unchanged.
+Observers are removed in `finally`, and a failed UI still preserves diagnostics
+while retaining its failure and Redis cleanup. No trace, screenshot, video, saved
+browser state, raw error dump, ignored error or product fix is introduced.
+
+Offline controls exercise emitted-asset ownership, forged URLs, fixture/encoded/
+short/opaque secrets, JWT/JWE, headers, custom names/function names, safe-equivalent
+fingerprints, throwing getters, invalid coordinates/stages and size overflow.
+These controls do not establish the actual hosted error cause or compatibility;
+fresh hosted evidence remains required.
+
+## Controlled bad-readiness fixture
+
+Only the intentional Keycloak failure probe uses `exit 1`, one retry,1s interval,
+1s timeout and zero start period. Its configured failure budget is below the unchanged
+20s Compose wait deadline; normal fixture health policies and all images remain
+exact. Compose2.38.2 can take a nil-return deadline path, so timeout exit alone is
+not evidence of an unhealthy service and every unexpected zero still fails.
+
+Before cleanup the control selects exactly one full container ID using its own
+project/service labels, then inspects only ID and engine status/health enums.
+No full inspect, environment, command or container/health log is read. A fixed
+rejection category is derived from the exact owned-Keycloak unhealthy terminal
+line in the already-retained Compose command output; raw prose is not copied into
+the health receipt. Acceptance requires this cause, a verified nonzero exit,
+owned running/unhealthy state, saved health evidence and successful saved cleanup.
+Unknown/missing evidence, unrelated exit1/125, cancellation, zero exits and
+receipt/cleanup failures all remain failures. Only the original expected startup
+exception can be suppressed; auth operations never run in this negative control.
+
+
+## Fixed-baseline React composition — Identity44
+
+The selected workflow case is react19.3-catalog-fixed, immutable baseline
+b0c5baa1e9119563dc2a8c0720390dd1ce3a5890 (qualified47 merge/tree identical toba5).
+Historical auth-client/d9, react19.3/640 and catalog-yaml/640 remain explicit with
+their original graph/source/version assertions. Only historical catalog-yaml
+skips its known-defective baseline UI; the new case requires BOTH variants to
+execute BOTH broad44 and qualified Catalog suites with continuous errors.
+
+Broad UI runs first (hydration/SPA/form/API/Radix/focus/Monaco/locales/themes),
+then fresh Catalog navigation/schema/exact Undo/no-opApply/readback/SPA worker
+closure/reopen. Distinct ui-broad.json and ui-catalog.json are retained; ui.json
+is assembled only after both pass and is required for both source variants.
+No receipt overwrite, counter reset, baseline skip or missing suite can qualify.
+The Catalog listener starts before fresh navigation, so it counts its own new
+worker objects rather than a prior broad-suite worker. Both variants receive
+owned synthetic disabled catalog data and exact emitted worker descriptors,
+whose evidence names the actual baseline or candidate source separately.
+
+One registry and one YAML selector drive source validation, archive/runtime
+selection, UI policy and final comparison. Actual command/inert source controls
+exercise historical and new immutable baseline binding, real R100 renames and
+source/config/version failures; actual browser-body and runner/archive tests
+verify awaited suite calls and distinct receipts. Readiness/assets/native worker
+identity and strict privacy projection remain qualified Main support, with only
+fixed diagnostic stage union needed for broader44.
+
+Manifest/lock retain exact b68 dependency blobs: React/DOM19.3.1, types19.3.0 and
+scheduler0.28.0,5package replacements/79snapshots; other pins and PostCSS8.5.30
+unchanged. Full units/build/fresh hosted both-variant UI/auth/image acceptance
+remain pending phaseB/publication review. All previous failed runs remain failed.
+Original29's106 provisional accounting gaps include normalization/qualified
+substitutions and genuinely unadopted records; Main owns the per-record final
+disposition after qualification. No blanket coverage or tooling-only claim.
+
+
+The150s browser budget is inherited from historical44 broader UI, not increased
+after a runtime failure. Case routing selects150s only for the React experiments
+and preserves qualified auth-client/catalog-yaml90s. Assertion/navigation
+defaults/retries are unchanged; no browser budget exceeds150s. Historical
+react19.3 broad-only runs still collect and persist their asset inventory;
+Catalog worker descriptor/evidence is collected only where Catalog actually runs.

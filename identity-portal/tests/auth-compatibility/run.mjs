@@ -9,11 +9,13 @@ import path from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { assertHostedContext, assertFixture, IMAGE_TAGS, composeDocument, cleanEnvironment, redactor, lineRedactor, attemptCleanup, ownedLifecycle, compareReceipts, assertProductDeltaFromGit } from './contract.mjs'
 
-import { proofCase, assertCatalogSources, assertCatalogVersions, assertCatalogUiReceipts } from './catalog-case.mjs'
+import { assertCatalogSources, assertCatalogUiReceipts } from './catalog-case.mjs'
+import { qualificationCase, assertQualificationSources, assertQualificationManifest, assertQualificationVersions, assertReactSourcePathFromGit } from './qualification-case.mjs'
+import { qualificationUiPlan, assertFixedReactUiReceipts } from './ui-plan.mjs'
 import { emittedBrowserAssetPaths } from './browser-assets.mjs'
 import { emittedYamlWorker } from './catalog-worker-identity.mjs'
 import { badReadinessDocument, observeBadKeycloakHealth, classifyBadReadinessRejection, requireExpectedBadReadinessError, READINESS_CONTROL_WAIT_SECONDS } from './readiness-control.mjs'
-const selectedCase = proofCase(process.env.AUTH_PROOF_CASE)
+const selectedCase = qualificationCase(process.env.AUTH_PROOF_CASE)
 const BASELINE = selectedCase.baseline
 
 const sourceRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../../..')
@@ -219,7 +221,10 @@ async function variant(variant, root, images, head) {
     }, async () => {
       await pnpm(['install', '--frozen-lockfile'], 'frozen')
       const versions = Object.fromEntries(['next', 'react', 'react-dom', 'jose', '@keycloak/keycloak-admin-client'].map(name => [name, JSON.parse(fs.readFileSync(path.join(app, 'node_modules', name, 'package.json'))).version]))
-      if (selectedCase.name === 'catalog-yaml') assertCatalogVersions(versions)
+      if (selectedCase.name !== 'auth-client') {
+        for (const name of ['@types/react', '@types/react-dom']) versions[name] = JSON.parse(fs.readFileSync(path.join(app, 'node_modules', name, 'package.json'))).version
+        assertQualificationVersions(selectedCase.name, variant, versions)
+      }
       else {
         assert.equal(versions.next, '16.4.2'); assert.equal(versions.react, '19.2.4'); assert.equal(versions['react-dom'], '19.2.4')
         assert.equal(versions.jose, variant === 'baseline' ? '6.2.3' : '6.2.12')
@@ -236,12 +241,15 @@ async function variant(variant, root, images, head) {
       env = { ...env, KEYCLOAK_CLIENT_SECRET: c.portalSecret, KEYCLOAK_ADMIN_API_CLIENT_SECRET: c.adminApiSecret }
       await pnpm(['exec', 'vitest', 'run', '--project', 'integration', 'tests/integration/keycloak-admin.test.ts', 'tests/integration/keycloak-bootstrap.test.ts'], 'existing-admin-pkce')
       await pnpm(['build'], 'build')
-      if (selectedCase.name === 'catalog-yaml' && variant === 'candidate') {
+      const uiPlan = qualificationUiPlan(selectedCase.name, variant)
+      if (uiPlan.broad || uiPlan.catalog) {
         c.browserAssets = emittedBrowserAssetPaths(app)
-        c.yamlWorker = emittedYamlWorker(app)
-        const workerEvidence = JSON.stringify({ qualificationCase: selectedCase.name, source: head, descriptor: c.yamlWorker }, null, 2)
-        assert.ok(Buffer.byteLength(workerEvidence, 'utf8') <= 8192, 'Bound emitted worker identity evidence')
-        fs.writeFileSync(path.join(c.evidenceDirectory, 'yaml-worker-assets.json'), workerEvidence, { mode: 0o600 })
+        if (uiPlan.catalog) {
+          c.yamlWorker = emittedYamlWorker(app)
+          const workerEvidence = JSON.stringify({ qualificationCase: selectedCase.name, source: variant === 'baseline' ? BASELINE : head, descriptor: c.yamlWorker }, null, 2)
+          assert.ok(Buffer.byteLength(workerEvidence, 'utf8') <= 8192, 'Bound emitted worker identity evidence')
+          fs.writeFileSync(path.join(c.evidenceDirectory, 'yaml-worker-assets.json'), workerEvidence, { mode: 0o600 })
+        }
         fs.writeFileSync(configFile, JSON.stringify(c), { mode: 0o600 })
       }
       stopPortal = await startPortal(c, app, env)
@@ -254,7 +262,7 @@ async function variant(variant, root, images, head) {
       await docker(['stop', 'redis'], 'owned-redis-stop')
       env = { ...env, AUTH_PROOF_REDIS_STOPPED: c.project }
       await pnpm(['exec', 'vitest', 'run', '--config', 'tests/auth-compatibility/vitest.config.ts', 'tests/auth-compatibility/redis-outage.integration.test.ts'], 'actual-redis-outage')
-      if (selectedCase.name === 'catalog-yaml') summary.ui = JSON.parse(fs.readFileSync(path.join(c.evidenceDirectory, 'ui.json')))
+      if (selectedCase.name !== 'auth-client') summary.ui = JSON.parse(fs.readFileSync(path.join(c.evidenceDirectory, 'ui.json')))
       for (const name of ['browser', 'transport', 'outage']) summary[name] = JSON.parse(fs.readFileSync(path.join(c.evidenceDirectory, `${name}.json`)))
     }, async () => {
       const actions = [['relay', stopRelay], ['portal', stopPortal]]
@@ -341,8 +349,16 @@ async function main() {
   const validateOnly = process.argv.slice(2).length === 1 && process.argv[2] === '--validate-sources'
   assert.ok(process.argv.length === 2 || validateOnly, 'Unknown proof arguments')
   if (selectedCase.name === 'catalog-yaml') assertCatalogSources({ baseline: BASELINE, head, requestedHead: process.env.AUTH_PROOF_HEAD, cwd: sourceRoot, env: infraEnv })
+  else if (selectedCase.name !== 'auth-client') {
+    assertQualificationSources(selectedCase.name, { baseline: BASELINE, head, requestedHead: process.env.AUTH_PROOF_HEAD,
+      ancestor: git('merge-base', BASELINE, head) === BASELINE })
+    const baselineManifest = execFileSync('git', ['-C', sourceRoot, 'show', `${BASELINE}:identity-portal/package.json`], { env: { ...infraEnv, GIT_NO_LAZY_FETCH: '1' } }).toString()
+    assertQualificationManifest(selectedCase.name, baselineManifest, JSON.parse(git('show', `${head}:identity-portal/package.json`)))
+    const changed = git('diff', '--name-only', '--no-renames', '-z', BASELINE, head).split('\0').filter(Boolean)
+    for (const file of changed) assertReactSourcePathFromGit(file, BASELINE, head, { cwd: sourceRoot, env: infraEnv }, selectedCase.name)
+  }
   if (validateOnly) {
-    assert.equal(selectedCase.name, 'catalog-yaml', 'Source-only validation is catalog-specific')
+    assert.notEqual(selectedCase.name, 'auth-client', 'Historical auth validation remains on its original full path')
     console.log(JSON.stringify({ validationOnly: true, qualificationCase: selectedCase.name, baseline: BASELINE, head, dockerAccessed: false }))
     return
   }
@@ -383,6 +399,7 @@ async function main() {
     const candidate = await variant('candidate', root, images, head)
     assert.equal(cancelled, false, 'Cancelled proof cannot qualify')
     if (selectedCase.name === 'catalog-yaml') assertCatalogUiReceipts(baseline, candidate)
+    if (selectedCase.name === 'react19.3-catalog-fixed') assertFixedReactUiReceipts(baseline, candidate)
     const comparison = compareReceipts(baseline, candidate)
     fs.writeFileSync(path.join(output, 'qualification.json'), JSON.stringify({ qualificationCase: selectedCase.name, head, baseline: BASELINE, images, readinessControl, comparison, baselineReceipt: baseline, candidateReceipt: candidate }, null, 2))
     console.log(JSON.stringify({ qualificationCase: selectedCase.name, head, baseline: BASELINE, comparison, evidence: output }))

@@ -11,9 +11,9 @@ checkPaths:
   - .github/dependabot.yml
   - identity-portal/pnpm-lock.yaml
   - docs/guides/dependency-maintenance.md
-lastReviewedAt: 2026-10-26
-lastReviewedCommit: 104135f3aae4d39cebef13a9f12abfc53daed376
-lastReviewedNote: "Identity #41: reviewed Node24.22.1 runtime/CI/image inputs and types24.19.2; exact pnpm11.9 integrity, other dependency versions, product semantics and manual production authorization remain. Local frozen install, lint, typecheck, 96 units and standalone build pass. Fresh hosted image/auth proof, independent review, merge and integration remain required."
+lastReviewedAt: 2026-10-27
+lastReviewedCommit: 2d9d0044bd5d0b6bc19a4c8d864331cf7fd9f851
+lastReviewedNote: "Identity #44 prepared bad-readiness correction: only intentional Keycloak false probe uses1retry/1s interval/1s timeout/zero start period; normal fixtures and20s deadline exact. Controlled failure requires owned full-ID running/unhealthy state plus exact startup rejection, retained health and cleanup, nonzero exit and no cancellation. Actual-function inert regressions reject unrelated1/125 and receipt/cleanup failures. Scoped33cases, lint/typecheck and independent re-review pass; draft cause gap resolved. No local Docker/product/Compose upgrade or page-error/auth relaxation; runtime and Main publication review pending."
 ---
 
 # Dependency maintenance
@@ -159,3 +159,20 @@ and remains unqualified until that task delivers the required evidence.
 References: [GitHub options](https://docs.github.com/en/code-security/reference/supply-chain-security/dependabot-options-reference),
 [ecosystem support](https://docs.github.com/en/code-security/reference/supply-chain-security/supported-ecosystems-and-repositories),
 [updater pnpm selection](https://github.com/dependabot/dependabot-core/blob/main/npm_and_yarn/lib/dependabot/npm_and_yarn/helpers.rb).
+
+## Separate renderer qualification (Identity #44)
+
+The React case in the existing auth compatibility workflow is now explicitly
+selected against immutable Main64055a2. Its manifest boundary admits only the
+exact React/DOM19.3.1 pair; the frozen graph updates types19.3.0 and scheduler0.28.0
+with required peer substitutions. Existing `^19` type declarations and every
+other direct dependency/tool/runtime/product pin remain. Whole-lock comparison
+must account for every changed snapshot, including rejecting incidental refreshes.
+The old historical auth-client case retains its19.2.4 assertions and is not claimed
+to execute on this19.3 candidate. Actual standalone UI checks augment the same
+synthetic hosted auth flow; local/static validation does not replace them.
+
+Original PR29 also proposed many incidental transitive updates. The scoped React
+change does not implicitly deliver or retire those records: the coordinating
+owner must preserve a complete per-record contained/superseded/gap disposition
+and any required follow-up. Original29 remains closed unmerged.

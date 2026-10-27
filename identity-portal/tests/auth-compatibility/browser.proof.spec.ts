@@ -5,6 +5,8 @@ import Redis from 'ioredis'
 import { createKeycloakAdmin } from '../../lib/keycloak/admin-client'
 import { fixture, receipt } from './fixture'
 import { qualifyCatalogUi } from './catalog-ui'
+import { qualifyStandaloneUi } from './ui-acceptance'
+import { qualificationUiPlan, combinedReactUi } from './ui-plan.mjs'
 import { createBrowserDiagnostics } from './browser-diagnostics'
 
 const c = fixture()
@@ -13,8 +15,9 @@ test('real Keycloak PKCE/Auth.js session is denied after actual signed backchann
   expect(c.adminApiSecret && c.userId).toBeTruthy()
   const admin = createKeycloakAdmin({ baseUrl: c.keycloakOrigin, realm: c.realm, clientId: 'user-portal-admin-api', clientSecret: c.adminApiSecret! })
   const redis = new Redis(process.env.REDIS_URL!, { maxRetriesPerRequest: 1, connectTimeout: 3000 })
-  const catalog = c.qualificationCase === 'catalog-yaml'
-  const ui = catalog && c.variant === 'candidate'
+  const plan = qualificationUiPlan(c.qualificationCase, c.variant)
+  const catalog = c.qualificationCase === 'catalog-yaml' || c.qualificationCase === 'react19.3-catalog-fixed'
+  const ui = plan.broad || plan.catalog
   const errors = { page: 0, console: 0 }
   const diagnostics = createBrowserDiagnostics({ portalOrigin: c.portalOrigin, builtAssetPaths: c.browserAssets ?? [],
     secrets: [c.masterPassword, c.redisPassword, c.postgresPassword, c.authSecret, c.userPassword, c.portalSecret ?? '', c.adminApiSecret ?? '', c.email, c.userId ?? ''] })
@@ -43,9 +46,15 @@ test('real Keycloak PKCE/Auth.js session is denied after actual signed backchann
     expect((await before.json()).user.keycloakSub).toBe(c.userId)
     if (ui) {
       expect(c.browserAssets?.length).toBeGreaterThan(0)
-      await qualifyCatalogUi(page, errors, diagnostics)
+      if (c.qualificationCase === 'react19.3-catalog-fixed') {
+        await qualifyStandaloneUi(page, errors, diagnostics, 'ui-broad.json')
+        await qualifyCatalogUi(page, errors, diagnostics, 'ui-catalog.json')
+        const read = (name: string) => JSON.parse(readFileSync(path.join(c.evidenceDirectory, name), 'utf8'))
+        receipt('ui.json', combinedReactUi(c.qualificationCase, c.variant, read('ui-broad.json'), read('ui-catalog.json'), errors))
+      } else if (plan.broad) await qualifyStandaloneUi(page, errors, diagnostics)
+      else await qualifyCatalogUi(page, errors, diagnostics)
       page.off('pageerror', pageError); page.off('console', consoleError)
-    } else if (catalog) receipt('ui.json', { qualificationCase: 'catalog-yaml', executed: false, passed: false,
+    } else if (plan.knownDefectiveSkip) receipt('ui.json', { qualificationCase: 'catalog-yaml', executed: false, passed: false,
       reason: 'known-baseline-yaml-worker-defect', baseline: '64055a2cd05fa4056ea36fd9ab1b780a77e1690e', retainedFailureRun: 40474716057 })
     await admin.logoutUserSessions(c.userId!)
     const callbackFile = path.join(c.evidenceDirectory, 'callback.json')

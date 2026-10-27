@@ -1,7 +1,7 @@
 import { createHash } from 'node:crypto'
 import { redactor } from './contract.mjs'
 
-const STAGES = ['unknown', 'login', 'navigation', 'catalog', 'monaco-load', 'worker-schema', 'monaco-edit-apply', 'worker-disposal', 'worker-reopen'] as const
+const STAGES = ['unknown', 'login', 'hydration', 'navigation', 'radix', 'organization', 'catalog', 'monaco-load', 'worker-schema', 'monaco-edit-apply', 'worker-disposal', 'worker-reopen', 'locale-theme'] as const
 export type BrowserStage = (typeof STAGES)[number]
 const NAMES = new Set(['Error', 'TypeError', 'SyntaxError', 'RangeError', 'ReferenceError', 'EvalError', 'URIError', 'AggregateError', 'AbortError', 'SecurityError', 'NetworkError', 'InvalidStateError', 'NotSupportedError', 'DataCloneError', 'Canceled', 'CancellationError'])
 const REACT_CODES = new Set([418, 419, 421, 422, 423, 424, 425, 426])
