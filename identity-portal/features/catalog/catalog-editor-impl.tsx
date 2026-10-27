@@ -15,25 +15,31 @@
  * 的那条路径——Monaco 因此完全来自本地打包产物(随 `/_next` 一起分发,满足 `'self'`),不再依赖 CDN。
  */
 import * as monaco from 'monaco-editor'
+import { useEffect, useRef } from 'react'
+import type { MonacoYaml } from 'monaco-yaml'
 import { loader } from '@monaco-editor/react'
 import Editor, { type BeforeMount, type OnChange } from '@monaco-editor/react'
 import { catalogJsonSchema } from '@/lib/catalog/schema'
+import { withCatalogYamlWorker } from './yaml-worker-adapter'
 
 loader.config({ monaco })
+
+const createYamlWorker = () =>
+  new Worker(new URL('monaco-yaml/yaml.worker', import.meta.url))
 
 /**
  * Web worker 接线(Tier-2 前置条件):monaco-yaml 需要 yaml worker 才能做 schema 校验/补全。
  * 仅在浏览器端设置一次;若这段在某些运行时环境下抛错(理论上不应该,但作为最后一道防线),
  * 不影响 Tier-1(纯高亮)——configureMonacoYaml 本身还有独立的 try/catch 兜底。
  *
- * 参见 docs/references/2026-07-07-monaco-yaml-nextjs.md。
+ * 参见 docs/references/2026-10-27-catalog-yaml-worker.md。
  */
 if (typeof window !== 'undefined') {
   try {
     window.MonacoEnvironment = {
       getWorker(_moduleId: string, label: string) {
         if (label === 'yaml') {
-          return new Worker(new URL('monaco-yaml/yaml.worker', import.meta.url))
+          return createYamlWorker()
         }
         return new Worker(new URL('monaco-editor/esm/vs/editor/editor.worker', import.meta.url))
       },
@@ -52,11 +58,22 @@ export default function CatalogEditorImpl({
   onChange?: (v: string) => void
   readOnly?: boolean
 }) {
+  const yamlSupport = useRef<MonacoYaml | undefined>(undefined)
+  const unmounted = useRef(false)
+  useEffect(() => {
+    unmounted.current = false
+    return () => {
+      unmounted.current = true
+      yamlSupport.current?.dispose()
+      yamlSupport.current = undefined
+    }
+  }, [])
   const beforeMount: BeforeMount = (monacoInstance) => {
     // schema-aware(Tier-2);若 worker 未接通,编辑器仍高亮(Tier-1),服务端 apply 兜底校验
     import('monaco-yaml')
       .then(({ configureMonacoYaml }) => {
-        configureMonacoYaml(monacoInstance, {
+        if (unmounted.current || yamlSupport.current) return
+        yamlSupport.current = configureMonacoYaml(withCatalogYamlWorker(monacoInstance, createYamlWorker), {
           enableSchemaRequest: false,
           schemas: [
             { uri: 'inmemory://catalog.json', fileMatch: ['*'], schema: catalogJsonSchema as object },

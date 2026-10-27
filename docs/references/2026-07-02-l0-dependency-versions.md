@@ -409,3 +409,17 @@ by actual-function inert regressions, including unrelated1/125, unknown/missing
 state, cancellation and receipt/cleanup failures. All normal fixtures, service
 versions, page-error/auth gates and product behavior stay unchanged. Scoped tests,
 lint/typecheck and source/privacy review do not substitute for fresh hosted proof.
+
+
+### Identity44 fixed-baseline planning and composition (2026-10-27)
+
+New explicit react19.3-catalog-fixed comparison binds immutable qualified Main
+b0c5baa1e9119563dc2a8c0720390dd1ce3a5890; the old640/auth/catalog experiments and
+failures are preserved, not repointed. Both variants must run broad44 and Catalog
+schema/Undo/Apply/SPA worker lifecycle with strict-zero errors and distinct
+receipts before real auth/transport/outage. Exact b68 manifest/lock graph5/79 is
+retained, with no further upgrades. Registry metadata rechecked2026-10-27 still
+reports React/DOM19.3.1 and both types19.3.0. This records source composition only;
+full build/unit and exact-head hosted proof remain pending Main phase review.
+The106 original29 provisional gaps need Main's exact per-record disposition;
+they are not blanket unadopted tooling or a whole-proposal completion claim.

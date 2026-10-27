@@ -11,8 +11,8 @@ checkPaths:
   - docs/design/README.md
   - docs/README.md
 lastReviewedAt: 2026-10-27
-lastReviewedCommit: 2d9d0044bd5d0b6bc19a4c8d864331cf7fd9f851
-lastReviewedNote: "Identity #44 prepared bad-readiness correction: only intentional Keycloak false probe uses1retry/1s interval/1s timeout/zero start period; normal fixtures and20s deadline exact. Controlled failure requires owned full-ID running/unhealthy state plus exact startup rejection, retained health and cleanup, nonzero exit and no cancellation. Actual-function inert regressions reject unrelated1/125 and receipt/cleanup failures. Scoped33cases, lint/typecheck and independent re-review pass; draft cause gap resolved. No local Docker/product/Compose upgrade or page-error/auth relaxation; runtime and Main publication review pending."
+lastReviewedCommit: b0e4297edbe76c8565d589a24d898c94ae00498c
+lastReviewedNote: "Identity46 catalog-yaml hosted support: immutable Main64055a2 exact graph/product source, rename-safe whole-tree fence, actual entrypoint and inert runner/archive wiring negatives, known-defective baseline UI unexecuted, strict-zero candidate Registry schema/Apply/worker disposal-reopen, then unchanged auth/transport/outage and both-image runtime proof. Necessary b68 readiness/privacy helpers retain strict semantics and provenance. Focused32cases/types/lint pass; source review descriptor evidence gap fixed. Product/graph unchanged from a463 focused browser and113-unit/standalone proof. Hosted qualification/publication/merge remain pending; no local Docker/build/browser rerun or design-body changes."
 ---
 
 # 统一身份与用户门户设计文档集

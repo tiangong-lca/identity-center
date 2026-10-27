@@ -2,6 +2,7 @@ import assert from 'node:assert/strict'
 import { execFileSync } from 'node:child_process'
 import { createHash } from 'node:crypto'
 import { BASELINE, assertProductDelta } from './contract.mjs'
+import { proofCase, assertCatalogVersions } from './catalog-case.mjs'
 
 // Separate reviewed experiments. Never widen one experiment to admit another.
 const cases = Object.freeze({
@@ -13,9 +14,14 @@ const cases = Object.freeze({
     baseline: '64055a2cd05fa4056ea36fd9ab1b780a77e1690e',
     manifestSha256: 'd9082c7ffa6e01869dbba0bcbe2c01ce1baeaece1a17fd964e7f7fac5d2df38d',
   }),
+  'react19.3-catalog-fixed': Object.freeze({
+    baseline: 'b0c5baa1e9119563dc2a8c0720390dd1ce3a5890',
+    manifestSha256: 'd9082c7ffa6e01869dbba0bcbe2c01ce1baeaece1a17fd964e7f7fac5d2df38d',
+  }),
 })
 
 export function qualificationCase(name = 'auth-client') {
+  if (name === 'catalog-yaml') return proofCase(name)
   assert.ok(Object.hasOwn(cases, name), 'Unknown qualification case')
   return { name, ...cases[name] }
 }
@@ -47,6 +53,7 @@ export function assertQualificationManifest(name, baselineContent, candidate) {
 export function assertQualificationVersions(name, variant, versions) {
   qualificationCase(name)
   assert.ok(['baseline', 'candidate'].includes(variant))
+  if (name === 'catalog-yaml') return assertCatalogVersions(Object.fromEntries(['next', 'react', 'react-dom', 'jose', '@keycloak/keycloak-admin-client'].map(key => [key, versions[key]])))
   const historical = name === 'auth-client'
   const upgraded = !historical && variant === 'candidate'
   assert.equal(versions.next, '16.4.2')
@@ -97,9 +104,9 @@ export function assertQualificationProductDelta(name, file, before, after) {
     'React qualification cannot change product or deployment behavior')
 }
 
-export function assertReactSourcePathFromGit(file, beforeRef, afterRef, options) {
+export function assertReactSourcePathFromGit(file, beforeRef, afterRef, options, name = 'react19.3') {
   const policy = reactChangedPathPolicy(file)
-  if (policy === 'review-metadata') assertQualificationProductDeltaFromGit('react19.3', file, beforeRef, afterRef, options)
+  if (policy === 'review-metadata') assertQualificationProductDeltaFromGit(name, file, beforeRef, afterRef, options)
   return policy
 }
 

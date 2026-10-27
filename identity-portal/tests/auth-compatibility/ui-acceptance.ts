@@ -4,7 +4,7 @@ import type { BrowserDiagnostics } from './browser-diagnostics'
 
 // Actual shipped routes/components and real APIs, exclusively in the owned fixture.
 // This runs before logout so deliberate transport-denial errors do not mask UI errors.
-export async function qualifyStandaloneUi(page: Page, errors: { page: number; console: number }, diagnostics: BrowserDiagnostics) {
+export async function qualifyStandaloneUi(page: Page, errors: { page: number; console: number }, diagnostics: BrowserDiagnostics, receiptName: 'ui.json' | 'ui-broad.json' = 'ui.json') {
   const c = fixture()
   let passed = false
   try {
@@ -114,6 +114,6 @@ export async function qualifyStandaloneUi(page: Page, errors: { page: number; co
     passed = true
   } finally {
     // Counts only: never retain raw console/error text, token URLs or browser state.
-    receipt('ui.json', { passed, errors, firstRenderHydration: passed, clientNavigation: passed, realFormAndReadback: passed, radixFocusTrapAndRestore: passed, monacoEditAndApply: passed, localesAndThemes: passed, syntheticDataOnly: true })
+    receipt(receiptName, { passed, errors, firstRenderHydration: passed, clientNavigation: passed, realFormAndReadback: passed, radixFocusTrapAndRestore: passed, monacoEditAndApply: passed, localesAndThemes: passed, syntheticDataOnly: true })
   }
 }

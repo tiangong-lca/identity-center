@@ -5,6 +5,8 @@ import { createDbClient } from '../../lib/db/client'
 import { seedAdminRbac } from '../../scripts/seed/admin-rbac'
 import { seedKeycloakAdmin, seedAdminConfigFromEnv } from '../../scripts/seed/keycloak-admin'
 import { fixture } from './fixture'
+import { applications } from '../../db/schema/applications'
+import { syntheticCatalogDocument } from './catalog-case.mjs'
 
 async function main() {
   const c = fixture()
@@ -26,6 +28,12 @@ async function main() {
     await seedAdminRbac(db.db)
     const seeded = await seedKeycloakAdmin(db.db, seedAdminConfigFromEnv())
     c.userId = seeded.keycloakSub
+    if (c.qualificationCase === 'catalog-yaml' || c.qualificationCase === 'react19.3-catalog-fixed') {
+      assert.equal((await db.db.query.applications.findMany()).length, 0, 'Require empty owned catalog before synthetic seed')
+      const [app] = syntheticCatalogDocument(c).applications
+      await db.db.insert(applications).values({ code: app.code, name: app.name, status: app.status,
+        keycloakClientId: app.keycloak.clientId, accessClientRole: app.keycloak.accessRole })
+    }
     // This disposable proof user is not a first-login/password-policy qualification.
     await master.users.resetPassword({ id: c.userId, credential: { type: 'password', value: c.userPassword, temporary: false } })
   } finally { await db.close() }

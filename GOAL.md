@@ -12,8 +12,8 @@ checkPaths:
   - docs/implementation/README.md
   - docs/implementation/definition-of-done.md
 lastReviewedAt: 2026-10-27
-lastReviewedCommit: 2d9d0044bd5d0b6bc19a4c8d864331cf7fd9f851
-lastReviewedNote: "Identity #44 prepared bad-readiness correction: only intentional Keycloak false probe uses1retry/1s interval/1s timeout/zero start period; normal fixtures and20s deadline exact. Controlled failure requires owned full-ID running/unhealthy state plus exact startup rejection, retained health and cleanup, nonzero exit and no cancellation. Actual-function inert regressions reject unrelated1/125 and receipt/cleanup failures. Scoped33cases, lint/typecheck and independent re-review pass; draft cause gap resolved. No local Docker/product/Compose upgrade or page-error/auth relaxation; runtime and Main publication review pending."
+lastReviewedCommit: 66189ab6d92c09e1e4308b4d0c1ee98f342c1b61
+lastReviewedNote: "Identity46 a0 hosted quality130/27 and CodeQL pass; auth remains failed at restored-buffer diagnostic clearance, before candidate Apply/reopen/logout/transport. Full image/source/protocol/cleanup/privacy artifacts verified and failed history retained. Native Mac focused diagnostics confirmed multiline input transformation, then fresh initial-invalid-Undo public EditContext equality restored exact bytes and final original no-op payload; unavailable/partial/wrong states never exact. Hosted restore is bounded8 normal Undo with whole nonempty exact selection, no hardcoded5/raw buffer/offset/length/hash/private hook/clipboard/setValue.3privacy/state plus20affected controls/types/lint pass. Product/graph/fence unchanged; no Linux/Portal acceptance or new CI push/rerun/full build/suite. Main final candidate review pending."
 ---
 
 # GOAL — 统一身份平台一期全量交付

@@ -10,6 +10,12 @@ on:
       - identity-portal/pnpm-lock.yaml
       - identity-portal/tests/auth-compatibility/**
       - identity-portal/tests/unit/auth-compatibility-harness.test.ts
+      - identity-portal/tests/unit/catalog-qualification.test.ts
+      - identity-portal/tests/unit/yaml-worker-adapter.test.ts
+      - identity-portal/tests/monaco-worker/**
+      - identity-portal/features/catalog/catalog-editor-impl.tsx
+      - identity-portal/features/catalog/yaml-worker-adapter.ts
+      - identity-portal/scripts/monaco-worker-regression.mjs
       - identity-portal/tests/integration/keycloak-admin.test.ts
       - identity-portal/tests/integration/keycloak-bootstrap.test.ts
       - .github/workflows/auth-compatibility.yml
@@ -105,8 +111,9 @@ jobs:
           done
       - name: Qualify isolated baseline and candidate auth transports
         env:
-          AUTH_PROOF_CASE: react19.3
           AUTH_PROOF_HEAD: ${{ github.event.pull_request.head.sha }}
+          # Explicit fixed-Main React experiment; historical cases remain intact.
+          AUTH_PROOF_CASE: react19.3-catalog-fixed
         run: node tests/auth-compatibility/run.mjs
       - name: Preserve sanitized proof and cleanup receipts
         if: always()

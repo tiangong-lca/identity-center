@@ -23,7 +23,9 @@ export interface Fixture {
   appPort: number
   portalSecret?: string
   adminApiSecret?: string
+  qualificationCase?: 'auth-client' | 'catalog-yaml' | 'react19.3' | 'react19.3-catalog-fixed'
   browserAssets?: string[]
+  yamlWorker?: { bootstrap: string; chunks: string[]; digests: Record<string, string> }
   userId?: string
 }
 

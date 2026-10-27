@@ -106,7 +106,7 @@ it('keeps hosted auth proof secretless, PR-head bound and absent from unrelated 
   expect(workflow.permissions).toEqual({ contents: 'read' })
   const job = workflow.jobs['auth-compatibility']
   expect(job['runs-on']).toBe('ubuntu-24.04')
-  expect(job.steps.find(step => step.env?.AUTH_PROOF_CASE)?.env?.AUTH_PROOF_CASE).toBe('react19.3')
+  expect(job.steps.find(step => step.env?.AUTH_PROOF_CASE)?.env?.AUTH_PROOF_CASE).toBe('react19.3-catalog-fixed')
   expect(job.steps.find(step => step.uses?.startsWith('actions/setup-node@'))?.with?.['node-version']).toBe('24.22.1')
   expect(job.steps[0].with?.ref).toBe('${{ github.event.pull_request.head.sha }}')
   expect(job.steps[0].with?.['persist-credentials']).toBe(false)
@@ -217,6 +217,88 @@ it('preserves real Git blob newlines at the orchestrator extraction boundary', (
 })
 
 import { qualificationCase, assertQualificationSources, assertQualificationManifest, assertQualificationVersions, assertQualificationProductDelta, reactChangedPathPolicy } from '../auth-compatibility/qualification-case.mjs'
+import { qualificationUiPlan, combinedReactUi, assertFixedReactUiReceipts } from '../auth-compatibility/ui-plan.mjs'
+import ts from 'typescript'
+
+const fixedName = 'react19.3-catalog-fixed'
+const fixedBase = 'b0c5baa1e9119563dc2a8c0720390dd1ce3a5890'
+const broadReceipt = () => ({ passed: true, errors: { page: 0, console: 0 }, firstRenderHydration: true, clientNavigation: true, realFormAndReadback: true, radixFocusTrapAndRestore: true, monacoEditAndApply: true, localesAndThemes: true, syntheticDataOnly: true })
+const catalogReceipt = () => ({ executed: true, passed: true, errors: { page: 0, console: 0 }, schemaWorker: true, keyboardApplyReadback: true, spaDisposalReopen: true, exactBufferRestored: true, syntheticDataOnly: true, yamlWorkers: 2, yamlWorkersClosed: 2, unrecognizedWorkers: 0, undoSteps: [5, 5] })
+
+it('binds the new immutable fixed baseline without repointing any historical case', () => {
+  expect(qualificationCase(fixedName).baseline).toBe(fixedBase)
+  expect(qualificationCase('react19.3').baseline).toBe('64055a2cd05fa4056ea36fd9ab1b780a77e1690e')
+  expect(qualificationCase('catalog-yaml').baseline).toBe('64055a2cd05fa4056ea36fd9ab1b780a77e1690e')
+  expect(qualificationCase().baseline).toBe('d9b4827c961967fe16ef31c365025049c7ff8802')
+  const head = 'a'.repeat(40)
+  expect(() => assertQualificationSources(fixedName, { baseline: fixedBase, head, requestedHead: head, ancestor: true })).not.toThrow()
+  for (const baseline of ['main', '64055a2cd05fa4056ea36fd9ab1b780a77e1690e']) expect(() => assertQualificationSources(fixedName, { baseline, head, requestedHead: head, ancestor: true })).toThrow()
+  const before = { next: '16.4.2', react: '19.2.4', 'react-dom': '19.2.4', '@types/react': '19.2.17', '@types/react-dom': '19.2.3', jose: '6.2.12', '@keycloak/keycloak-admin-client': '26.8.1' }
+  const after = { ...before, react: '19.3.1', 'react-dom': '19.3.1', '@types/react': '19.3.0', '@types/react-dom': '19.3.0' }
+  expect(() => assertQualificationVersions(fixedName, 'baseline', before)).not.toThrow()
+  expect(() => assertQualificationVersions(fixedName, 'candidate', after)).not.toThrow()
+  for (const delta of [{ 'react-dom': '19.2.4' }, { react: '19.3.0' }, { '@types/react-dom': '19.2.3' }, { next: '16.4.3' }]) expect(() => assertQualificationVersions(fixedName, 'candidate', { ...after, ...delta })).toThrow()
+})
+
+it('requires both broad and Catalog suites in both fixed variants, never the known-defective skip', () => {
+  for (const variant of ['baseline', 'candidate']) expect(qualificationUiPlan(fixedName, variant)).toEqual({ broad: true, catalog: true, knownDefectiveSkip: false })
+  expect(qualificationUiPlan('catalog-yaml', 'baseline').knownDefectiveSkip).toBe(true)
+  expect(qualificationUiPlan('react19.3', 'baseline').broad).toBe(true)
+  const before = { ui: combinedReactUi(fixedName, 'baseline', broadReceipt(), catalogReceipt(), { page: 0, console: 0 }) }
+  const after = { ui: combinedReactUi(fixedName, 'candidate', broadReceipt(), catalogReceipt(), { page: 0, console: 0 }) }
+  expect(() => assertFixedReactUiReceipts(before, after)).not.toThrow()
+  for (const variant of ['baseline', 'candidate']) {
+    expect(() => combinedReactUi(fixedName, variant, undefined, catalogReceipt(), { page: 0, console: 0 })).toThrow()
+    expect(() => combinedReactUi(fixedName, variant, broadReceipt(), undefined, { page: 0, console: 0 })).toThrow()
+    expect(() => combinedReactUi(fixedName, variant, broadReceipt(), { ...catalogReceipt(), executed: false }, { page: 0, console: 0 })).toThrow()
+    expect(() => combinedReactUi(fixedName, variant, { ...broadReceipt(), radixFocusTrapAndRestore: false }, catalogReceipt(), { page: 0, console: 0 })).toThrow()
+    expect(() => combinedReactUi(fixedName, variant, broadReceipt(), { ...catalogReceipt(), yamlWorkersClosed: 1 }, { page: 0, console: 0 })).toThrow()
+    expect(() => combinedReactUi(fixedName, variant, broadReceipt(), catalogReceipt(), { page: 1, console: 0 })).toThrow()
+  }
+  expect(() => assertFixedReactUiReceipts({ ui: { executed: false, passed: false } }, after)).toThrow()
+  expect(() => assertFixedReactUiReceipts(before, { ui: { ...after.ui, broad: undefined } })).toThrow()
+})
+
+it('rejects the actual silent-merge duplicate YAML selector and selects exactly the fixed case', () => {
+  const source = fs.readFileSync(path.resolve(__dirname, '../../../.github/workflows/auth-compatibility.yml'), 'utf8')
+  const key = 'AUTH_PROOF_CASE: react19.3-catalog-fixed'
+  expect(source.split(key).length - 1).toBe(1)
+  expect(() => load(source.replace(key, key + '\n          AUTH_PROOF_CASE: catalog-yaml'))).toThrow(/duplicat/i)
+})
+
+it('executes actual browser orchestration for both variants with distinct awaited suite receipts', async () => {
+  const source = fs.readFileSync(path.resolve(__dirname, '../auth-compatibility/browser.proof.spec.ts'), 'utf8')
+  const start = source.indexOf('    if (ui) {'); const end = source.indexOf('\n    await admin.logoutUserSessions', start)
+  expect(start).toBeGreaterThan(-1); expect(end).toBeGreaterThan(start)
+  for (const variant of ['baseline', 'candidate']) {
+    const files = new Map<string, string>(); const events: string[] = []; let combined: unknown
+    const c = { ...fixture(), qualificationCase: fixedName, variant, browserAssets: ['owned.js'], evidenceDirectory: '/inert' }
+    const dependencies = { c, ui: true, plan: qualificationUiPlan(fixedName, variant), page: { off: () => events.push('listener-detach') }, errors: { page: 0, console: 0 }, diagnostics: {}, expect, pageError: () => {}, consoleError: () => {}, path,
+      qualifyStandaloneUi: async (_page: unknown, _errors: unknown, _diagnostics: unknown, name: string) => { await Promise.resolve(); expect(name).toBe('ui-broad.json'); events.push('broad'); files.set('/inert/'+name, JSON.stringify(broadReceipt())) },
+      qualifyCatalogUi: async (_page: unknown, _errors: unknown, _diagnostics: unknown, name: string) => { await Promise.resolve(); expect(name).toBe('ui-catalog.json'); events.push('catalog'); files.set('/inert/'+name, JSON.stringify(catalogReceipt())) },
+      readFileSync: (name: string) => { expect(files.has(name)).toBe(true); return files.get(name) }, combinedReactUi,
+      receipt: (name: string, value: unknown) => { expect(name).toBe('ui.json'); combined = value },
+    }
+    const emitted = ts.transpileModule(`async function invokeUi(){${source.slice(start,end)}}`, { compilerOptions: { target: ts.ScriptTarget.ES2022, module: ts.ModuleKind.None } }).outputText
+    await new Function(...Object.keys(dependencies), `${emitted};return invokeUi()`)(...Object.values(dependencies))
+    expect(events.slice(0,2)).toEqual(['broad','catalog'])
+    expect(combined).toMatchObject({ qualificationCase: fixedName, variant, executed: true, passed: true })
+  }
+})
+
+it('persists worker descriptor evidence against the actual baseline or candidate source', () => {
+  const source = fs.readFileSync(path.resolve(__dirname, '../auth-compatibility/run.mjs'), 'utf8')
+  const start = source.indexOf('        const workerEvidence = ')
+  const end = source.indexOf('\n      }', start)
+  expect(start).toBeGreaterThan(-1); expect(end).toBeGreaterThan(start)
+  for (const variant of ['baseline', 'candidate']) {
+    const files = new Map<string, string>()
+    const c = { evidenceDirectory: '/inert', yamlWorker: { bootstrap: '/_next/static/chunks/owned.js', chunks: [], digests: {} } }
+    const deps = { selectedCase: qualificationCase(fixedName), variant, BASELINE: fixedBase, head: 'a'.repeat(40), c, assert: nodeAssert, Buffer, path, configFile: '/inert/config.json', fs: { writeFileSync: (name: string, data: string) => files.set(name, data) } }
+    new Function(...Object.keys(deps), source.slice(start,end))(...Object.values(deps))
+    expect(JSON.parse(files.get('/inert/yaml-worker-assets.json')!)).toMatchObject({ qualificationCase: fixedName, source: variant === 'baseline' ? fixedBase : 'a'.repeat(40) })
+  }
+})
 
 describe('independent source-bound React qualification', () => {
   const baselineFixture = (name: string) => JSON.parse(fs.readFileSync(path.resolve(__dirname, `../auth-compatibility/fixtures/manifest-${name}.json`), 'utf8')) as { sourceCommit: string; sourcePath: string; content: string }
@@ -292,10 +374,10 @@ describe('independent source-bound React qualification', () => {
 
 // The inert executable doubles use POSIX shebangs; hosted execution is Linux.
 const sourceWiringIt = process.platform === 'win32' ? it.skip : it
-sourceWiringIt('actual validate-only entrypoint rejects unrelated configuration and real Git product renames without Docker', () => {
+sourceWiringIt.each(['react19.3', 'react19.3-catalog-fixed'])('actual validate-only entrypoint rejects unrelated configuration and real Git product renames without Docker: %s', (caseName) => {
   const tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'identity44-source-wiring-'))
   try {
-  const selected = qualificationCase('react19.3')
+  const selected = qualificationCase(caseName)
   const head = 'a'.repeat(40)
   const original = JSON.parse(fs.readFileSync(path.resolve(__dirname, '../auth-compatibility/fixtures/manifest-react19.3.json'), 'utf8')).content as string
   const candidate = JSON.parse(original)
@@ -363,12 +445,12 @@ else if (args[0] === 'show') {
   execFileSync(path.join(tmp, 'docker'))
   expect(fs.existsSync(marker)).toBe(true)
   fs.unlinkSync(marker)
-  const env = { NODE_ENV: 'test' as const, PATH: `${tmp}:${process.env.PATH}`, AUTH_PROOF_CASE: 'react19.3', AUTH_PROOF_HEAD: head }
+  const env = { NODE_ENV: 'test' as const, PATH: `${tmp}:${process.env.PATH}`, AUTH_PROOF_CASE: caseName, AUTH_PROOF_HEAD: head }
   const run = (changed = {}) => {
     fs.writeFileSync(state, JSON.stringify(changed))
     return execFileSync(process.execPath, [path.resolve(__dirname, '../auth-compatibility/run.mjs'), '--validate-sources'], { env: { ...env, ...changed }, encoding: 'utf8', stdio: 'pipe' })
   }
-    expect(JSON.parse(run())).toEqual({ validationOnly: true, qualificationCase: 'react19.3', baseline: selected.baseline, head, dockerAccessed: false })
+    expect(JSON.parse(run())).toEqual({ validationOnly: true, qualificationCase: caseName, baseline: selected.baseline, head, dockerAccessed: false })
     const invoked = fs.readFileSync(calls, 'utf8').trim().split('\n').map(line => JSON.parse(line) as string[])
     expect(invoked).toContainEqual(['show', `${selected.baseline}:${file}`])
     expect(invoked).toContainEqual(['show', `${head}:${file}`])

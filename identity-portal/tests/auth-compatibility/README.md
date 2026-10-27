@@ -1,5 +1,78 @@
 # Auth dependency interoperability proof
 
+Identity46 adds an explicit `AUTH_PROOF_CASE=catalog-yaml` owner case. The
+workflow selects this case for the catalog repair; the historical auth-client
+case remains available with its original baseline, graph and product assertions,
+and is not claimed executed by that selected workflow. React44's separate
+branch/case is unchanged and is not imported here.
+
+Catalog proof binds immutable Main64055a2cd05fa4056ea36fd9ab1b780a77e1690e,
+byte-identical manifest/lock and exact reviewed adapter/editor blobs. Whole-tree
+`--no-renames` classification rejects unknown product/config paths and changed
+product blobs. `--validate-sources` is an explicit pre-Docker source-only mode;
+normal invocation still refuses local/self-hosted execution. Actual subprocess
+tests route inert Git executables to a real temporary repository, including R100
+rename exposure/rejection and unknown/source/config controls. Actual main/archive
+function seams separately prove selected baseline/case reach runner/comparison.
+
+The unit control is hermetic under the quality workflow's depth-one checkout.
+Its minimal source fixture records64055a2 graph/editor and a463281 reviewed
+product provenance/hashes; only the lock is gzip/base64 encoded. The fixture is
+unit data and is never read by the production source fence. Tests initialize a
+real temporary Git graph and map only the immutable baseline reference to that
+owned test commit; all actual diff/rename/ancestry operations still execute Git.
+This seam is distinct from the real clean-head hosted preflight. No historical
+object fetch, checkout deepening, skipped control or source-fence change is used.
+
+After the controlled invalid schema edit, restore with at most8 normal Undo
+operations. Select all before reading the standard active HTMLElement.editContext
+state: Monaco exposes only selected lines in that context, so a collapsed caret
+is insufficient. The reader requires a complete nonempty selection and exact
+original bytes, returning only available/wholeSelection/exact booleans. No raw
+buffer, offsets, lengths or buffer hashes leave the browser. Unsupported,
+partial, malformed or wrong-text states cannot qualify. Marker clearance and the
+original keyboard comment/no-op request/version/readback gates still apply.
+
+Native macOS diagnostics with actual product options/schema/serializer confirmed
+full multiline typing can change indentation, while bounded Undo restores exact
+bytes and the unchanged comment payload is exact. A separate live public-reader
+check rejected unavailable/partial/wrong states, restored exact bytes and proved
+the final payload. Those checks used Meta shortcuts and no platform override;
+they are not Linux or Portal qualification. Hosted Linux uses its normal Control
+shortcuts and still requires a future exact-head complete run.
+
+Both runtime variants keep Main's React/DOM19.2.4/jose6.2.12/admin26.8.1 graph.
+Baseline auth/transport remains real, while its UI receipt explicitly records
+executed:false/passed:false/known-defective and retains run40474716057 as prior
+negative evidence. Candidate Registry UI must pass strict page/console zero,
+actual schema warning/repair, keyboard no-op Apply exact payload/version/readback,
+SPA YAML worker close/reopen and unchanged logout/transport/outage. The owned DB
+must be empty before seeding one unique disabled synthetic catalog app, with no
+webhook/login/business URL. No original source catalog is applied.
+
+YAML worker identity is derived from the exact emitted Next16.4.2 Turbopack
+constructor/chunks and asset hashes. Worker URL/fragment is inspected only in
+memory with bounded fixed shape/owned-origin checks; receipts retain counts and
+safe asset identities, not URLs or deployment metadata. Only that YAML worker's
+close event is required; independent shared editor workers are not conflated.
+Unknown emitted layouts fail closed. This is version-bound test support, not a
+new product dependency on a private worker protocol.
+
+Only necessary strict readiness and structural diagnostic helpers were borrowed
+from React44 head b68c2d1116aba9bea60d41477b498dbf32f100c7, with exact source
+provenance retained for review. The controlled bad readiness probe now fails in
+the engine before the unchanged20s deadline and requires its exact startup cause,
+full owned running/unhealthy identity, health evidence before cleanup and saved
+successful cleanup; unrelated nonzero exit, missing proof or cancellation fails.
+Page counters increment before bounded diagnostic projection; raw browser error
+text/stack/state, credential URLs, tokens, screenshots/traces/video stay absent.
+
+Local a463 component worker proof and113-unit/standalone build remain evidence
+for unchanged product/graph. New hosted support has only focused local negative,
+type/lint/Docpact validation until a future exact-head hosted run actually occurs.
+Candidate Next/Portal Apply/lifecycle, real auth and both shipped images are still
+pending; no positive hosted result or merge/integration is claimed here.
+
 Identity #34 qualifies Keycloak admin26.8.1 and jose6.2.12 against accepted
 Main `d9b4827c961967fe16ef31c365025049c7ff8802`. This is test support; application
 behavior, server version lines, production Compose and existing quality CI stay
@@ -176,3 +249,39 @@ owned running/unhealthy state, saved health evidence and successful saved cleanu
 Unknown/missing evidence, unrelated exit1/125, cancellation, zero exits and
 receipt/cleanup failures all remain failures. Only the original expected startup
 exception can be suppressed; auth operations never run in this negative control.
+
+
+## Fixed-baseline React composition — Identity44
+
+The selected workflow case is react19.3-catalog-fixed, immutable baseline
+b0c5baa1e9119563dc2a8c0720390dd1ce3a5890 (qualified47 merge/tree identical toba5).
+Historical auth-client/d9, react19.3/640 and catalog-yaml/640 remain explicit with
+their original graph/source/version assertions. Only historical catalog-yaml
+skips its known-defective baseline UI; the new case requires BOTH variants to
+execute BOTH broad44 and qualified Catalog suites with continuous errors.
+
+Broad UI runs first (hydration/SPA/form/API/Radix/focus/Monaco/locales/themes),
+then fresh Catalog navigation/schema/exact Undo/no-opApply/readback/SPA worker
+closure/reopen. Distinct ui-broad.json and ui-catalog.json are retained; ui.json
+is assembled only after both pass and is required for both source variants.
+No receipt overwrite, counter reset, baseline skip or missing suite can qualify.
+The Catalog listener starts before fresh navigation, so it counts its own new
+worker objects rather than a prior broad-suite worker. Both variants receive
+owned synthetic disabled catalog data and exact emitted worker descriptors,
+whose evidence names the actual baseline or candidate source separately.
+
+One registry and one YAML selector drive source validation, archive/runtime
+selection, UI policy and final comparison. Actual command/inert source controls
+exercise historical and new immutable baseline binding, real R100 renames and
+source/config/version failures; actual browser-body and runner/archive tests
+verify awaited suite calls and distinct receipts. Readiness/assets/native worker
+identity and strict privacy projection remain qualified Main support, with only
+fixed diagnostic stage union needed for broader44.
+
+Manifest/lock retain exact b68 dependency blobs: React/DOM19.3.1, types19.3.0 and
+scheduler0.28.0,5package replacements/79snapshots; other pins and PostCSS8.5.30
+unchanged. Full units/build/fresh hosted both-variant UI/auth/image acceptance
+remain pending phaseB/publication review. All previous failed runs remain failed.
+Original29's106 provisional accounting gaps include normalization/qualified
+substitutions and genuinely unadopted records; Main owns the per-record final
+disposition after qualification. No blanket coverage or tooling-only claim.
