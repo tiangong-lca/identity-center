@@ -11,8 +11,8 @@ checkPaths:
   - docs/design/README.md
   - docs/README.md
 lastReviewedAt: 2026-10-27
-lastReviewedCommit: ba66ed6e182b407cead86f59883d7fac8ca06ab0
-lastReviewedNote: "Identity #44 second independent review repair: whole-tree React diff disables rename detection so deleted product sources cannot hide behind allowed support destinations. Real temporary Git R100 entrypoint exposure/rejection controls and existing config/new-path negatives pass in the21-case scoped harness; lint/typecheck and clean source preflight pass. Historical auth-client behavior and application/build inputs unchanged. No new full-suite/build or hosted qualification claimed; prior evidence retained."
+lastReviewedCommit: 22278f299571b9a059803054adb36390eed8efac
+lastReviewedNote: "Identity #44 hosted baseline selector correction: registry href matched navigation and edit CTA; Main reviewed unique navigation Registry/count1 plus destination and SPA assertions. Scoped ESLint/typecheck pass; no product/build input or full-suite/build rerun. Prior cd26893 hosted quality111 and both images passed, baseline browser failed before candidate/logout/transport; verified cleanup/privacy artifacts retained. Corrected head needs fresh full hosted qualification; no merge or production authority."
 ---
 
 # 统一身份与用户门户设计文档集
