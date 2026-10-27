@@ -11,8 +11,8 @@ checkPaths:
   - docs/implementation/definition-of-done.md
   - GOAL.md
 lastReviewedAt: 2026-10-27
-lastReviewedCommit: b0e4297edbe76c8565d589a24d898c94ae00498c
-lastReviewedNote: "Identity46 catalog-yaml hosted support: immutable Main64055a2 exact graph/product source, rename-safe whole-tree fence, actual entrypoint and inert runner/archive wiring negatives, known-defective baseline UI unexecuted, strict-zero candidate Registry schema/Apply/worker disposal-reopen, then unchanged auth/transport/outage and both-image runtime proof. Necessary b68 readiness/privacy helpers retain strict semantics and provenance. Focused32cases/types/lint pass; source review descriptor evidence gap fixed. Product/graph unchanged from a463 focused browser and113-unit/standalone proof. Hosted qualification/publication/merge remain pending; no local Docker/build/browser rerun or design-body changes."
+lastReviewedCommit: 70c745309896bf1e7ac21c4ef25dff6f8949dc1b
+lastReviewedNote: "Identity46 af1 hosted failures retained: quality129/130 lacked historical Git tree in depth-one checkout; candidate real YAML warning existed with page/console0 but decorative hover was pointer-intercepted, before Apply/reopen/logout/transport. Baseline auth/transport/outage, both shipped Node24 images and all cleanup/source bindings verified. Minimal immutable unit snapshots and exact baseline-ref-only seam preserve real Git/source/rename controls;17 pass both normal and genuine shallow checkout with historical objects absent. Ordinary hover now targets one visible controlled token, same warning/tooltip/zero gates and timeout. Types/lint pass; snapshot provenance independently rechecked. Product/graph/fence unchanged; no full build/browser/rerun/push or qualification acceptance."
 ---
 
 # 完成定义(DoD)核对 — GOAL.md §7
