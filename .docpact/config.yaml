@@ -1,8 +1,8 @@
 version: 1
 layout: repo
-lastReviewedAt: "2026-10-26"
-lastReviewedCommit: "3161be477faf321632d19709465ade7a2ae1c9e2"
-lastReviewedNote: "Identity #41: quality CI on 3161be4 failed despite 105 passing cases because four unhandled JSON parse errors exposed a fake-state truncation race. Both fake Docker writers now write a PID-unique sibling temporary file and rename it over the polled state. Parsing and assertions remain strict. Local lint/typecheck, 105 units and six concurrent-load cancellation repeats pass without unhandled errors. Windows skips only the eight POSIX controls; no native Windows proof claimed. Product/runtime/workflow unchanged; new exact-head hosted CI and artifact validation remain required."
+lastReviewedAt: "2026-10-27"
+lastReviewedCommit: "66189ab6d92c09e1e4308b4d0c1ee98f342c1b61"
+lastReviewedNote: "Identity46 a0 hosted quality130/27 and CodeQL pass; auth remains failed at restored-buffer diagnostic clearance, before candidate Apply/reopen/logout/transport. Full image/source/protocol/cleanup/privacy artifacts verified and failed history retained. Native Mac focused diagnostics confirmed multiline input transformation, then fresh initial-invalid-Undo public EditContext equality restored exact bytes and final original no-op payload; unavailable/partial/wrong states never exact. Hosted restore is bounded8 normal Undo with whole nonempty exact selection, no hardcoded5/raw buffer/offset/length/hash/private hook/clipboard/setValue.3privacy/state plus20affected controls/types/lint pass. Product/graph/fence unchanged; no Linux/Portal acceptance or new CI push/rerun/full build/suite. Main final candidate review pending."
 
 # Repo-local docpact governance for identity-center.
 # The workspace root config governs the submodule pointer and cross-repo view;
@@ -468,6 +468,10 @@ rules:
     scope: repo
     repo: identity-center
     triggers:
+      - path: identity-portal/scripts/monaco-worker-regression.mjs
+        kind: worker-regression-runner
+      - path: docs/references/2026-10-27-catalog-yaml-worker.md
+        kind: worker-compatibility-record
       - path: identity-portal/tests/**
         kind: repo-test
       - path: identity-portal/package.json

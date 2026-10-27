@@ -2,6 +2,17 @@
 
 > 按 GOAL.md §2:实施中发现的设计缺口、矛盾与用户裁决在此记录。
 
+## D-009 Catalog YAML worker API compatibility（2026-10-27，Identity46）
+
+Main64055a2 的 Monaco0.55.1 要求实际 Worker，而 YAML5.5.1/manager2.0.1
+仍传旧 moduleId/createData。Identity46 独立拥有此产品基线修复：仅向
+configureMonacoYaml 传局部 facade，按该版本官方初始化顺序接到公共 Worker API；
+不升级依赖、不改全局 API、私有 RPC、CSP、认证或服务端 Apply 行为。
+实际 worker markers/修复/links/code actions/模型同步/释放与 Portal Apply 仍须验证，
+严格零浏览器错误门保持。版本来源、边界与未执行项见
+[资格记录](../references/2026-10-27-catalog-yaml-worker.md)。React44 的旧失败与不可变
+64055a2 比较保留；该修复不自行完成 React 升级或原 PR29 的未采纳范围。
+
 ## D-008 Node24 LTS 运行时与类型基线（2026-10-26，Identity #41）
 
 用户明确允许 Identity 采用最新兼容 Node24 LTS，并继续其他依赖的普通 Dependabot 更新。
