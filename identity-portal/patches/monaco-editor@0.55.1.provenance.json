@@ -1,0 +1,129 @@
+{
+  "monacoVersion": "0.55.1",
+  "upstreamVersion": "3.4.17",
+  "upstreamSha256": "60c5d5ccbb466de3de3ba863461a92bf134f8c156cef7992da43e0f659bc5cbd",
+  "patchSha256": "cee9c1b977bb0b433b2f1f6e11eecd14795fa8311f644558276f64e9fa1dcb4e",
+  "maps": "Explicitly stripped upstream sourceMappingURL; no original Monaco maps/directives existed on these three files. No stale map added.",
+  "assets": [
+    {
+      "path": "esm/vs/base/browser/dompurify/dompurify.js",
+      "originalSha256": "9b2835fc7de5bd37faff156e83bf060067577a1f09c6620d9f37d5fa5e5970b1",
+      "patchedSha256": "a23ba9b1063ff7f345fca86a1380cf144b2c26083c73b66e200d20b4a07d8ea0",
+      "librarySpan": [
+        0,
+        62826
+      ],
+      "spanUnit": "UTF-16 code units",
+      "libraryByteSpan": [
+        0,
+        62831
+      ],
+      "preservedBridge": null,
+      "prefixSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "suffixSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "upstreamSha256": "60c5d5ccbb466de3de3ba863461a92bf134f8c156cef7992da43e0f659bc5cbd",
+      "strippedUpstreamSourceMappingURL": [
+        "//# sourceMappingURL=purify.es.mjs.map"
+      ],
+      "originalSourceMappingURL": false,
+      "privateBindingEscapes": 0,
+      "trustedUpstreamFreeGlobals": [
+        "Array",
+        "BigInt",
+        "Boolean",
+        "Function",
+        "Number",
+        "Object",
+        "Promise",
+        "Reflect",
+        "RegExp",
+        "Set",
+        "String",
+        "Symbol",
+        "TypeError",
+        "console",
+        "window"
+      ]
+    },
+    {
+      "path": "dev/vs/editor.api-CykLys8L.js",
+      "originalSha256": "abdd0cc9b9e1c38e5ac610bd6ab98704994e0fd14b6318550e9dba6ed08fb1cf",
+      "patchedSha256": "120a41e5f9d36215f10126f14297c24671f2d8b9a37934bef487c57f8829d30d",
+      "librarySpan": [
+        3220236,
+        3267114
+      ],
+      "spanUnit": "UTF-16 code units",
+      "libraryByteSpan": [
+        3220789,
+        3267667
+      ],
+      "preservedBridge": "purify",
+      "prefixSha256": "3ecdd59f6da3703f3e6c61558527463effab69ccac66a2dd35fa010944c5540c",
+      "suffixSha256": "588f6ea50fc9ca79ec63fc4257c2935de2c79309e03e183e975a697727e25d10",
+      "upstreamSha256": "60c5d5ccbb466de3de3ba863461a92bf134f8c156cef7992da43e0f659bc5cbd",
+      "strippedUpstreamSourceMappingURL": [
+        "//# sourceMappingURL=purify.es.mjs.map"
+      ],
+      "originalSourceMappingURL": false,
+      "privateBindingEscapes": 0,
+      "trustedUpstreamFreeGlobals": [
+        "Array",
+        "BigInt",
+        "Boolean",
+        "Function",
+        "Number",
+        "Object",
+        "Promise",
+        "Reflect",
+        "RegExp",
+        "Set",
+        "String",
+        "Symbol",
+        "TypeError",
+        "console",
+        "window"
+      ]
+    },
+    {
+      "path": "min/vs/editor.api-CalNCsUg.js",
+      "originalSha256": "c10d0058fe0ee5d2c46c3b6cbb28474407be5d45ada35973f3230561f82c4de5",
+      "patchedSha256": "ddaaa0d8285cc62aeaae8f24a68247bc2ca90e39d3f61ed18a8dec15a9e470aa",
+      "librarySpan": [
+        1568130,
+        1590950
+      ],
+      "spanUnit": "UTF-16 code units",
+      "libraryByteSpan": [
+        1568377,
+        1591197
+      ],
+      "preservedBridge": "K_",
+      "prefixSha256": "394cb4db6d206681c1a9a33ccf769ddd6a6db83e101b184e7c7a59dd57108077",
+      "suffixSha256": "28473ce84ae947de918b571b5b8b605eb5104feeda147b4fb17fb57d56f89566",
+      "upstreamSha256": "60c5d5ccbb466de3de3ba863461a92bf134f8c156cef7992da43e0f659bc5cbd",
+      "strippedUpstreamSourceMappingURL": [
+        "//# sourceMappingURL=purify.es.mjs.map"
+      ],
+      "originalSourceMappingURL": false,
+      "privateBindingEscapes": 0,
+      "trustedUpstreamFreeGlobals": [
+        "Array",
+        "BigInt",
+        "Boolean",
+        "Function",
+        "Number",
+        "Object",
+        "Promise",
+        "Reflect",
+        "RegExp",
+        "Set",
+        "String",
+        "Symbol",
+        "TypeError",
+        "console",
+        "window"
+      ]
+    }
+  ]
+}

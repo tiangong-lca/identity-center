@@ -4,18 +4,18 @@ import { qualificationCase } from './qualification-case.mjs'
 export function qualificationUiPlan(name, variant) {
   qualificationCase(name)
   assert.ok(['baseline', 'candidate'].includes(variant))
-  const fixed = name === 'react19.3-catalog-fixed'
+  const fixed = name === 'react19.3-catalog-fixed' || name === 'security-audit'
   return { broad: fixed || name === 'react19.3', catalog: fixed || name === 'catalog-yaml' && variant === 'candidate',
     knownDefectiveSkip: name === 'catalog-yaml' && variant === 'baseline' }
 }
 
 export function qualificationBrowserTimeout(name = 'auth-client') {
   qualificationCase(name)
-  return name === 'react19.3' || name === 'react19.3-catalog-fixed' ? 150_000 : 90_000
+  return name === 'react19.3' || name === 'react19.3-catalog-fixed' || name === 'security-audit' ? 150_000 : 90_000
 }
 
 export function combinedReactUi(name, variant, broad, catalog, errors) {
-  assert.equal(name, 'react19.3-catalog-fixed')
+  assert.ok(['react19.3-catalog-fixed', 'security-audit'].includes(name))
   assert.deepEqual(qualificationUiPlan(name, variant), { broad: true, catalog: true, knownDefectiveSkip: false })
   assert.deepEqual(errors, { page: 0, console: 0 })
   assert.equal(broad?.passed, true, 'Broad UI must pass')
@@ -35,5 +35,12 @@ export function assertFixedReactUiReceipts(baseline, candidate) {
     assert.equal(summary.ui?.executed, true, 'New fixed baseline cannot skip UI')
     const value = combinedReactUi('react19.3-catalog-fixed', variant, summary.ui?.broad, summary.ui?.catalog, summary.ui?.errors)
     assert.deepEqual(summary.ui, value)
+  }
+}
+
+export function assertSecurityUiReceipts(baseline, candidate) {
+  for (const [variant, summary] of [['baseline', baseline], ['candidate', candidate]]) {
+    assert.equal(summary.ui?.executed, true, 'Security baseline cannot skip UI')
+    assert.deepEqual(summary.ui, combinedReactUi('security-audit', variant, summary.ui?.broad, summary.ui?.catalog, summary.ui?.errors))
   }
 }

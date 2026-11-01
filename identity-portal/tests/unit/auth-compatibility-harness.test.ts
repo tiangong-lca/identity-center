@@ -106,7 +106,7 @@ it('keeps hosted auth proof secretless, PR-head bound and absent from unrelated 
   expect(workflow.permissions).toEqual({ contents: 'read' })
   const job = workflow.jobs['auth-compatibility']
   expect(job['runs-on']).toBe('ubuntu-24.04')
-  expect(job.steps.find(step => step.env?.AUTH_PROOF_CASE)?.env?.AUTH_PROOF_CASE).toBe('react19.3-catalog-fixed')
+  expect(job.steps.find(step => step.env?.AUTH_PROOF_CASE)?.env?.AUTH_PROOF_CASE).toBe('security-audit')
   expect(job.steps.find(step => step.uses?.startsWith('actions/setup-node@'))?.with?.['node-version']).toBe('24.22.1')
   expect(job.steps[0].with?.ref).toBe('${{ github.event.pull_request.head.sha }}')
   expect(job.steps[0].with?.['persist-credentials']).toBe(false)
@@ -180,7 +180,9 @@ it('admits the exact reviewed Node24 Dockerfile, rejects other image or build-po
   const original = JSON.parse(fs.readFileSync(path.resolve(__dirname, '../auth-compatibility/fixtures/dockerfile-before-node24.json'), 'utf8')) as { sourceCommit: string; sourcePath: string; content: string }
   expect(original.sourceCommit).toBe('104135f3aae4d39cebef13a9f12abfc53daed376')
   expect(original.sourcePath).toBe(file)
-  const after = fs.readFileSync(path.resolve(__dirname, '../../../', file), 'utf8')
+  const snapshots = JSON.parse(fs.readFileSync(path.resolve(__dirname, '../auth-compatibility/fixtures/security-source.json'), 'utf8')) as { source: string; files: Record<string,string> }
+  expect(snapshots.source).toBe('68e1fafce35e7e931ee0e7c65b5c6e0b4ccf8e8b')
+  const after = snapshots.files[file]
   expect(() => assertProductDelta(file, original.content, after)).not.toThrow()
   for (const changed of [after.replace('24.22.1-alpine', '25-alpine'), after.replace(' pnpm-workspace.yaml', ''), `${after}\nRUN echo unreviewed\n`]) {
     expect(() => assertProductDelta(file, original.content, changed)).toThrow()
@@ -194,7 +196,9 @@ it('preserves real Git blob newlines at the orchestrator extraction boundary', (
   const root = fs.mkdtempSync(path.join(os.tmpdir(), 'identity41-git-blobs-'))
   const file = 'identity-portal/deploy/docker/Dockerfile'
   const before = JSON.parse(fs.readFileSync(path.resolve(__dirname, '../auth-compatibility/fixtures/dockerfile-before-node24.json'), 'utf8')).content as string
-  const after = fs.readFileSync(path.resolve(__dirname, '../../../', file), 'utf8')
+  const snapshots = JSON.parse(fs.readFileSync(path.resolve(__dirname, '../auth-compatibility/fixtures/security-source.json'), 'utf8')) as { source: string; files: Record<string,string> }
+  expect(snapshots.source).toBe('68e1fafce35e7e931ee0e7c65b5c6e0b4ccf8e8b')
+  const after = snapshots.files[file]
   const env = { PATH: process.env.PATH, HOME: root, GIT_CONFIG_NOSYSTEM: '1', NODE_ENV: 'test' as const }
   const git = (...args: string[]) => execFileSync('git', args, { cwd: root, env, encoding: 'utf8' }).trim()
   try {
@@ -259,9 +263,9 @@ it('requires both broad and Catalog suites in both fixed variants, never the kno
   expect(() => assertFixedReactUiReceipts(before, { ui: { ...after.ui, broad: undefined } })).toThrow()
 })
 
-it('rejects the actual silent-merge duplicate YAML selector and selects exactly the fixed case', () => {
+it('rejects the actual silent-merge duplicate YAML selector and selects exactly the owner case', () => {
   const source = fs.readFileSync(path.resolve(__dirname, '../../../.github/workflows/auth-compatibility.yml'), 'utf8')
-  const key = 'AUTH_PROOF_CASE: react19.3-catalog-fixed'
+  const key = 'AUTH_PROOF_CASE: security-audit'
   expect(source.split(key).length - 1).toBe(1)
   expect(() => load(source.replace(key, key + '\n          AUTH_PROOF_CASE: catalog-yaml'))).toThrow(/duplicat/i)
 })

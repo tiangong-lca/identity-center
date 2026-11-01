@@ -163,7 +163,7 @@ it('the actual entrypoint validates a real Git tree and rejects unrelated paths,
   } finally { fs.rmSync(temp, { recursive: true, force: true }) }
 }) // POSIX inert executable seam; no native Windows runtime proof is claimed.
 
-it('activates only exact catalog owner paths on the secretless exact-head hosted workflow', () => {
+it('retains exact catalog owner paths in the secretless exact-head security workflow', () => {
   const source = fs.readFileSync(path.resolve(__dirname, '../../../.github/workflows/auth-compatibility.yml'), 'utf8')
   const workflow = load(source) as { on: { pull_request: { paths: string[] } }; permissions: Record<string, string>; jobs: Record<string, { steps: Array<{ env?: Record<string, string>; with?: Record<string, unknown>; run?: string }> }> }
   expect(Object.keys(workflow.on)).toEqual(['pull_request'])
@@ -174,7 +174,7 @@ it('activates only exact catalog owner paths on the secretless exact-head hosted
   expect(paths).not.toContain('identity-portal/**')
   const steps = workflow.jobs['auth-compatibility'].steps
   const runner = steps.find(step => step.env?.AUTH_PROOF_CASE)
-  expect(runner?.env).toEqual({ AUTH_PROOF_HEAD: '${{ github.event.pull_request.head.sha }}', AUTH_PROOF_CASE: 'react19.3-catalog-fixed' })
+  expect(runner?.env).toEqual({ AUTH_PROOF_HEAD: '${{ github.event.pull_request.head.sha }}', AUTH_PROOF_CASE: 'security-audit' })
   expect(runner?.run).toBe('node tests/auth-compatibility/run.mjs')
   expect(steps[0].with?.ref).toBe('${{ github.event.pull_request.head.sha }}')
   expect(steps[0].with?.['persist-credentials']).toBe(false)

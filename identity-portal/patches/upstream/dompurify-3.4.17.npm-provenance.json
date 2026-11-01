@@ -1,0 +1,39 @@
+{
+  "version": "3.4.17",
+  "tarballUrl": "https://registry.npmjs.org/dompurify/-/dompurify-3.4.17.tgz",
+  "tarballIntegrityVerified": true,
+  "tarballSha256": "056cbdae276897208b88c21d1d779adfa09ad7be488a2f510a28e900d3bbffe7",
+  "members": [
+    {
+      "member": "package/dist/purify.es.mjs",
+      "file": "dompurify-3.4.17-dist__purify.es.mjs",
+      "bytes": 85820,
+      "sha256": "60c5d5ccbb466de3de3ba863461a92bf134f8c156cef7992da43e0f659bc5cbd"
+    },
+    {
+      "member": "package/dist/purify.es.mjs.map",
+      "file": "dompurify-3.4.17-dist__purify.es.mjs.map",
+      "bytes": 49880,
+      "sha256": "2d8320d303936a66e9d2b881395a680bcf4de2974014ddf8b2893e248a0af973"
+    },
+    {
+      "member": "package/LICENSE",
+      "file": "dompurify-3.4.17-LICENSE",
+      "bytes": 11358,
+      "sha256": "cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30"
+    },
+    {
+      "member": "package/README.md",
+      "file": "dompurify-3.4.17-README.md",
+      "bytes": 45401,
+      "sha256": "565e6a29192b5dbb94b172ef5e4b90759994eb34874da22bb8e9be5c3e894969"
+    },
+    {
+      "url": "https://raw.githubusercontent.com/cure53/DOMPurify/3.4.17/test/test-suite.js",
+      "file": "dompurify-3.4.17-tests.js",
+      "bytes": 298396,
+      "sha256": "5351b94bb5c8abd44f6122d53878d8ada0516b1a74a9ab093895ef12eb9e6f1d"
+    }
+  ],
+  "sourceMapPolicy": "Vendor patch strips the upstream sourceMappingURL directive; upstream map is not copied because the library is embedded/renamed. Original3 Monaco files have no sourceMappingURL. Registry external package retains its own valid maps."
+}

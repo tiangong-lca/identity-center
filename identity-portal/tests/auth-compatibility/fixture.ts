@@ -23,9 +23,10 @@ export interface Fixture {
   appPort: number
   portalSecret?: string
   adminApiSecret?: string
-  qualificationCase?: 'auth-client' | 'catalog-yaml' | 'react19.3' | 'react19.3-catalog-fixed'
+  qualificationCase?: 'auth-client' | 'catalog-yaml' | 'react19.3' | 'react19.3-catalog-fixed' | 'security-audit'
   browserAssets?: string[]
   yamlWorker?: { bootstrap: string; chunks: string[]; digests: Record<string, string> }
+  securityBinding?: { source: string; manifestSha256: string; lockSha256: string; parserSha256: string; zod: {format:string;version:string;entryPath:string;esmEntryPath:string;packageSha256:string;entrySha256:string;esmEntrySha256:string;runtimeTreeSha256:string}; assets: { assets: Array<{ path: string; sha256: string }> } }
   userId?: string
 }
 

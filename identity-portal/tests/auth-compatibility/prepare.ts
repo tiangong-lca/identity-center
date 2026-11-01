@@ -28,7 +28,7 @@ async function main() {
     await seedAdminRbac(db.db)
     const seeded = await seedKeycloakAdmin(db.db, seedAdminConfigFromEnv())
     c.userId = seeded.keycloakSub
-    if (c.qualificationCase === 'catalog-yaml' || c.qualificationCase === 'react19.3-catalog-fixed') {
+    if (c.qualificationCase === 'catalog-yaml' || c.qualificationCase === 'react19.3-catalog-fixed' || c.qualificationCase === 'security-audit') {
       assert.equal((await db.db.query.applications.findMany()).length, 0, 'Require empty owned catalog before synthetic seed')
       const [app] = syntheticCatalogDocument(c).applications
       await db.db.insert(applications).values({ code: app.code, name: app.name, status: app.status,
