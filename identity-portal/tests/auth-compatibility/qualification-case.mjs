@@ -4,7 +4,7 @@ import { createHash } from 'node:crypto'
 import { BASELINE, assertProductDelta } from './contract.mjs'
 import { securityCase, assertSecurityManifest, assertSecurityVersions } from './security-case.mjs'
 import { proofCase, assertCatalogVersions } from './catalog-case.mjs'
-import { frameworkPatchCase } from './framework-patch.mjs'
+import { frameworkSource } from './framework-patch.mjs'
 
 // Separate reviewed experiments. Never widen one experiment to admit another.
 const cases = Object.freeze({
@@ -25,7 +25,7 @@ const cases = Object.freeze({
 export function qualificationCase(name = 'auth-client') {
   if (name === 'catalog-yaml') return proofCase(name)
   if (name === 'security-audit') return securityCase()
-  if (name === frameworkPatchCase) return { ...securityCase(), name, behaviorCase: 'security-audit' }
+  if (frameworkSource(name)) return { ...securityCase(), name, behaviorCase: 'security-audit' }
   assert.ok(Object.hasOwn(cases, name), 'Unknown qualification case')
   return { name, ...cases[name] }
 }
@@ -39,7 +39,7 @@ export function assertQualificationSources(name, { baseline, head, requestedHead
 }
 
 export function assertQualificationManifest(name, baselineContent, candidate) {
-  if (name === 'security-audit' || name === frameworkPatchCase) return assertSecurityManifest(baselineContent, candidate, name)
+  if (name === 'security-audit' || frameworkSource(name)) return assertSecurityManifest(baselineContent, candidate, name)
   const selected = qualificationCase(name)
   assert.equal(createHash('sha256').update(baselineContent).digest('hex'), selected.manifestSha256, 'Baseline manifest must match its immutable source')
   const expected = JSON.parse(baselineContent)
@@ -59,7 +59,7 @@ export function assertQualificationVersions(name, variant, versions) {
   qualificationCase(name)
   assert.ok(['baseline', 'candidate'].includes(variant))
   if (name === 'catalog-yaml') return assertCatalogVersions(Object.fromEntries(['next', 'react', 'react-dom', 'jose', '@keycloak/keycloak-admin-client'].map(key => [key, versions[key]])))
-  if (name === 'security-audit' || name === frameworkPatchCase) return assertSecurityVersions(variant, versions, name)
+  if (name === 'security-audit' || frameworkSource(name)) return assertSecurityVersions(variant, versions, name)
   const historical = name === 'auth-client'
   const upgraded = !historical && variant === 'candidate'
   assert.equal(versions.next, '16.4.2')

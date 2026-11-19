@@ -174,10 +174,10 @@ it('uses guarded structured inspection argv and rejects malformed, stale or unsu
   const repo=path.resolve(__dirname,'../../..');const temporary=fs.mkdtempSync(path.join(os.tmpdir(),'identity48-image-command-'))
   try{
     const imageId='sha256:'+'a'.repeat(64);const info=path.join(temporary,'runner-image.txt');fs.writeFileSync(info,imageId+' linux/amd64\n')
-    const expected=buildExpected(repo,source,'next-16.4.6')
+    const expected=buildExpected(repo,source,'eslint-config-next-16.4.6')
     const filesystem={schema:1,target:'runner',source,scope:'image-root-filesystem',hostExpectedInputHashes:expected.inputHashes,frameworkVendor:expected.frameworkVendor,runner:{buildId:'owned',manifests:[],browserSanitizers:[],clientZod:[],serverZod:[]}}
     const receipt={schema:1,target:'runner',source,imageId,nodeVersion:'v24.22.1',platform:'linux',arch:'x64',filesystem}
-    const options={target:'runner',image:'identity41-node24-123-2:runner',name:'identity41-node24-123-2-runner',evidence:temporary,source,imageInfo:info,root:repo,sourceCase:'next-16.4.6'}
+    const options={target:'runner',image:'identity41-node24-123-2:runner',name:'identity41-node24-123-2-runner',evidence:temporary,source,imageInfo:info,root:repo,sourceCase:'eslint-config-next-16.4.6'}
     const calls:Array<{executable:string;args:string[];options:unknown}>=[]
     const transport=(executable:string,args:string[],spawnOptions:unknown)=>{calls.push({executable,args,options:spawnOptions});return {status:0,stdout:JSON.stringify(receipt),stderr:''}}
     await runImageInspection(options,transport)

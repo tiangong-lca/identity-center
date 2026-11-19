@@ -2,11 +2,12 @@
 
 ## Current Next.js source qualification
 
-The dependency workflow selects `next-16.4.6`. Its baseline is the historical
+The dependency workflow selects `eslint-config-next-16.4.6`. Its baseline is the historical
 security baseline `68e1fafce35e7e931ee0e7c65b5c6e0b4ccf8e8b`. The new
-candidate must also descend from accepted Main `742b6e1325f37dac2605bb1e482851258326b234`.
-The patch adds exactly one direct framework selector to the earlier reviewed
-manifest changes. The host binds the candidate manifest and lock to their
+candidate must also descend from accepted Main `1b6e888ec981c786b69556fae8151cbe0348dd65`.
+This case updates the development ESLint configuration and its Next.js plugin
+to 16.4.6. The earlier `next-16.4.6` case retains its reviewed framework update,
+parent and dependency hashes. The host binds the candidate manifest and lock to their
 reviewed hashes and checks the complete earlier input contract before using
 the remaining seven input hashes. Historical cases remain independently selectable.
 
@@ -17,7 +18,7 @@ Zod identity is bound to the new lock and its separately qualified implementatio
 bytes. The browser and transport jobs use the existing `security-audit` behavior.
 The outer receipt records both `qualificationCase` and `behaviorCase` for this run.
 
-From a clean checkout, use `AUTH_PROOF_CASE=next-16.4.6 AUTH_PROOF_HEAD="$(git rev-parse HEAD)" node tests/auth-compatibility/run.mjs --validate-sources`
+From a clean checkout, use `AUTH_PROOF_CASE=eslint-config-next-16.4.6 AUTH_PROOF_HEAD="$(git rev-parse HEAD)" node tests/auth-compatibility/run.mjs --validate-sources`
 in `identity-portal/` to check Git identity and the complete allowed delta.
 The native image builds, restricted image inspections and behavioral comparison
 are verified by the existing hosted workflow.

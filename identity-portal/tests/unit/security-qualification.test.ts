@@ -5,7 +5,7 @@ import os from 'node:os'
 import { execFileSync } from 'node:child_process'
 import { createHash } from 'node:crypto'
 import { qualificationCase, assertQualificationManifest, assertQualificationVersions } from '../auth-compatibility/qualification-case.mjs'
-import { frameworkPatchCase, securityInputsForCase } from '../auth-compatibility/framework-patch.mjs'
+import { eslintConfigCase, frameworkPatchCase, securityInputsForCase } from '../auth-compatibility/framework-patch.mjs'
 import { SECURITY_BASELINE, SECURITY_INPUTS, SECURITY_PATCH, securityChangedPathPolicy, assertSecurityArchive, SECURITY_CANDIDATE_PATHS, SECURITY_PROVENANCE, SECURITY_UPSTREAM, SECURITY_ORIGINAL_ASSETS, assertSecurityProvenance, securityInstalledAssets } from '../auth-compatibility/security-case.mjs'
 import { qualificationUiPlan, qualificationBrowserTimeout, combinedReactUi, assertSecurityUiReceipts } from '../auth-compatibility/ui-plan.mjs'
 
@@ -37,7 +37,18 @@ it('keeps the framework patch separate from the original security case and binds
 
   const historic = fs.readFileSync(path.resolve(__dirname, '../auth-compatibility/security-inputs.json'))
   const before = securityInputsForCase('security-audit', historic)
-  const after = securityInputsForCase(frameworkPatchCase, historic)
+  const framework = securityInputsForCase(frameworkPatchCase, historic)
+  expect(framework.candidateHashes['identity-portal/package.json']).toBe('24bea394241e4544bd1d59c5269b4d3b44daa77519575aa3b763f8851d68c6df')
+  expect(framework.candidateHashes['identity-portal/pnpm-lock.yaml']).toBe('fb9fe8e39078055fc36fed089f410bb73045a7ac705298d6b1b79971c80e5730')
+  const after = securityInputsForCase(eslintConfigCase, historic)
+  expect(qualificationCase(eslintConfigCase)).toMatchObject({ name: eslintConfigCase, baseline: SECURITY_BASELINE, behaviorCase: 'security-audit' })
+  expect(() => assertQualificationManifest(eslintConfigCase, immutableManifest.content, patched)).toThrow()
+  patched.devDependencies['eslint-config-next'] = '16.4.6'
+  expect(() => assertQualificationManifest(eslintConfigCase, immutableManifest.content, patched)).not.toThrow()
+  expect(() => assertQualificationManifest(frameworkPatchCase, immutableManifest.content, patched)).toThrow()
+  const lintVersions = { ...patchedVersions, 'eslint-config-next': '16.4.6', '@next/eslint-plugin-next': '16.4.6' }
+  expect(() => assertQualificationVersions(eslintConfigCase, 'candidate', lintVersions)).not.toThrow()
+  expect(() => assertQualificationVersions(eslintConfigCase, 'candidate', { ...lintVersions, '@next/eslint-plugin-next': '16.4.2' })).toThrow()
   for (const file of Object.keys(before.candidateHashes)) {
     if (file === 'identity-portal/package.json' || file === 'identity-portal/pnpm-lock.yaml') {
       const actual = fs.readFileSync(path.resolve(__dirname, '../../..', file))
@@ -45,6 +56,7 @@ it('keeps the framework patch separate from the original security case and binds
       expect(after.candidateHashes[file]).not.toBe(before.candidateHashes[file])
     } else {
       expect(after.candidateHashes[file]).toBe(before.candidateHashes[file])
+      expect(framework.candidateHashes[file]).toBe(before.candidateHashes[file])
     }
   }
   expect(() => securityInputsForCase(frameworkPatchCase, Buffer.concat([historic, Buffer.from(' ')]))).toThrow()

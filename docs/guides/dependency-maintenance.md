@@ -12,8 +12,8 @@ checkPaths:
   - identity-portal/pnpm-lock.yaml
   - docs/guides/dependency-maintenance.md
 lastReviewedAt: 2026-11-19
-lastReviewedCommit: cbdcd2e42f42c884441879ca1ccf836b82ff7adb
-lastReviewedNote: "Identity #55. Reviewed the release-age diagnosis, exact Next.js 16.4.6 graph, source case, and independent residual ownership."
+lastReviewedCommit: 041691db7e94608c20804b901e1a976b32c9c97a
+lastReviewedNote: "Identity #57 reviewed the ESLint configuration and plugin against the accepted framework graph, frozen lock, image inputs and authentication behavior suite."
 ---
 
 # Dependency maintenance
@@ -195,7 +195,15 @@ The focused 16.4.6 update is resolved from the accepted Main graph. Only Next,
 its environment package and eight native SWC packages move. The unchanged
 compatibility pins include React, next-auth, Keycloak, the ESLint configuration
 and the Monaco patch. The earlier `security-audit` case retains its immutable
-baseline and expectations. The current `next-16.4.6` case binds the new input
+baseline and expectations. The `next-16.4.6` case binds the new input
 bytes and uses that same behavioral suite. The former Next.js advisories clear
 on a fresh audit, while the separately recorded #49 and #52 residuals retain
 their existing owners. See the [source and image proof contract](../../identity-portal/tests/auth-compatibility/README.md).
+
+## ESLint configuration for Identity #57
+
+The `eslint-config-next-16.4.6` case adds the development configuration and
+its `@next/eslint-plugin-next` dependency to the framework graph accepted in
+#55. Both resolve to 16.4.6. The case pins the manifest and frozen lock and
+checks both installed versions when running the existing compatibility suite.
+The earlier source cases retain their own graph and manifest expectations.
