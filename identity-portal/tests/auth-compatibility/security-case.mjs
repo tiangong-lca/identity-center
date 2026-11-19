@@ -3,7 +3,7 @@ import { execFileSync } from 'node:child_process'
 import { createHash } from 'node:crypto'
 import { readFileSync, readdirSync, lstatSync, realpathSync } from 'node:fs'
 import path from 'node:path'
-import { frameworkParent, frameworkPatchCase, frameworkVersion, securityInputsForCase } from './framework-patch.mjs'
+import { eslintConfigCase, frameworkSource, frameworkVersion, securityInputsForCase } from './framework-patch.mjs'
 
 export const SECURITY_BASELINE = '68e1fafce35e7e931ee0e7c65b5c6e0b4ccf8e8b'
 export const SECURITY_PATCH = 'identity-portal/patches/monaco-editor@0.55.1.patch'
@@ -38,7 +38,10 @@ export function assertSecurityManifest(baselineContent, candidate, sourceCase = 
   expected.dependencies.zod = '^4.6.7'
   expected.devDependencies.vitest = '^4.1.12'
   expected.devDependencies['@vitest/coverage-v8'] = '^4.1.12'
-  if (sourceCase === frameworkPatchCase) expected.dependencies.next = frameworkVersion
+  if (frameworkSource(sourceCase)) {
+    expected.dependencies.next = frameworkVersion
+    if (sourceCase === eslintConfigCase) expected.devDependencies['eslint-config-next'] = frameworkVersion
+  }
   else assert.equal(sourceCase, 'security-audit', 'Unknown security qualification source case')
   assert.deepEqual(candidate, expected, 'Only the exact manifest changes for this source case are admitted')
 }
@@ -49,8 +52,13 @@ export function assertSecurityVersions(variant, versions, sourceCase = 'security
   const selected = variant === 'baseline'
     ? { shadcn: '4.21.0', zod: '4.4.3', vitest: '4.1.11', '@vitest/coverage-v8': '4.1.11' }
     : { shadcn: '4.23.0', zod: '4.6.7', vitest: '4.1.12', '@vitest/coverage-v8': '4.1.12' }
-  assert.ok(sourceCase === 'security-audit' || sourceCase === frameworkPatchCase)
-  if (sourceCase === frameworkPatchCase && variant === 'candidate') fixed.next = frameworkVersion
+  assert.ok(sourceCase === 'security-audit' || frameworkSource(sourceCase))
+  if (frameworkSource(sourceCase) && variant === 'candidate') fixed.next = frameworkVersion
+  if (sourceCase === eslintConfigCase) {
+    const lintVersion = variant === 'candidate' ? frameworkVersion : '16.4.2'
+    assert.equal(versions['eslint-config-next'], lintVersion, 'Require exact ESLint configuration version')
+    assert.equal(versions['@next/eslint-plugin-next'], lintVersion, 'Require exact installed Next.js lint plugin')
+  }
   for (const [name, value] of Object.entries({ ...fixed, ...selected })) assert.equal(versions[name], value, `Exact security ${variant} version required: ${name}`)
 }
 
@@ -90,7 +98,8 @@ export function assertSecuritySources({ baseline, head, requestedHead, cwd, env,
   assert.notEqual(head, baseline)
   assert.equal(git(['merge-base', baseline, head], options).toString().trim(), baseline, 'Candidate must descend from the security baseline')
   const retainedInputs = show(head, SECURITY_INPUTS, options)
-  if (sourceCase === frameworkPatchCase) {
+  const frameworkParent = frameworkSource(sourceCase)?.parent
+  if (frameworkParent) {
     assert.equal(git(['merge-base', frameworkParent, head], options).toString().trim(), frameworkParent, 'Framework patch must descend from the reviewed parent')
     assert.deepEqual(retainedInputs, show(frameworkParent, SECURITY_INPUTS, options), 'Retain the original security input contract')
   }

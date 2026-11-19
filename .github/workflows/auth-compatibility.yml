@@ -112,13 +112,13 @@ jobs:
           for target in runner worker; do
             bounded_docker 600000 build --label "org.tiangong.identity-proof=${image_prefix}" --target "$target" --tag "${image_prefix}:${target}" --file deploy/docker/Dockerfile .
             bounded_docker 15000 image inspect "${image_prefix}:${target}" --format '{{.Id}} {{.Os}}/{{.Architecture}}' > "$evidence_dir/${target}-image.txt"
-            node tests/auth-compatibility/image-security-proof.mjs --source-case next-16.4.6 --target "$target" --image "${image_prefix}:${target}" --name "${image_prefix}-${target}" --evidence "$evidence_dir" --source "$(git rev-parse HEAD)" --image-info "$evidence_dir/${target}-image.txt"
+            node tests/auth-compatibility/image-security-proof.mjs --source-case eslint-config-next-16.4.6 --target "$target" --image "${image_prefix}:${target}" --name "${image_prefix}-${target}" --evidence "$evidence_dir" --source "$(git rev-parse HEAD)" --image-info "$evidence_dir/${target}-image.txt"
           done
       - name: Qualify isolated baseline and candidate auth transports
         env:
           AUTH_PROOF_HEAD: ${{ github.event.pull_request.head.sha }}
           # Explicit immutable security experiment; historical cases remain intact.
-          AUTH_PROOF_CASE: next-16.4.6
+          AUTH_PROOF_CASE: eslint-config-next-16.4.6
         run: node tests/auth-compatibility/run.mjs
       - name: Preserve sanitized proof and cleanup receipts
         if: always()
