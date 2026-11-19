@@ -1,0 +1,176 @@
+{
+  "source": "1ea85e1a8a369e2f2a2c7271cfa0a05cc6742f98",
+  "manifestSha256": "27ee774f620581f531bcf95f149e5695c6d37115a4eae0ad64abd556f5902ea9",
+  "lockSha256": "08ed7d0cfc959d227f23b2e787db4c96e2f3b354b058ef7c052c4960341cfb50",
+  "scope": "Actual source schema/migration bytes; same sorted actual export namespace into Kit API, unmodified emitted SQL; thin-adapter queries and pg serializers. No DB connection or applied migration.",
+  "summary": {
+    "schemaInputs": {
+      "files": [
+        {
+          "path": "db/schema/_shared.ts",
+          "sha256": "fe8300cbdb150c0d22c3a5c273e0b4af047bcadc3b2187455a8802b636b9207d"
+        },
+        {
+          "path": "db/schema/admin-rbac.ts",
+          "sha256": "9f018cebb72a8fdc9c0c6337e63a6b5d9d98b9be70e165b87c1c59fcb71ebcc4"
+        },
+        {
+          "path": "db/schema/applications.ts",
+          "sha256": "617d20b5d816a40e8ba90e75fb594f4265ce03f887f7c99457e91b0baa0f8767"
+        },
+        {
+          "path": "db/schema/audit.ts",
+          "sha256": "9c2450151c58d33a471e71a02548bcec1cc5207500c1520c6cbc086d33f6ba2a"
+        },
+        {
+          "path": "db/schema/catalog-versions.ts",
+          "sha256": "c2edda6802b8d6f75691f80ce2621d3715304977cd91825401cde1710a971f22"
+        },
+        {
+          "path": "db/schema/events.ts",
+          "sha256": "05fd6b126589cf41333fc18c92c8cae4594309f5e35aef666f9f038be5be3528"
+        },
+        {
+          "path": "db/schema/index.ts",
+          "sha256": "31d278c8b6c58227988a48748453664caf560b75e5966f808a8b45fcaac1837f"
+        },
+        {
+          "path": "db/schema/organizations.ts",
+          "sha256": "37454f70ea61e71dc2f92a75fa70682b7fe12aa5a817398c3fb01e7cc865fed2"
+        },
+        {
+          "path": "db/schema/users.ts",
+          "sha256": "abeb4c7c6492edd65fc03c0e54025e24f9259a0451f866130f13355d2a721513"
+        }
+      ],
+      "sha256": "c5b61e44e37b05d07bb050ab7b469251cf6deee676f841da5d7384b88dcd70c3"
+    },
+    "migrationInputs": {
+      "files": [
+        {
+          "path": "db/migrations/0000_init.sql",
+          "sha256": "b3fda69b3db6ffccc54225758db78629a9ea9dd588454e34217035ba2e582ac2"
+        },
+        {
+          "path": "db/migrations/0001_add_phone_encrypted.sql",
+          "sha256": "40b8939f5d58da58bc75a825098a9921aef3cc29463a49dfc37a8d01e941b921"
+        },
+        {
+          "path": "db/migrations/0002_registration_requested_access.sql",
+          "sha256": "351df23b72d085d51a091fea0b7d510cf7696b24f19bfe0d3d96eba6cca28c94"
+        },
+        {
+          "path": "db/migrations/0003_serious_vampiro.sql",
+          "sha256": "2ca4dec7b2603a9ff90a16dcd4e8021bc19db5d8f63103f53f7cd24fac8fb3ee"
+        },
+        {
+          "path": "db/migrations/meta/0000_snapshot.json",
+          "sha256": "e28cd501af6c73bdc3dfb6bebbbf253a615f754b6888d4fc9211800d1eec9ea1"
+        },
+        {
+          "path": "db/migrations/meta/0001_snapshot.json",
+          "sha256": "997821987b9489e357babc0661dbcf009efb44e18449682a4432aa65ec542e07"
+        },
+        {
+          "path": "db/migrations/meta/0002_snapshot.json",
+          "sha256": "2916ad7b621e78c412575354a59772e99ce367722a385c2c8d15928c12ba3ed7"
+        },
+        {
+          "path": "db/migrations/meta/0003_snapshot.json",
+          "sha256": "0adf7aef3306c70a7242f0ba55c7d341168f4eab0803be0720ed34cb68b517f4"
+        },
+        {
+          "path": "db/migrations/meta/_journal.json",
+          "sha256": "26bda59444d8623cf61f3a8ba5b432944b1108fe8b91c99e12f7f328ec9cd9d1"
+        }
+      ],
+      "sha256": "53906e08a3d81d576009894ad6e79a1c4f72eb691edbd9eb576ce3c99a1a9fe6"
+    },
+    "tables": [
+      "public.admin_permissions",
+      "public.admin_role_permissions",
+      "public.admin_roles",
+      "public.admin_user_roles",
+      "public.application_assignments",
+      "public.application_roles",
+      "public.application_user_roles",
+      "public.applications",
+      "public.audit_logs",
+      "public.business_app_organization_mappings",
+      "public.catalog_versions",
+      "public.dead_letter_events",
+      "public.outbox_events",
+      "public.platform_organization_members",
+      "public.platform_organizations",
+      "public.platform_tenant_members",
+      "public.platform_tenants",
+      "public.portal_users",
+      "public.processed_events",
+      "public.registration_requests",
+      "public.webhook_deliveries"
+    ],
+    "snapshotSha256": "50a530d5c687de98fca34895a3716c6729dad83c23f5ea723e9fb71cec7b7bba",
+    "migrationSqlSha256": "e7f41a62bc214a4683285508ae884755d12d1ab752580c3bf697ab609005e3bb",
+    "repeatedSql": [],
+    "queries": {
+      "delete": {
+        "params": [
+          "11111111-1111-4111-8111-111111111111"
+        ],
+        "sql": "delete from \"portal_users\" where \"portal_users\".\"id\" = $1 returning \"id\""
+      },
+      "insert": {
+        "params": [
+          "11111111-1111-4111-8111-111111111111",
+          "fixture-sub",
+          "fixture@example.invalid",
+          "{\"locale\":\"中文\",\"values\":[null,3]}",
+          "2026-01-02T03:04:05.000Z",
+          "2026-01-02T03:04:05.000Z"
+        ],
+        "sql": "insert into \"portal_users\" (\"id\", \"keycloak_sub\", \"keycloak_user_id\", \"email\", \"display_name\", \"phone_encrypted\", \"status\", \"sync_status\", \"metadata\", \"created_at\", \"updated_at\") values ($1, $2, default, $3, default, default, default, default, $4, $5, $6) returning \"id\""
+      },
+      "select": {
+        "params": [
+          "fixture'key",
+          3,
+          2
+        ],
+        "sql": "select \"id\", \"keycloak_sub\" from \"portal_users\" where \"portal_users\".\"keycloak_sub\" = $1 order by \"portal_users\".\"id\" asc limit $2 offset $3"
+      },
+      "update": {
+        "params": [
+          "名字",
+          "{\"approved\":true}",
+          "2026-01-02T03:04:05.000Z",
+          "11111111-1111-4111-8111-111111111111"
+        ],
+        "sql": "update \"portal_users\" set \"display_name\" = $1, \"metadata\" = $2, \"updated_at\" = $3 where \"portal_users\".\"id\" = $4 returning \"id\""
+      }
+    },
+    "driver": {
+      "bigint": "9223372036854775807",
+      "identifier": "\"fixture\"\"name\"",
+      "json": {
+        "locale": "中文",
+        "values": [
+          1,
+          null
+        ]
+      },
+      "literal": " E'fixture''\\\\value'",
+      "parameters": [
+        null,
+        null,
+        "{\"1\",NULL,\"a,b\",\"a\\\"b\"}",
+        "{\"locale\":\"中文\"}",
+        {
+          "type": "Buffer",
+          "hex": "00ff"
+        },
+        "{\"custom\",\"value\"}"
+      ]
+    },
+    "networkConnectCalls": 0
+  }
+}

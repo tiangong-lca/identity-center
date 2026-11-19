@@ -6,6 +6,7 @@ import { execFileSync } from 'node:child_process'
 import { createHash } from 'node:crypto'
 import { qualificationCase, assertQualificationManifest, assertQualificationVersions } from '../auth-compatibility/qualification-case.mjs'
 import { eslintConfigCase, frameworkPatchCase, securityInputsForCase } from '../auth-compatibility/framework-patch.mjs'
+import { databaseCase } from '../auth-compatibility/database-case.mjs'
 import { SECURITY_BASELINE, SECURITY_INPUTS, SECURITY_PATCH, securityChangedPathPolicy, assertSecurityArchive, SECURITY_CANDIDATE_PATHS, SECURITY_PROVENANCE, SECURITY_UPSTREAM, SECURITY_ORIGINAL_ASSETS, assertSecurityProvenance, securityInstalledAssets } from '../auth-compatibility/security-case.mjs'
 import { qualificationUiPlan, qualificationBrowserTimeout, combinedReactUi, assertSecurityUiReceipts } from '../auth-compatibility/ui-plan.mjs'
 
@@ -49,12 +50,16 @@ it('keeps the framework patch separate from the original security case and binds
   const lintVersions = { ...patchedVersions, 'eslint-config-next': '16.4.6', '@next/eslint-plugin-next': '16.4.6' }
   expect(() => assertQualificationVersions(eslintConfigCase, 'candidate', lintVersions)).not.toThrow()
   expect(() => assertQualificationVersions(eslintConfigCase, 'candidate', { ...lintVersions, '@next/eslint-plugin-next': '16.4.2' })).toThrow()
+  expect(after.candidateHashes['identity-portal/package.json']).toBe('27ee774f620581f531bcf95f149e5695c6d37115a4eae0ad64abd556f5902ea9')
+  expect(after.candidateHashes['identity-portal/pnpm-lock.yaml']).toBe('08ed7d0cfc959d227f23b2e787db4c96e2f3b354b058ef7c052c4960341cfb50')
+  const current = securityInputsForCase(databaseCase, historic)
   for (const file of Object.keys(before.candidateHashes)) {
     if (file === 'identity-portal/package.json' || file === 'identity-portal/pnpm-lock.yaml') {
       const actual = fs.readFileSync(path.resolve(__dirname, '../../..', file))
-      expect(after.candidateHashes[file]).toBe(createHash('sha256').update(actual).digest('hex'))
-      expect(after.candidateHashes[file]).not.toBe(before.candidateHashes[file])
+      expect(current.candidateHashes[file]).toBe(createHash('sha256').update(actual).digest('hex'))
+      expect(current.candidateHashes[file]).not.toBe(before.candidateHashes[file])
     } else {
+      expect(current.candidateHashes[file]).toBe(before.candidateHashes[file])
       expect(after.candidateHashes[file]).toBe(before.candidateHashes[file])
       expect(framework.candidateHashes[file]).toBe(before.candidateHashes[file])
     }

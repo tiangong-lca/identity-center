@@ -11,6 +11,7 @@ import { fileURLToPath } from 'node:url'
 import { assertHostedContext, assertFixture, IMAGE_TAGS, composeDocument, cleanEnvironment, redactor, lineRedactor, attemptCleanup, ownedLifecycle, compareReceipts, assertProductDeltaFromGit } from './contract.mjs'
 
 import { eslintConfigCase } from './framework-patch.mjs'
+import { databaseCase, installedDatabaseVersions } from './database-case.mjs'
 import { assertCatalogSources, assertCatalogUiReceipts } from './catalog-case.mjs'
 import { qualificationCase, assertQualificationSources, assertQualificationManifest, assertQualificationVersions, assertReactSourcePathFromGit } from './qualification-case.mjs'
 import { assertSecurityBehaviorReceipts, securityZodIdentity } from './security-behavior-source.mjs'
@@ -237,11 +238,14 @@ async function variant(variant, root, images, head, securityInputs) {
       if (selectedCase.name !== 'auth-client') {
         for (const name of ['@types/react', '@types/react-dom']) versions[name] = JSON.parse(fs.readFileSync(path.join(app, 'node_modules', name, 'package.json'))).version
         if (selectedCase.name === 'security-audit') for (const name of ['shadcn', 'zod', 'vitest', '@vitest/coverage-v8', 'monaco-editor', 'monaco-yaml']) versions[name] = JSON.parse(fs.readFileSync(path.join(app, 'node_modules', name, 'package.json'))).version
-        if (sourceCase.name === eslintConfigCase) {
+        if (sourceCase.name === eslintConfigCase || sourceCase.name === databaseCase) {
           const configPath = path.join(app, 'node_modules/eslint-config-next/package.json')
           versions['eslint-config-next'] = JSON.parse(fs.readFileSync(configPath)).version
           const pluginPath = createRequire(fs.realpathSync(configPath)).resolve('@next/eslint-plugin-next/package.json')
           versions['@next/eslint-plugin-next'] = JSON.parse(fs.readFileSync(pluginPath)).version
+        }
+        if (sourceCase.name === databaseCase) {
+          Object.assign(versions, installedDatabaseVersions(app))
         }
         assertQualificationVersions(sourceCase.name, variant, versions)
       }

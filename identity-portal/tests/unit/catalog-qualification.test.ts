@@ -174,7 +174,7 @@ it('retains exact catalog owner paths in the secretless exact-head security work
   expect(paths).not.toContain('identity-portal/**')
   const steps = workflow.jobs['auth-compatibility'].steps
   const runner = steps.find(step => step.env?.AUTH_PROOF_CASE)
-  expect(runner?.env).toEqual({ AUTH_PROOF_HEAD: '${{ github.event.pull_request.head.sha }}', AUTH_PROOF_CASE: 'eslint-config-next-16.4.6' })
+  expect(runner?.env).toEqual({ AUTH_PROOF_HEAD: '${{ github.event.pull_request.head.sha }}', AUTH_PROOF_CASE: 'database-2026-11-19' })
   expect(runner?.run).toBe('node tests/auth-compatibility/run.mjs')
   expect(steps[0].with?.ref).toBe('${{ github.event.pull_request.head.sha }}')
   expect(steps[0].with?.['persist-credentials']).toBe(false)

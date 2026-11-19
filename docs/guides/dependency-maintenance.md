@@ -207,3 +207,25 @@ its `@next/eslint-plugin-next` dependency to the framework graph accepted in
 #55. Both resolve to 16.4.6. The case pins the manifest and frozen lock and
 checks both installed versions when running the existing compatibility suite.
 The earlier source cases retain their own graph and manifest expectations.
+
+## Database cohort for Identity #58
+
+Original PR40 adopts the four latest compatible stable database declarations:
+Drizzle ORM0.45.4, Kit0.31.11 and pg/@types8.23.1. Current official release
+metadata is outside the configured age windows. The scoped lock restores the
+original proposal's unrelated Rolldown/OXC/wasm/PostCSS/resolver/lint/helper
+changes, preserving #51's remaining accounting. Seven package records and eight
+snapshots/peer bindings move; the other 950 entries in each map remain exact.
+Official metadata and full archive SRI checks bind all seven selected artifacts.
+
+The new `database-2026-11-19` source case composes with accepted Main1ea85e1,
+keeps every prior source/hash case and requires the actual installed database
+closure. Actual root-frozen Main/candidate Kit API and CLI, thin-adapter query
+compilation and pg serialization compare offline without opening a connection.
+This does not implement #49's obsolete-loader removal, apply a migration or
+claim PostgreSQL/KES server equivalence. The five current unfiltered audit
+findings (one High, three Moderate and one Low) match current Main exactly and
+remain with #49/#52; #51's89-record scope is not retired. See the
+[qualification contract](../../identity-portal/tests/auth-compatibility/README.md).
+The full existing hosted image and both-variant auth/UI/security gate remains
+required before original-source delivery and exact workspace integration.

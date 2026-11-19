@@ -423,3 +423,33 @@ reports React/DOM19.3.1 and both types19.3.0. This records source composition on
 full build/unit and exact-head hosted proof remain pending Main phase review.
 The106 original29 provisional gaps need Main's exact per-record disposition;
 they are not blanket unadopted tooling or a whole-proposal completion claim.
+
+## 2026-11-19 database cohort source qualification — Identity #58
+
+Original PR40's four declared upgrades are retained, with unrelated regenerated
+lock fields restored to reviewed Main1ea85e1. Official fixed-version metadata
+([ORM](https://registry.npmjs.org/drizzle-orm/0.45.4),
+[Kit](https://registry.npmjs.org/drizzle-kit/0.31.11),
+[pg](https://registry.npmjs.org/pg/8.23.1),
+[types](https://registry.npmjs.org/%40types%2Fpg/8.23.1)) and complete seven-archive
+SHA512/name/version checks bind the selected graph. No source/metadata field
+outside the required pg closure is silently refreshed.
+
+Current-Main and candidate actual frozen installs produce identical 21-table
+schema snapshots,65 API-generated SQL statements, unchanged migration inputs,
+four compiled thin-adapter queries and pg parameter/type conversions. The same
+ordered namespace is passed to both Kit APIs; emitted SQL order and bytes remain
+intact. Actual CLI `generate` runs against owned explicit configurations also
+produce identical SQL. No migration is applied or database socket opened.
+The [official Kit distinction](https://orm.drizzle.team/docs/migrations) keeps
+SQL generation separate from migration execution; the
+[pg conversion contract](https://node-postgres.com/features/queries) covers the
+real serializer used here. The previous source cases/fixtures remain immutable.
+
+The `database-2026-11-19` workflow case retains historical security baseline68
+and the same complete native image, provider/DB/Redis, browser and security
+comparison. Its new parent and manifest/lock hashes are exact. Local offline
+and full unit proof cannot replace hosted acceptance. #49's vendor/obsolete
+loader remediation, #51's original89-record accounting, #52's remaining audit
+paths and production/publication authority stay separate. The current five
+unfiltered findings exactly match the accepted Main graph.

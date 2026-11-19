@@ -4,6 +4,7 @@ import { createHash } from 'node:crypto'
 import { readFileSync, readdirSync, lstatSync, realpathSync } from 'node:fs'
 import path from 'node:path'
 import { eslintConfigCase, frameworkSource, frameworkVersion, securityInputsForCase } from './framework-patch.mjs'
+import { databaseCase, databaseManifest, databaseBaselineVersions, databaseVersions } from './database-case.mjs'
 
 export const SECURITY_BASELINE = '68e1fafce35e7e931ee0e7c65b5c6e0b4ccf8e8b'
 export const SECURITY_PATCH = 'identity-portal/patches/monaco-editor@0.55.1.patch'
@@ -40,7 +41,11 @@ export function assertSecurityManifest(baselineContent, candidate, sourceCase = 
   expected.devDependencies['@vitest/coverage-v8'] = '^4.1.12'
   if (frameworkSource(sourceCase)) {
     expected.dependencies.next = frameworkVersion
-    if (sourceCase === eslintConfigCase) expected.devDependencies['eslint-config-next'] = frameworkVersion
+    if (sourceCase === eslintConfigCase || sourceCase === databaseCase) expected.devDependencies['eslint-config-next'] = frameworkVersion
+    if (sourceCase === databaseCase) {
+      Object.assign(expected.dependencies, databaseManifest.dependencies)
+      Object.assign(expected.devDependencies, databaseManifest.devDependencies)
+    }
   }
   else assert.equal(sourceCase, 'security-audit', 'Unknown security qualification source case')
   assert.deepEqual(candidate, expected, 'Only the exact manifest changes for this source case are admitted')
@@ -54,10 +59,15 @@ export function assertSecurityVersions(variant, versions, sourceCase = 'security
     : { shadcn: '4.23.0', zod: '4.6.7', vitest: '4.1.12', '@vitest/coverage-v8': '4.1.12' }
   assert.ok(sourceCase === 'security-audit' || frameworkSource(sourceCase))
   if (frameworkSource(sourceCase) && variant === 'candidate') fixed.next = frameworkVersion
-  if (sourceCase === eslintConfigCase) {
+  if (sourceCase === eslintConfigCase || sourceCase === databaseCase) {
     const lintVersion = variant === 'candidate' ? frameworkVersion : '16.4.2'
     assert.equal(versions['eslint-config-next'], lintVersion, 'Require exact ESLint configuration version')
     assert.equal(versions['@next/eslint-plugin-next'], lintVersion, 'Require exact installed Next.js lint plugin')
+  }
+  if (sourceCase === databaseCase) {
+    for (const [name, value] of Object.entries(variant === 'baseline' ? databaseBaselineVersions : databaseVersions)) {
+      assert.equal(versions[name], value, `Exact database ${variant} version required: ${name}`)
+    }
   }
   for (const [name, value] of Object.entries({ ...fixed, ...selected })) assert.equal(versions[name], value, `Exact security ${variant} version required: ${name}`)
 }
@@ -77,6 +87,7 @@ const supportPaths = new Set([
   'identity-portal/tests/unit/auth-image-cleanup.test.ts',
   '.github/workflows/auth-compatibility.yml', 'identity-portal/tests/unit/auth-compatibility-harness.test.ts',
   'identity-portal/tests/unit/catalog-qualification.test.ts', 'identity-portal/tests/unit/security-qualification.test.ts', 'identity-portal/tests/unit/security-behavior.test.ts',
+  'identity-portal/tests/unit/database-cohort.test.ts',
 ])
 const docPaths = new Set(['docs/guides/dependency-maintenance.md', 'docs/references/2026-07-02-l0-dependency-versions.md', 'docs/references/2026-10-28-dependency-security.md'])
 const stripReview = value => value.replace(/^(?:lastReviewedAt|lastReviewedCommit|lastReviewedNote):[^\r\n]*(?:\r?\n|$)/gm, '')
