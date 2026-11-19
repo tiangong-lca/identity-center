@@ -5,8 +5,8 @@ import net from 'node:net'
 import path from 'node:path'
 import { createRequire } from 'node:module'
 import { fileURLToPath } from 'node:url'
-import { asc, eq } from 'drizzle-orm'
-import { pgTable, uuid, text, jsonb, timestamp } from 'drizzle-orm/pg-core'
+import { asc, eq, is, getTableColumns } from 'drizzle-orm'
+import { PgTable, pgTable, uuid, text, jsonb, timestamp } from 'drizzle-orm/pg-core'
 import { databaseCase, databaseSource } from './database-case.mjs'
 import { generateDrizzleJson, generateMigration } from 'drizzle-kit/api'
 import * as schemaExports from '@/db/schema'
@@ -45,10 +45,16 @@ function inputTree(root: string, directory: string) {
 export async function databaseConsumerProof(root = fileURLToPath(new URL('../../', import.meta.url)), mode: 'full' | 'focused' = 'full') {
   assert.ok(mode === 'full' || mode === 'focused')
   // Node's CJS export-star bridge and the Vitest ESM loader expose the same tables.
-  const exports = ('default' in schemaExports ? schemaExports.default : schemaExports) as typeof schemaExports
-  // Feed both compiler loaders the same ordered namespace; do not sort emitted SQL.
-  const schema = Object.fromEntries(Object.keys(exports).sort().map(name => [name, exports[name as keyof typeof exports]])) as typeof schemaExports
-  const table = mode === 'full' ? schema.portalUsers : probeTable
+  const sourceSchema = () => {
+    const exports = ('default' in schemaExports ? schemaExports.default : schemaExports) as Record<string, unknown>
+    // Feed both compiler loaders the same ordered namespace; do not sort emitted SQL.
+    return Object.fromEntries(Object.keys(exports).sort().map(name => [name, exports[name]]))
+  }
+  const schema = mode === 'full' ? sourceSchema() : null
+  const table = mode === 'full' ? schema?.portalUsers : probeTable
+  assert.ok(is(table, PgTable), 'Require the selected qualification table')
+  const columns = getTableColumns(table)
+  for (const name of ['id', 'keycloakSub', 'email', 'displayName', 'metadata', 'createdAt', 'updatedAt']) assert.ok(columns[name], `Require qualification column: ${name}`)
   const originalConnect = net.Socket.prototype.connect
   let networkConnectCalls = 0
   net.Socket.prototype.connect = function () { networkConnectCalls++; throw new Error('Database proof forbids a socket connection') }
@@ -58,10 +64,10 @@ export async function databaseConsumerProof(root = fileURLToPath(new URL('../../
     const id = '11111111-1111-4111-8111-111111111111'
     const instant = new Date('2026-01-02T03:04:05.000Z')
     const queries = {
-      select: client.db.select({ id: table.id, sub: table.keycloakSub }).from(table).where(eq(table.keycloakSub, "fixture'key")).orderBy(asc(table.id)).limit(3).offset(2).toSQL(),
-      insert: client.db.insert(table).values({ id, keycloakSub: 'fixture-sub', email: 'fixture@example.invalid', metadata: { locale: '中文', values: [null, 3] }, createdAt: instant, updatedAt: instant }).returning({ id: table.id }).toSQL(),
-      update: client.db.update(table).set({ displayName: '名字', metadata: { approved: true }, updatedAt: instant }).where(eq(table.id, id)).returning({ id: table.id }).toSQL(),
-      delete: client.db.delete(table).where(eq(table.id, id)).returning({ id: table.id }).toSQL(),
+      select: client.db.select({ id: columns.id, sub: columns.keycloakSub }).from(table).where(eq(columns.keycloakSub, "fixture'key")).orderBy(asc(columns.id)).limit(3).offset(2).toSQL(),
+      insert: client.db.insert(table).values({ id, keycloakSub: 'fixture-sub', email: 'fixture@example.invalid', metadata: { locale: '中文', values: [null, 3] }, createdAt: instant, updatedAt: instant }).returning({ id: columns.id }).toSQL(),
+      update: client.db.update(table).set({ displayName: '名字', metadata: { approved: true }, updatedAt: instant }).where(eq(columns.id, id)).returning({ id: columns.id }).toSQL(),
+      delete: client.db.delete(table).where(eq(columns.id, id)).returning({ id: columns.id }).toSQL(),
     }
     const require = createRequire(path.join(root, 'package.json'))
     const pg = require('pg') as { escapeIdentifier: (value: string) => string; escapeLiteral: (value: string) => string; types: { getTypeParser: (oid: number) => (value: string) => unknown } }
@@ -76,6 +82,7 @@ export async function databaseConsumerProof(root = fileURLToPath(new URL('../../
     assert.equal(client.pool.totalCount, 0)
     assert.equal(networkConnectCalls, 0)
     if (mode === 'focused') return canonical({ queries, driver, networkConnectCalls })
+    assert.ok(schema)
     const empty = generateDrizzleJson({})
     const snapshot = generateDrizzleJson(schema, empty.id)
     const migrationSql = await generateMigration(empty, snapshot)
