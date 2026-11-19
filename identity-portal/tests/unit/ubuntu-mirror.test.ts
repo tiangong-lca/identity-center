@@ -2,23 +2,40 @@ import { expect, it } from 'vitest'
 import fs from 'node:fs'
 import path from 'node:path'
 import { load } from 'js-yaml'
-import { canonicalUbuntuMirrors, assertUbuntuMirrorContext } from '../auth-compatibility/ubuntu-mirror.mjs'
+import { ubuntuMirrorPlan, assertUbuntuMirrorContext, writeAndVerifyUbuntuMirror } from '../auth-compatibility/ubuntu-mirror.mjs'
 
 const archive = 'https://archive.ubuntu.com/ubuntu/\tpriority:2\n'
 const security = 'https://security.ubuntu.com/ubuntu/\tpriority:3\n'
 
-it('selects only the two existing signed Ubuntu HTTPS endpoints without changing their metadata', () => {
-  for (const cloud of ['azure.archive.ubuntu.com', 'us-east-2.ec2.archive.ubuntu.com']) {
-    expect(canonicalUbuntuMirrors(`http://${cloud}/ubuntu/\tpriority:1\n${archive}${security}`)).toBe(archive + security)
-  }
-  expect(canonicalUbuntuMirrors(archive + security)).toBe(archive + security)
+const sources = 'Types: deb\nURIs: mirror+file:/etc/apt/apt-mirrors.txt\nSuites: noble noble-updates noble-backports\nComponents: main universe\nSigned-By: /usr/share/keyrings/ubuntu-archive-keyring.gpg\n'
+const ec2 = `http://us-east-2.ec2.archive.ubuntu.com/ubuntu/\tpriority:1\n${archive}${security}`
+
+it('changes only the exact observed EC2 mirror profile, retaining both existing HTTPS entries', () => {
+  expect(ubuntuMirrorPlan(ec2, sources)).toEqual({ changed: true, reason: 'observed-ec2-regional-entry-removed', text: archive + security })
 })
 
-it('fails closed for unknown/private sources, missing fallbacks, duplicate or altered metadata', () => {
-  for (const text of [archive, archive + security + archive, archive + security + 'https://private.invalid/\tpriority:1\n', archive + security + 'https://user:owned-secret@archive.ubuntu.com/ubuntu/\tpriority:1\n', archive.replace('priority:2', 'trusted:yes') + security]) {
-    expect(() => canonicalUbuntuMirrors(text)).toThrow()
-    try { canonicalUbuntuMirrors(text) } catch (error) { expect(String(error)).not.toContain('owned-secret') }
+it('records fixed non-applicable reasons for healthy Azure, direct sources, missing files and new formats without a write plan', () => {
+  const azure = ec2.replace('us-east-2.ec2.archive.ubuntu.com', 'azure.archive.ubuntu.com')
+  for (const [mirrors, config] of [[azure, sources], [archive + security, sources], [null, sources], [ec2, null], [ec2, sources.replace('mirror+file:/etc/apt/apt-mirrors.txt', 'https://archive.ubuntu.com/ubuntu/')], [ec2 + 'https://new.example/\tpriority:4\n', sources], [ec2.replace('priority:1', 'priority:0'), sources], ['https://user:owned-secret@example.invalid/\n', sources]] as const) {
+    const plan = ubuntuMirrorPlan(mirrors, config)
+    expect(plan.changed).toBe(false)
+    expect(plan).not.toHaveProperty('text')
+    expect(JSON.stringify(plan)).not.toContain('owned-secret')
   }
+})
+
+it('propagates actual write/read-back failures instead of converting them into non-applicable success', () => {
+  let current: Buffer = Buffer.from(ec2)
+  const after = Buffer.from(archive + security)
+  const config = Buffer.from(sources)
+  const io = { readMirrors: () => current, readSources: () => config, writeMirrors: (bytes: Buffer) => { current = bytes } }
+  expect(() => writeAndVerifyUbuntuMirror(Buffer.from(ec2), after, config, io)).not.toThrow()
+  current = Buffer.from(ec2)
+  expect(() => writeAndVerifyUbuntuMirror(current, after, config, { ...io, writeMirrors: () => { throw Object.assign(new Error('owned write denied'), { code: 'EACCES' }) } })).toThrow('owned write denied')
+  expect(() => writeAndVerifyUbuntuMirror(current, after, config, { ...io, writeMirrors: () => {} })).toThrow('read-back')
+  current = Buffer.from(ec2)
+  expect(() => writeAndVerifyUbuntuMirror(current, after, config, { ...io, readSources: () => Buffer.from('changed signing configuration') })).toThrow('signing')
+  expect(() => writeAndVerifyUbuntuMirror(current, after, config, { ...io, readMirrors: () => { throw new Error('owned read denied') } })).toThrow('owned read denied')
 })
 
 it('requires the exact native ephemeral GitHub repository/head context before host configuration access', () => {

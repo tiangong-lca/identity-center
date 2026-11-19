@@ -238,27 +238,24 @@ rewriting the historical oracle. All prior auth/image/behavior checks remain.
 
 ## Bounded hosted Ubuntu transport prerequisite — Identity #58
 
-Two exact-source Auth attempts passed native image inspection and the immutable
-baseline database case, then exhausted the unchanged browser-install command
-budget while the preferred EC2 Ubuntu mirror downloaded32.1MB in5m43s and6m21s.
-The candidate variant did not execute and neither failure is accepted coverage.
-Both attempts retain successful real fixture/image cleanup receipts.
+Two exact-source Auth attempts passed native inspections and the baseline
+DB case, then exceeded the original browser-install budget while the regional
+EC2 mirror downloaded32.1MB in5m43s/6m21s. Neither candidate variant ran; actual
+cleanup receipts and both failures remain retained.
 
-The [official runner construction](https://github.com/actions/runner-images/blob/main/images/ubuntu/scripts/build/configure-apt-sources.sh)
-uses a public regional priority1 mirror and already configured HTTPS Ubuntu
-archive/security fallbacks at priorities2/3. The
-[APT mirror contract](https://manpages.ubuntu.com/manpages/noble/man1/apt-transport-mirror.1.html)
-selects lower priorities first. The hosted-only helper removes only the known
-Azure/EC2 regional entry from that existing mirror list. It retains both HTTPS
-fallbacks and their metadata, and verifies the deb822 source file remains
-byte-identical, preserving suites/components/signing policy. Unknown mirror
-formats fail before modification. Exact repository/head, native Linux x64,
-GitHub-hosted and Node24.22.1 guards precede any configuration access.
+The [runner construction](https://github.com/actions/runner-images/blob/main/images/ubuntu/scripts/build/configure-apt-sources.sh)
+and [APT mirror selection](https://manpages.ubuntu.com/manpages/noble/man1/apt-transport-mirror.1.html)
+identify that exact three-line EC2 priority1 profile. Only that observed form
+loses its regional entry, preserving the existing HTTPS priorities2/3. Healthy
+Azure, already canonical/direct sources, missing files and upstream new formats
+are zero-write no-ops with fixed reason receipts; the original full browser and
+authentication gates continue to decide acceptance. Repository/head/native
+hosted/Node context failures, permissions, actual writes and read-back/signing
+configuration mismatches remain errors, never no-op success.
 
-This step does not run apt itself, alter packages/versions, signing keys, acquire
-settings, caches, test selection, timeout/retry values or production hosts.
-The original Playwright installation and every image/auth/UI/security check
-remain mandatory under the original bounds. Only the ephemeral runner mirror
-file changes; a source-bound hash-only receipt is uploaded through the existing
-always-run artifact step. Local owned-fixture tests do not claim hosted recovery;
-a fresh reviewed exact-head full workflow must prove it.
+No suite/component/GPG/acquire setting, package/version, cache, test, timeout or
+retry policy changes. Only the ephemeral mirror list can be written; the deb822
+source file is hash-verified unchanged after an applicable write. The existing
+always-run artifact upload retains source-bound setup hashes/reasons. Local
+pure/inert controls do not establish hosted recovery; fresh exact-head complete
+qualification remains required.

@@ -8,25 +8,21 @@ import { assertHostedContext } from './contract.mjs'
 
 const mirrorFile = '/etc/apt/apt-mirrors.txt'
 const sourcesFile = '/etc/apt/sources.list.d/ubuntu.sources'
-const archive = 'https://archive.ubuntu.com/ubuntu/\tpriority:2'
-const security = 'https://security.ubuntu.com/ubuntu/\tpriority:3'
-const regional = new Set([
-  'http://azure.archive.ubuntu.com/ubuntu/\tpriority:1',
-  'http://us-east-2.ec2.archive.ubuntu.com/ubuntu/\tpriority:1',
-])
+const archive = 'https://archive.ubuntu.com/ubuntu/\tpriority:2\n'
+const security = 'https://security.ubuntu.com/ubuntu/\tpriority:3\n'
+const observed = 'http://us-east-2.ec2.archive.ubuntu.com/ubuntu/\tpriority:1\n' + archive + security
 const digest = bytes => createHash('sha256').update(bytes).digest('hex')
 
-// The two HTTPS fallbacks already belong to the runner image. Drop only its
-// known regional priority-1 entry; suites, keys and acquire policy are untouched.
-export function canonicalUbuntuMirrors(text) {
-  assert.ok(Buffer.byteLength(text) <= 4096, 'Unexpected hosted Ubuntu mirror list')
-  const lines = text.split('\n').filter(Boolean)
-  assert.ok(lines.length === 2 || lines.length === 3, 'Unexpected hosted Ubuntu mirror list')
-  assert.equal(lines.filter(line => line === archive).length, 1, 'Require the existing canonical Ubuntu archive')
-  assert.equal(lines.filter(line => line === security).length, 1, 'Require the existing Ubuntu security fallback')
-  assert.ok(lines.every(line => line === archive || line === security || regional.has(line)), 'Unexpected hosted Ubuntu mirror list')
-  assert.ok(lines.filter(line => regional.has(line)).length <= 1, 'Unexpected hosted Ubuntu mirror list')
-  return text.split('\n').filter(line => !regional.has(line)).join('\n')
+// A transport correction for the exact observed profile, never a new prerequisite
+// for a healthy or normally changed hosted image. Reasons contain no file text.
+export function ubuntuMirrorPlan(mirrors, sources) {
+  const noop = reason => ({ changed: false, reason })
+  if (sources === null) return noop('deb822-source-not-present')
+  if (Buffer.byteLength(sources) > 16384 || !/^URIs: mirror\+file:\/etc\/apt\/apt-mirrors\.txt\s*$/m.test(sources) || !/^Suites: noble(?:\s|$)/m.test(sources)) return noop('deb822-profile-not-observed')
+  if (mirrors === null) return noop('mirror-list-not-present')
+  if (mirrors === archive + security) return noop('canonical-https-already-preferred')
+  if (mirrors !== observed) return noop('mirror-profile-not-observed-ec2')
+  return { changed: true, reason: 'observed-ec2-regional-entry-removed', text: archive + security }
 }
 
 export function assertUbuntuMirrorContext(env, platform, arch, requestedHead, actualHead) {
@@ -35,29 +31,44 @@ export function assertUbuntuMirrorContext(env, platform, arch, requestedHead, ac
   assertHostedContext({ ...env, AUTH_PROOF_HEAD: requestedHead }, platform, actualHead)
 }
 
-if (process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {
+// IO is explicit for inert failure controls. Real write/read-back errors propagate.
+export function writeAndVerifyUbuntuMirror(before, after, sources, io) {
+  assert.equal(digest(io.readMirrors()), digest(before), 'Mirror list changed before write')
+  io.writeMirrors(after)
+  assert.equal(digest(io.readMirrors()), digest(after), 'Mirror list read-back failed')
+  assert.equal(digest(io.readSources()), digest(sources), 'Preserve suites/components/signing configuration')
+}
+
+function readInitialFile(file, limit) {
   try {
-    const args = process.argv.slice(2)
-    assert.equal(args.length, 3)
-    assert.equal(args[0], '--apply')
-    assert.equal(args[1], '--head')
-    const root = fileURLToPath(new URL('../../../', import.meta.url))
-    const head = execFileSync('git', ['-C', root, 'rev-parse', 'HEAD'], { encoding: 'utf8' }).trim()
-    assertUbuntuMirrorContext(process.env, process.platform, process.arch, args[2], head)
-    assert.equal(process.version, 'v24.22.1', 'Use the reviewed hosted Node runtime')
-    const stat = fs.lstatSync(mirrorFile)
-    assert.ok(stat.isFile() && !stat.isSymbolicLink() && stat.size <= 4096)
-    const sources = fs.readFileSync(sourcesFile)
-    assert.match(sources.toString(), /^URIs: mirror\+file:\/etc\/apt\/apt-mirrors\.txt\s*$/m)
-    assert.match(sources.toString(), /^Suites: noble(?:\s|$)/m)
-    const before = fs.readFileSync(mirrorFile)
-    const after = Buffer.from(canonicalUbuntuMirrors(before.toString()))
-    if (!before.equals(after)) execFileSync('sudo', ['-n', '/usr/bin/tee', mirrorFile], { input: after, stdio: ['pipe', 'ignore', 'pipe'] })
-    assert.deepEqual(fs.readFileSync(mirrorFile), after)
-    assert.deepEqual(fs.readFileSync(sourcesFile), sources, 'Preserve suites/components/signing configuration')
-    console.log(JSON.stringify({ schema: 1, source: head, changed: !before.equals(after), beforeSha256: digest(before), afterSha256: digest(after), sourcesSha256: digest(sources), scope: 'Existing public Ubuntu mirror selection on this ephemeral hosted runner only' }))
-  } catch {
-    console.error('Canonical hosted Ubuntu mirror setup failed')
-    process.exitCode = 1
+    const stat = fs.lstatSync(file)
+    if (!stat.isFile() || stat.isSymbolicLink() || stat.size > limit) return null
+    return fs.readFileSync(file)
+  } catch (error) {
+    if (error?.code === 'ENOENT') return null
+    throw error
   }
+}
+
+if (process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {
+  const args = process.argv.slice(2)
+  assert.equal(args.length, 3)
+  assert.equal(args[0], '--apply')
+  assert.equal(args[1], '--head')
+  const root = fileURLToPath(new URL('../../../', import.meta.url))
+  const head = execFileSync('git', ['-C', root, 'rev-parse', 'HEAD'], { encoding: 'utf8' }).trim()
+  assertUbuntuMirrorContext(process.env, process.platform, process.arch, args[2], head)
+  assert.equal(process.version, 'v24.22.1', 'Use the reviewed hosted Node runtime')
+  const sources = readInitialFile(sourcesFile, 16384)
+  const before = readInitialFile(mirrorFile, 4096)
+  const plan = ubuntuMirrorPlan(before?.toString() ?? null, sources?.toString() ?? null)
+  if (plan.changed) {
+    assert.ok(before && sources && plan.text)
+    writeAndVerifyUbuntuMirror(before, Buffer.from(plan.text), sources, {
+      readMirrors: () => fs.readFileSync(mirrorFile),
+      readSources: () => fs.readFileSync(sourcesFile),
+      writeMirrors: bytes => execFileSync('sudo', ['-n', '/usr/bin/tee', mirrorFile], { input: bytes, stdio: ['pipe', 'ignore', 'pipe'] }),
+    })
+  }
+  console.log(JSON.stringify({ schema: 1, source: head, changed: plan.changed, reason: plan.reason, ...(before ? { beforeSha256: digest(before) } : {}), ...(sources ? { sourcesSha256: digest(sources) } : {}), ...(plan.changed ? { afterSha256: digest(plan.text) } : {}), scope: 'Observed public EC2 Ubuntu mirror selection on this ephemeral hosted runner only' }))
 }

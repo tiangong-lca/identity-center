@@ -363,29 +363,6 @@ defaults/retries are unchanged; no browser budget exceeds150s. Historical
 react19.3 broad-only runs still collect and persist their asset inventory;
 Catalog worker descriptor/evidence is collected only where Catalog actually runs.
 
-## Bounded hosted Ubuntu transport prerequisite — Identity #58
+## Hosted Ubuntu mirror transport
 
-Two exact-source Auth attempts passed native image inspection and the immutable
-baseline database case, then exhausted the unchanged browser-install command
-budget while the preferred EC2 Ubuntu mirror downloaded32.1MB in5m43s and6m21s.
-The candidate variant did not execute and neither failure is accepted coverage.
-Both attempts retain successful real fixture/image cleanup receipts.
-
-The [official runner construction](https://github.com/actions/runner-images/blob/main/images/ubuntu/scripts/build/configure-apt-sources.sh)
-uses a public regional priority1 mirror and already configured HTTPS Ubuntu
-archive/security fallbacks at priorities2/3. The
-[APT mirror contract](https://manpages.ubuntu.com/manpages/noble/man1/apt-transport-mirror.1.html)
-selects lower priorities first. The hosted-only helper removes only the known
-Azure/EC2 regional entry from that existing mirror list. It retains both HTTPS
-fallbacks and their metadata, and verifies the deb822 source file remains
-byte-identical, preserving suites/components/signing policy. Unknown mirror
-formats fail before modification. Exact repository/head, native Linux x64,
-GitHub-hosted and Node24.22.1 guards precede any configuration access.
-
-This step does not run apt itself, alter packages/versions, signing keys, acquire
-settings, caches, test selection, timeout/retry values or production hosts.
-The original Playwright installation and every image/auth/UI/security check
-remain mandatory under the original bounds. Only the ephemeral runner mirror
-file changes; a source-bound hash-only receipt is uploaded through the existing
-always-run artifact step. Local owned-fixture tests do not claim hosted recovery;
-a fresh reviewed exact-head full workflow must prove it.
+See the [single transport record](../../../docs/guides/dependency-maintenance.md#bounded-hosted-ubuntu-transport-prerequisite--identity-58) for the two retained EC2 failures, exact applicability and unchanged full gates. Other hosted image layouts record no-op; context and actual IO failures remain errors.
