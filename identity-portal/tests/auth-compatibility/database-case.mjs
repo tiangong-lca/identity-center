@@ -9,6 +9,7 @@ export const databaseSource = Object.freeze({
   parent: '1ea85e1a8a369e2f2a2c7271cfa0a05cc6742f98',
   manifest: '5f59ecf21718901fa9f154b5626d6a3b755e03fbd60f2d5690475500be05b0c9',
   lock: '5e8a58eee52ff4a3ce153a8dfe82aa19c1ef7abf21ef615d71ac0a3972bf09ae',
+  consumers: '98d25d93fbb30cb8f455488af21f0146da5fa82d4088895a18e95c676c01b42c',
 })
 export const databaseManifest = Object.freeze({
   dependencies: Object.freeze({ 'drizzle-orm': '^0.45.4', pg: '^8.23.1' }),

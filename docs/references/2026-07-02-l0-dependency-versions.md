@@ -458,3 +458,9 @@ and full unit proof cannot replace hosted acceptance. #49's vendor/obsolete
 loader remediation, #51's original89-record accounting, #52's remaining audit
 paths and production/publication authority stay separate. The current five
 unfiltered findings exactly match the accepted Main graph.
+
+The complete historical schema/migration/SQL oracle is required only by the
+explicit database dependency case's `database-consumer.mts --verify-case`
+entry in both archived variants. Ordinary quality uses an owned probe table and
+pg conversions, allowing independent business schema/migration changes without
+rewriting the historical oracle. All prior auth/image/behavior checks remain.

@@ -6,11 +6,19 @@ import path from 'node:path'
 import { createRequire } from 'node:module'
 import { fileURLToPath } from 'node:url'
 import { asc, eq } from 'drizzle-orm'
+import { pgTable, uuid, text, jsonb, timestamp } from 'drizzle-orm/pg-core'
+import { databaseCase, databaseSource } from './database-case.mjs'
 import { generateDrizzleJson, generateMigration } from 'drizzle-kit/api'
 import * as schemaExports from '@/db/schema'
 import { createDbClient } from '@/lib/db/client'
 
 const digest = (value: string | Buffer) => createHash('sha256').update(value).digest('hex')
+const probeTable = pgTable('dependency_probe', {
+  id: uuid('id').primaryKey(), keycloakSub: text('keycloak_sub').notNull(),
+  email: text('email').notNull(), displayName: text('display_name'), metadata: jsonb('metadata'),
+  createdAt: timestamp('created_at', { withTimezone: true }).notNull(),
+  updatedAt: timestamp('updated_at', { withTimezone: true }).notNull(),
+})
 function canonical(value: unknown): unknown {
   if (value instanceof Date) return { type: 'Date', iso: value.toISOString() }
   if (Buffer.isBuffer(value)) return { type: 'Buffer', hex: value.toString('hex') }
@@ -34,11 +42,13 @@ function inputTree(root: string, directory: string) {
 }
 
 /** Real source/API calls with socket connection denied. This never migrates a DB. */
-export async function databaseConsumerProof(root = fileURLToPath(new URL('../../', import.meta.url))) {
+export async function databaseConsumerProof(root = fileURLToPath(new URL('../../', import.meta.url)), mode: 'full' | 'focused' = 'full') {
+  assert.ok(mode === 'full' || mode === 'focused')
   // Node's CJS export-star bridge and the Vitest ESM loader expose the same tables.
   const exports = ('default' in schemaExports ? schemaExports.default : schemaExports) as typeof schemaExports
   // Feed both compiler loaders the same ordered namespace; do not sort emitted SQL.
   const schema = Object.fromEntries(Object.keys(exports).sort().map(name => [name, exports[name as keyof typeof exports]])) as typeof schemaExports
+  const table = mode === 'full' ? schema.portalUsers : probeTable
   const originalConnect = net.Socket.prototype.connect
   let networkConnectCalls = 0
   net.Socket.prototype.connect = function () { networkConnectCalls++; throw new Error('Database proof forbids a socket connection') }
@@ -48,16 +58,11 @@ export async function databaseConsumerProof(root = fileURLToPath(new URL('../../
     const id = '11111111-1111-4111-8111-111111111111'
     const instant = new Date('2026-01-02T03:04:05.000Z')
     const queries = {
-      select: client.db.select({ id: schema.portalUsers.id, sub: schema.portalUsers.keycloakSub }).from(schema.portalUsers).where(eq(schema.portalUsers.keycloakSub, "fixture'key")).orderBy(asc(schema.portalUsers.id)).limit(3).offset(2).toSQL(),
-      insert: client.db.insert(schema.portalUsers).values({ id, keycloakSub: 'fixture-sub', email: 'fixture@example.invalid', metadata: { locale: '中文', values: [null, 3] }, createdAt: instant, updatedAt: instant }).returning({ id: schema.portalUsers.id }).toSQL(),
-      update: client.db.update(schema.portalUsers).set({ displayName: '名字', metadata: { approved: true }, updatedAt: instant }).where(eq(schema.portalUsers.id, id)).returning({ id: schema.portalUsers.id }).toSQL(),
-      delete: client.db.delete(schema.portalUsers).where(eq(schema.portalUsers.id, id)).returning({ id: schema.portalUsers.id }).toSQL(),
+      select: client.db.select({ id: table.id, sub: table.keycloakSub }).from(table).where(eq(table.keycloakSub, "fixture'key")).orderBy(asc(table.id)).limit(3).offset(2).toSQL(),
+      insert: client.db.insert(table).values({ id, keycloakSub: 'fixture-sub', email: 'fixture@example.invalid', metadata: { locale: '中文', values: [null, 3] }, createdAt: instant, updatedAt: instant }).returning({ id: table.id }).toSQL(),
+      update: client.db.update(table).set({ displayName: '名字', metadata: { approved: true }, updatedAt: instant }).where(eq(table.id, id)).returning({ id: table.id }).toSQL(),
+      delete: client.db.delete(table).where(eq(table.id, id)).returning({ id: table.id }).toSQL(),
     }
-    const empty = generateDrizzleJson({})
-    const snapshot = generateDrizzleJson(schema, empty.id)
-    const migrationSql = await generateMigration(empty, snapshot)
-    const repeatedSql = await generateMigration(snapshot, snapshot)
-    assert.deepEqual(repeatedSql, [])
     const require = createRequire(path.join(root, 'package.json'))
     const pg = require('pg') as { escapeIdentifier: (value: string) => string; escapeLiteral: (value: string) => string; types: { getTypeParser: (oid: number) => (value: string) => unknown } }
     // This is the exact serializer called by pg's query path, not a replacement.
@@ -70,6 +75,12 @@ export async function databaseConsumerProof(root = fileURLToPath(new URL('../../
     }
     assert.equal(client.pool.totalCount, 0)
     assert.equal(networkConnectCalls, 0)
+    if (mode === 'focused') return canonical({ queries, driver, networkConnectCalls })
+    const empty = generateDrizzleJson({})
+    const snapshot = generateDrizzleJson(schema, empty.id)
+    const migrationSql = await generateMigration(empty, snapshot)
+    const repeatedSql = await generateMigration(snapshot, snapshot)
+    assert.deepEqual(repeatedSql, [])
     // Only generated snapshot linkage UUIDs are replaced; all schema/SQL survives.
     const stableSnapshot = { ...snapshot, id: '<generated-id>', prevId: '<previous-id>' }
     return canonical({ schemaInputs: inputTree(root, 'db/schema'), migrationInputs: inputTree(root, 'db/migrations'), tables: Object.keys(snapshot.tables).sort(), snapshot: stableSnapshot, migrationSql, repeatedSql, queries, driver, networkConnectCalls })
@@ -91,8 +102,22 @@ export function databaseConsumerSummary(value: unknown) {
 }
 
 if (process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {
-  const output = process.argv[2]
+  const selected = process.argv[2]
+  const verify = selected === '--verify-case'
+  const focused = selected === '--focused'
+  const output = verify || focused ? process.argv[3] : selected
+  assert.equal(process.argv.length, verify || focused ? 4 : 3)
   assert.ok(output && path.isAbsolute(output))
-  const proof = await databaseConsumerProof()
-  fs.writeFileSync(output, JSON.stringify(proof, null, 2) + '\n', { flag: 'wx' })
+  const proof = await databaseConsumerProof(undefined, focused ? 'focused' : 'full')
+  let receipt: unknown = proof
+  if (verify) {
+    const fixtureBytes = fs.readFileSync(fileURLToPath(new URL('./fixtures/database-consumers.json', import.meta.url)))
+    assert.equal(digest(fixtureBytes), databaseSource.consumers, 'Keep the immutable dependency-case database oracle')
+    const fixture = JSON.parse(fixtureBytes.toString())
+    assert.equal(fixture.source, databaseSource.parent)
+    const summary = databaseConsumerSummary(proof)
+    assert.deepEqual(summary, fixture.summary, 'Exact dependency-case schema/migration/SQL/client comparison')
+    receipt = { schema: 1, qualificationCase: databaseCase, oracleSource: fixture.source, matched: true, summary, fullProofSha256: digest(JSON.stringify(proof)) }
+  }
+  fs.writeFileSync(output, JSON.stringify(receipt, null, 2) + '\n', { flag: 'wx' })
 }

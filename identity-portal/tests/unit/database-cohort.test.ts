@@ -4,21 +4,22 @@ import path from 'node:path'
 import { createHash } from 'node:crypto'
 import { createRequire } from 'node:module'
 import { databaseCase, databaseSource, databaseBaselineVersions, databaseVersions, installedDatabaseVersions } from '../auth-compatibility/database-case.mjs'
-import { databaseConsumerProof, databaseConsumerSummary } from '../auth-compatibility/database-consumer.mjs'
+import { databaseConsumerProof } from '../auth-compatibility/database-consumer.mjs'
 import { assertQualificationManifest, assertQualificationVersions } from '../auth-compatibility/qualification-case.mjs'
 import { securityInputsForCase, eslintConfigCase } from '../auth-compatibility/framework-patch.mjs'
 
 const app = path.resolve(__dirname, '../..')
 const fixture = JSON.parse(fs.readFileSync(path.join(app, 'tests/auth-compatibility/fixtures/database-consumers.json'), 'utf8'))
 const immutable = JSON.parse(fs.readFileSync(path.join(app, 'tests/auth-compatibility/fixtures/manifest-security-audit.json'), 'utf8'))
+const focused = JSON.parse(fs.readFileSync(path.join(app, 'tests/auth-compatibility/fixtures/database-probe.json'), 'utf8'))
 const hash = (value: Buffer) => createHash('sha256').update(value).digest('hex')
 
-it('preserves actual schema/migration inputs, Kit SQL, thin-adapter queries and pg serialization without connecting', async () => {
+it('checks an owned ORM/query/pg fixture without freezing business schema or migration inputs', async () => {
   expect(fixture.source).toBe('1ea85e1a8a369e2f2a2c7271cfa0a05cc6742f98')
-  const summary = databaseConsumerSummary(await databaseConsumerProof(app))
-  expect(summary).toEqual(fixture.summary)
-  expect(summary.networkConnectCalls).toBe(0)
-  expect(summary.repeatedSql).toEqual([])
+  const proof = await databaseConsumerProof(app, 'focused')
+  expect(proof).toEqual(focused.proof)
+  expect(proof).not.toHaveProperty('schemaInputs')
+  expect(proof).not.toHaveProperty('migrationInputs')
 })
 
 it('binds only the new database manifest/lock while keeping all historical security inputs exact', () => {
@@ -32,6 +33,7 @@ it('binds only the new database manifest/lock while keeping all historical secur
   const historic = securityInputsForCase('security-audit', retained)
   const current = securityInputsForCase(databaseCase, retained)
   expect(databaseSource.parent).toBe(fixture.source)
+  expect(hash(fs.readFileSync(path.join(app, 'tests/auth-compatibility/fixtures/database-consumers.json')))).toBe(databaseSource.consumers)
   for (const [file, digest] of Object.entries(current.candidateHashes)) {
     if (file === 'identity-portal/package.json' || file === 'identity-portal/pnpm-lock.yaml') {
       expect(digest).toBe(hash(fs.readFileSync(path.join(app, '..', file))))

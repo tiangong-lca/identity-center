@@ -10,6 +10,7 @@ import { IMAGE_TAGS, composeDocument, ownedLifecycle, attemptCleanup } from '../
 import { proofCase, CATALOG_BASELINE, assertCatalogVersions, assertCatalogUiReceipts, syntheticCatalogDocument } from '../auth-compatibility/catalog-case.mjs'
 import { emittedYamlWorker, classifyYamlWorker } from '../auth-compatibility/catalog-worker-identity.mjs'
 import { qualificationCase, assertQualificationManifest } from '../auth-compatibility/qualification-case.mjs'
+import { databaseCase } from '../auth-compatibility/database-case.mjs'
 import { combinedReactUi, assertFixedReactUiReceipts } from '../auth-compatibility/ui-plan.mjs'
 import { nativeInputState } from '../auth-compatibility/native-input-state'
 
@@ -196,7 +197,7 @@ it.each(['catalog-yaml', 'react19.3-catalog-fixed'])('invokes actual runner sour
   const candidate = { source: head, ui: fixed ? combinedReactUi(caseName, 'candidate', broad, catalogUi, { page: 0, console: 0 }) : catalogUi }
   const start = source.indexOf('async function main()'); const end = source.indexOf('\nmain().catch', start)
   const dependencies = {
-    sourceCase: selectedCase,
+    sourceCase: selectedCase, databaseCase,
     git: (...args: string[]) => args.join(' ') === 'rev-parse HEAD' ? head : args.join(' ') === 'status --porcelain' ? '' : args[0] === 'merge-base' ? selectedCase.baseline : args[0] === 'show' ? JSON.stringify(targetManifest) : args[0] === 'diff' ? 'identity-portal/tests/auth-compatibility/ui-plan.mjs\0' : (() => { throw Error('Unexpected real Git seam') })(),
     assert: nodeAssert, selectedCase, BASELINE: selectedCase.baseline, sourceRoot: '/inert/source', infraEnv: {},
     process: { argv: ['node', 'run.mjs'], version: 'v24.22.1', platform: 'linux', env: { AUTH_PROOF_HEAD: head, RUNNER_TEMP: '/inert', GITHUB_RUN_ID: '1', GITHUB_RUN_ATTEMPT: '1' } },

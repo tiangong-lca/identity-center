@@ -11,7 +11,7 @@ import { fileURLToPath } from 'node:url'
 import { assertHostedContext, assertFixture, IMAGE_TAGS, composeDocument, cleanEnvironment, redactor, lineRedactor, attemptCleanup, ownedLifecycle, compareReceipts, assertProductDeltaFromGit } from './contract.mjs'
 
 import { eslintConfigCase } from './framework-patch.mjs'
-import { databaseCase, installedDatabaseVersions } from './database-case.mjs'
+import { databaseCase, databaseSource, installedDatabaseVersions } from './database-case.mjs'
 import { assertCatalogSources, assertCatalogUiReceipts } from './catalog-case.mjs'
 import { qualificationCase, assertQualificationSources, assertQualificationManifest, assertQualificationVersions, assertReactSourcePathFromGit } from './qualification-case.mjs'
 import { assertSecurityBehaviorReceipts, securityZodIdentity } from './security-behavior-source.mjs'
@@ -248,6 +248,16 @@ async function variant(variant, root, images, head, securityInputs) {
           Object.assign(versions, installedDatabaseVersions(app))
         }
         assertQualificationVersions(sourceCase.name, variant, versions)
+        if (sourceCase.name === databaseCase) {
+          const file = path.join(c.evidenceDirectory, 'database-consumers.json')
+          await pnpm(['exec', 'tsx', 'tests/auth-compatibility/database-consumer.mts', '--verify-case', file], 'database-consumers', 60_000)
+          const receipt = JSON.parse(fs.readFileSync(file))
+          assert.equal(receipt.schema, 1)
+          assert.equal(receipt.qualificationCase, databaseCase)
+          assert.equal(receipt.oracleSource, databaseSource.parent)
+          assert.equal(receipt.matched, true)
+          summary.databaseConsumers = receipt
+        }
       }
       else {
         assert.equal(versions.next, '16.4.2'); assert.equal(versions.react, '19.2.4'); assert.equal(versions['react-dom'], '19.2.4')
@@ -446,6 +456,12 @@ async function main() {
       assertSecurityBehaviorReceipts(baseline, candidate)
     }
     const comparison = compareReceipts(baseline, candidate)
+    if (sourceCase.name === databaseCase) {
+      assert.equal(baseline.databaseConsumers?.matched, true, 'Require baseline database qualification')
+      assert.equal(candidate.databaseConsumers?.matched, true, 'Require candidate database qualification')
+      assert.deepEqual(baseline.databaseConsumers.summary, candidate.databaseConsumers.summary)
+      assert.equal(baseline.databaseConsumers.fullProofSha256, candidate.databaseConsumers.fullProofSha256)
+    }
     fs.writeFileSync(path.join(output, 'qualification.json'), JSON.stringify({ ...sourceIdentity, head, baseline: BASELINE, images, readinessControl, comparison, baselineReceipt: baseline, candidateReceipt: candidate, ...(securityInputs ? { securityInputs } : {}) }, null, 2))
     console.log(JSON.stringify({ ...sourceIdentity, head, baseline: BASELINE, comparison, evidence: output }))
   } catch (e) {

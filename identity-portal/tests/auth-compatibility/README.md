@@ -30,7 +30,11 @@ and checked-in migration file hashes remain bound. Independent owned `generate`
 CLI runs use explicit source-only configurations and output paths, with no
 credentials or database operation; their SQL bytes also match. This is offline
 source/API/SQL proof, not applied-migration or live PostgreSQL/KES equivalence.
-The maintained unit fixture is bound to Main1ea85e1 and requires those outputs.
+The immutable full oracle is bound to Main1ea85e1. Only the explicit dependency
+qualification entry `pnpm exec tsx tests/auth-compatibility/database-consumer.mts --verify-case <new-absolute-receipt>` requires those complete outputs. The selected
+case runs it in BOTH root-frozen archived variants and requires matching verified
+receipts. Ordinary unit tests use a separate owned `dependency_probe` table and pg
+conversions; they never hash current business schema or migration files.
 
 From a clean committed checkout, use
 `AUTH_PROOF_CASE=database-2026-11-19 AUTH_PROOF_HEAD="$(git rev-parse HEAD)" node tests/auth-compatibility/run.mjs --validate-sources`.

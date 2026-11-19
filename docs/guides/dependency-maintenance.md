@@ -229,3 +229,9 @@ remain with #49/#52; #51's89-record scope is not retired. See the
 [qualification contract](../../identity-portal/tests/auth-compatibility/README.md).
 The full existing hosted image and both-variant auth/UI/security gate remains
 required before original-source delivery and exact workspace integration.
+
+The complete historical schema/migration/SQL oracle is required only by the
+explicit database dependency case's `database-consumer.mts --verify-case`
+entry in both archived variants. Ordinary quality uses an owned probe table and
+pg conversions, allowing independent business schema/migration changes without
+rewriting the historical oracle. All prior auth/image/behavior checks remain.
