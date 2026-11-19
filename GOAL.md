@@ -12,8 +12,8 @@ checkPaths:
   - docs/implementation/README.md
   - docs/implementation/definition-of-done.md
 lastReviewedAt: 2026-11-19
-lastReviewedCommit: 7f47619c54d31d640669d52400a5c62f351a982d
-lastReviewedNote: "Identity #57 reviewed the existing design and scope boundaries for the development lint graph and isolated image qualification."
+lastReviewedCommit: 65a4de21e933e5c97f00d1a625889ae5713313b7
+lastReviewedNote: "Identity #58 reviewed the exact observed EC2-only hosted transport correction, zero-write non-applicable outcomes and hard context/IO failures. Existing dependency, signature, auth/image, timeout/retry, product/DB and retained #49/#51/#52 boundaries remain unchanged."
 ---
 
 # GOAL — 统一身份平台一期全量交付

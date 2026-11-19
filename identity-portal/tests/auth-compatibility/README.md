@@ -1,8 +1,52 @@
 # Auth dependency interoperability proof
 
-## Current Next.js source qualification
+## Current database source qualification — Identity #58
 
-The dependency workflow selects `eslint-config-next-16.4.6`. Its baseline is the historical
+The dependency workflow selects `database-2026-11-19`. It retains the immutable
+security baseline `68e1fafce35e7e931ee0e7c65b5c6e0b4ccf8e8b` and the existing
+`security-audit` behavior comparison. The candidate must also descend from
+accepted Main `1ea85e1a8a369e2f2a2c7271cfa0a05cc6742f98`. Its new manifest/lock
+hashes admit only ORM 0.45.4, Kit 0.31.11, pg 8.23.1 and @types/pg 8.23.1 plus
+the required pg closure. All previous cases, hashes, original security inputs,
+Monaco patch, framework-vendor status and behavior fixtures remain exact.
+Both variants verify their eight actual database/pg package versions; candidate
+Worker inspection additionally checks every shipped copy of that closure.
+
+The original database proposal carried unrelated toolchain/resolver updates.
+The scoped lock restores those Main records: seven package replacements and
+eight snapshot/peer replacements remain, with 950 unchanged records in each map.
+This does not deliver Identity #51's original89-record cohorts or remove #49's
+obsolete Kit loader/esbuild edge. #49 and #52's unchanged audit findings retain
+their owners; no security waiver or clean-graph claim follows from this case.
+
+`database-consumer.mts` calls the actual source thin adapter, all schemas, Kit API
+and pg serializers while denying socket connections. The current-Main and
+candidate root-frozen installs produce equal snapshots for 21 tables, 65 SQL
+statements, an empty repeated migration, four compiled queries and driver
+conversion results. The input export namespace is ordered identically across
+CJS and ESM loaders; emitted SQL is never sorted or discarded. Only the generated
+snapshot linkage UUIDs are replaced when comparing schema data. Source schema
+and checked-in migration file hashes remain bound. Independent owned `generate`
+CLI runs use explicit source-only configurations and output paths, with no
+credentials or database operation; their SQL bytes also match. This is offline
+source/API/SQL proof, not applied-migration or live PostgreSQL/KES equivalence.
+The immutable full oracle is bound to Main1ea85e1. Only the explicit dependency
+qualification entry `pnpm exec tsx tests/auth-compatibility/database-consumer.mts --verify-case <new-absolute-receipt>` requires those complete outputs. The selected
+case runs it in BOTH root-frozen archived variants and requires matching verified
+receipts. Ordinary unit tests use a separate owned `dependency_probe` table and pg
+conversions; they never hash current business schema or migration files.
+
+From a clean committed checkout, use
+`AUTH_PROOF_CASE=database-2026-11-19 AUTH_PROOF_HEAD="$(git rev-parse HEAD)" node tests/auth-compatibility/run.mjs --validate-sources`.
+The unchanged complete hosted pipeline still builds and restrictively inspects
+both native images, then executes both baseline/candidate synthetic provider,
+PostgreSQL/Redis, security and browser/UI fixtures with the same assertions,
+bounds, failure controls and cleanup. Local proofs do not replace that gate.
+No production/existing database, real identity provider or publication is used.
+
+## Earlier Next.js and ESLint source qualification
+
+Identity #57 selected `eslint-config-next-16.4.6`. Its baseline is the historical
 security baseline `68e1fafce35e7e931ee0e7c65b5c6e0b4ccf8e8b`. The new
 candidate must also descend from accepted Main `1b6e888ec981c786b69556fae8151cbe0348dd65`.
 This case updates the development ESLint configuration and its Next.js plugin
@@ -318,3 +362,7 @@ and preserves qualified auth-client/catalog-yaml90s. Assertion/navigation
 defaults/retries are unchanged; no browser budget exceeds150s. Historical
 react19.3 broad-only runs still collect and persist their asset inventory;
 Catalog worker descriptor/evidence is collected only where Catalog actually runs.
+
+## Hosted Ubuntu mirror transport
+
+See the [single transport record](../../../docs/guides/dependency-maintenance.md#bounded-hosted-ubuntu-transport-prerequisite--identity-58) for the two retained EC2 failures, exact applicability and unchanged full gates. Other hosted image layouts record no-op; context and actual IO failures remain errors.

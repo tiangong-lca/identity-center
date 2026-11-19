@@ -14,6 +14,8 @@ on:
       - identity-portal/tests/unit/auth-compatibility-harness.test.ts
       - identity-portal/tests/unit/catalog-qualification.test.ts
       - identity-portal/tests/unit/security-qualification.test.ts
+      - identity-portal/tests/unit/database-cohort.test.ts
+      - identity-portal/tests/unit/ubuntu-mirror.test.ts
       - identity-portal/tests/unit/security-behavior.test.ts
       - identity-portal/tests/unit/image-security-proof.test.ts
       - identity-portal/tests/unit/yaml-worker-adapter.test.ts
@@ -51,6 +53,9 @@ jobs:
       - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
         with:
           node-version: 24.22.1
+      - name: Prefer the existing canonical Ubuntu HTTPS mirror
+        shell: bash
+        run: node tests/auth-compatibility/ubuntu-mirror.mjs --apply --head '${{ github.event.pull_request.head.sha }}' > "$RUNNER_TEMP/identity58-apt-mirror.json"
       - name: Build and inspect isolated Node24 Portal and Worker images
         timeout-minutes: 28
         shell: bash
@@ -112,13 +117,13 @@ jobs:
           for target in runner worker; do
             bounded_docker 600000 build --label "org.tiangong.identity-proof=${image_prefix}" --target "$target" --tag "${image_prefix}:${target}" --file deploy/docker/Dockerfile .
             bounded_docker 15000 image inspect "${image_prefix}:${target}" --format '{{.Id}} {{.Os}}/{{.Architecture}}' > "$evidence_dir/${target}-image.txt"
-            node tests/auth-compatibility/image-security-proof.mjs --source-case eslint-config-next-16.4.6 --target "$target" --image "${image_prefix}:${target}" --name "${image_prefix}-${target}" --evidence "$evidence_dir" --source "$(git rev-parse HEAD)" --image-info "$evidence_dir/${target}-image.txt"
+            node tests/auth-compatibility/image-security-proof.mjs --source-case database-2026-11-19 --target "$target" --image "${image_prefix}:${target}" --name "${image_prefix}-${target}" --evidence "$evidence_dir" --source "$(git rev-parse HEAD)" --image-info "$evidence_dir/${target}-image.txt"
           done
       - name: Qualify isolated baseline and candidate auth transports
         env:
           AUTH_PROOF_HEAD: ${{ github.event.pull_request.head.sha }}
           # Explicit immutable security experiment; historical cases remain intact.
-          AUTH_PROOF_CASE: eslint-config-next-16.4.6
+          AUTH_PROOF_CASE: database-2026-11-19
         run: node tests/auth-compatibility/run.mjs
       - name: Preserve sanitized proof and cleanup receipts
         if: always()
@@ -128,5 +133,6 @@ jobs:
           path: |
             ${{ runner.temp }}/identity34-evidence-*
             ${{ runner.temp }}/identity41-image-evidence-*
+            ${{ runner.temp }}/identity58-apt-mirror.json
           if-no-files-found: error
           retention-days: 7

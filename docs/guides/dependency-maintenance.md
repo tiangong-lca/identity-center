@@ -12,8 +12,8 @@ checkPaths:
   - identity-portal/pnpm-lock.yaml
   - docs/guides/dependency-maintenance.md
 lastReviewedAt: 2026-11-19
-lastReviewedCommit: 041691db7e94608c20804b901e1a976b32c9c97a
-lastReviewedNote: "Identity #57 reviewed the ESLint configuration and plugin against the accepted framework graph, frozen lock, image inputs and authentication behavior suite."
+lastReviewedCommit: 65a4de21e933e5c97f00d1a625889ae5713313b7
+lastReviewedNote: "Identity #58 reviewed the exact observed EC2-only hosted transport correction, zero-write non-applicable outcomes and hard context/IO failures. Existing dependency, signature, auth/image, timeout/retry, product/DB and retained #49/#51/#52 boundaries remain unchanged."
 ---
 
 # Dependency maintenance
@@ -207,3 +207,55 @@ its `@next/eslint-plugin-next` dependency to the framework graph accepted in
 #55. Both resolve to 16.4.6. The case pins the manifest and frozen lock and
 checks both installed versions when running the existing compatibility suite.
 The earlier source cases retain their own graph and manifest expectations.
+
+## Database cohort for Identity #58
+
+Original PR40 adopts the four latest compatible stable database declarations:
+Drizzle ORM0.45.4, Kit0.31.11 and pg/@types8.23.1. Current official release
+metadata is outside the configured age windows. The scoped lock restores the
+original proposal's unrelated Rolldown/OXC/wasm/PostCSS/resolver/lint/helper
+changes, preserving #51's remaining accounting. Seven package records and eight
+snapshots/peer bindings move; the other 950 entries in each map remain exact.
+Official metadata and full archive SRI checks bind all seven selected artifacts.
+
+The new `database-2026-11-19` source case composes with accepted Main1ea85e1,
+keeps every prior source/hash case and requires the actual installed database
+closure. Actual root-frozen Main/candidate Kit API and CLI, thin-adapter query
+compilation and pg serialization compare offline without opening a connection.
+This does not implement #49's obsolete-loader removal, apply a migration or
+claim PostgreSQL/KES server equivalence. The five current unfiltered audit
+findings (one High, three Moderate and one Low) match current Main exactly and
+remain with #49/#52; #51's89-record scope is not retired. See the
+[qualification contract](../../identity-portal/tests/auth-compatibility/README.md).
+The full existing hosted image and both-variant auth/UI/security gate remains
+required before original-source delivery and exact workspace integration.
+
+The complete historical schema/migration/SQL oracle is required only by the
+explicit database dependency case's `database-consumer.mts --verify-case`
+entry in both archived variants. Ordinary quality uses an owned probe table and
+pg conversions, allowing independent business schema/migration changes without
+rewriting the historical oracle. All prior auth/image/behavior checks remain.
+
+## Bounded hosted Ubuntu transport prerequisite — Identity #58
+
+Two exact-source Auth attempts passed native inspections and the baseline
+DB case, then exceeded the original browser-install budget while the regional
+EC2 mirror downloaded32.1MB in5m43s/6m21s. Neither candidate variant ran; actual
+cleanup receipts and both failures remain retained.
+
+The [runner construction](https://github.com/actions/runner-images/blob/main/images/ubuntu/scripts/build/configure-apt-sources.sh)
+and [APT mirror selection](https://manpages.ubuntu.com/manpages/noble/man1/apt-transport-mirror.1.html)
+identify that exact three-line EC2 priority1 profile. Only that observed form
+loses its regional entry, preserving the existing HTTPS priorities2/3. Healthy
+Azure, already canonical/direct sources, missing files and upstream new formats
+are zero-write no-ops with fixed reason receipts; the original full browser and
+authentication gates continue to decide acceptance. Repository/head/native
+hosted/Node context failures, permissions, actual writes and read-back/signing
+configuration mismatches remain errors, never no-op success.
+
+No suite/component/GPG/acquire setting, package/version, cache, test, timeout or
+retry policy changes. Only the ephemeral mirror list can be written; the deb822
+source file is hash-verified unchanged after an applicable write. The existing
+always-run artifact upload retains source-bound setup hashes/reasons. Local
+pure/inert controls do not establish hosted recovery; fresh exact-head complete
+qualification remains required.

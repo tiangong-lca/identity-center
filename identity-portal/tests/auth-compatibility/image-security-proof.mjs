@@ -4,6 +4,7 @@ import assert from 'node:assert/strict'
 import {createHash} from 'node:crypto'
 import {createRequire} from 'node:module'
 import { frameworkSource, frameworkVersion, securityInputsForCase } from './framework-patch.mjs'
+import { databaseCase, databaseVersions } from './database-case.mjs'
 import {spawn,execFileSync} from 'node:child_process'
 import {fileURLToPath} from 'node:url'
 const require=createRequire(import.meta.url)
@@ -27,7 +28,7 @@ export function inspectImageFilesystem(target,root,expected,{staticRoot}={}){
  function walk(dir,filter,depth=0){assert.ok(depth<=limits.depth,'Image directory depth exceeded');const list=[];for(const e of fs.readdirSync(dir,{withFileTypes:true})){const f=path.join(dir,e.name);assert.equal(e.isSymbolicLink(),false,'Refuse image inventory symlink');if(e.isDirectory())list.push(...walk(f,filter,depth+1));else if(e.isFile()&&filter(f))list.push(f);assert.ok(list.length<=limits.files,'Image file count exceeded')}return list}
  const frameworkPath=path.join(root,'node_modules/next/dist/compiled/zod/index.cjs'),framework=record(frameworkPath);assert.equal(framework.sha256,expected.frameworkVendor.sha256,'Known framework vendor bytes changed');assert.equal(framework.bytes,expected.frameworkVendor.bytes);const next=json(path.join(root,'node_modules/next/package.json'));assert.ok(['16.4.2', '16.4.6'].includes(next.version), 'Unreviewed framework version');// This function also runs in the image; the host case and package inventory must agree.
  const imageCase = expected.sourceCase ?? 'security-audit'
- assert.ok(['security-audit', 'next-16.4.6', 'eslint-config-next-16.4.6'].includes(imageCase), 'Unknown image source case')
+ assert.ok(['security-audit', 'next-16.4.6', 'eslint-config-next-16.4.6', 'database-2026-11-19'].includes(imageCase), 'Unknown image source case')
  const expectedNext = imageCase === 'security-audit' ? '16.4.2' : '16.4.6'
  assert.equal(next.version, expectedNext, 'Require exact reviewed framework version')
  assert.deepEqual(expected.packageVersions.next, [expectedNext], 'Host and image framework selections must agree')
@@ -76,7 +77,9 @@ export function buildExpected(root, source, sourceCase = 'security-audit') {
  const inputHashes = inputs.candidateHashes
  for(const[file,digest]of Object.entries(inputHashes)){assert.match(digest,/^[a-f0-9]{64}$/);assert.equal(sha(fs.readFileSync(path.join(root,file))),digest,'Host expected source input mismatch')}
  const patched = frameworkSource(sourceCase)
- const packageVersions = patched ? { ...EXPECTED_PACKAGE_VERSIONS, next: [frameworkVersion] } : EXPECTED_PACKAGE_VERSIONS
+ const packageVersions = sourceCase === databaseCase
+   ? { ...EXPECTED_PACKAGE_VERSIONS, next: [frameworkVersion], ...Object.fromEntries(Object.entries(databaseVersions).map(([name, version]) => [name, [version]])) }
+   : patched ? { ...EXPECTED_PACKAGE_VERSIONS, next: [frameworkVersion] } : EXPECTED_PACKAGE_VERSIONS
  const zodSource = patched ? { ...EXPECTED_ZOD_SOURCE, sourceLockSha256: inputHashes['identity-portal/pnpm-lock.yaml'] } : EXPECTED_ZOD_SOURCE
  return { source, sourceCase, inputHashes, provenance: JSON.parse(fs.readFileSync(path.join(app, 'patches/monaco-editor@0.55.1.provenance.json'), 'utf8')), packageVersions, zodSource, frameworkVendor: FRAMEWORK_VENDOR }
 }

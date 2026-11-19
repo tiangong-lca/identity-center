@@ -12,8 +12,8 @@ checkPaths:
   - GOAL.md
   - docs/design/README.md
 lastReviewedAt: 2026-11-19
-lastReviewedCommit: 041691db7e94608c20804b901e1a976b32c9c97a
-lastReviewedNote: "Identity #57 reviewed the ESLint configuration and plugin against the accepted framework graph, frozen lock, image inputs and authentication behavior suite."
+lastReviewedCommit: 65a4de21e933e5c97f00d1a625889ae5713313b7
+lastReviewedNote: "Identity #58 reviewed the exact observed EC2-only hosted transport correction, zero-write non-applicable outcomes and hard context/IO failures. Existing dependency, signature, auth/image, timeout/retry, product/DB and retained #49/#51/#52 boundaries remain unchanged."
 ---
 
 # 统一身份平台实施方案

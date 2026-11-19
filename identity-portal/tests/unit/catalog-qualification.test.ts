@@ -10,6 +10,7 @@ import { IMAGE_TAGS, composeDocument, ownedLifecycle, attemptCleanup } from '../
 import { proofCase, CATALOG_BASELINE, assertCatalogVersions, assertCatalogUiReceipts, syntheticCatalogDocument } from '../auth-compatibility/catalog-case.mjs'
 import { emittedYamlWorker, classifyYamlWorker } from '../auth-compatibility/catalog-worker-identity.mjs'
 import { qualificationCase, assertQualificationManifest } from '../auth-compatibility/qualification-case.mjs'
+import { databaseCase } from '../auth-compatibility/database-case.mjs'
 import { combinedReactUi, assertFixedReactUiReceipts } from '../auth-compatibility/ui-plan.mjs'
 import { nativeInputState } from '../auth-compatibility/native-input-state'
 
@@ -174,7 +175,7 @@ it('retains exact catalog owner paths in the secretless exact-head security work
   expect(paths).not.toContain('identity-portal/**')
   const steps = workflow.jobs['auth-compatibility'].steps
   const runner = steps.find(step => step.env?.AUTH_PROOF_CASE)
-  expect(runner?.env).toEqual({ AUTH_PROOF_HEAD: '${{ github.event.pull_request.head.sha }}', AUTH_PROOF_CASE: 'eslint-config-next-16.4.6' })
+  expect(runner?.env).toEqual({ AUTH_PROOF_HEAD: '${{ github.event.pull_request.head.sha }}', AUTH_PROOF_CASE: 'database-2026-11-19' })
   expect(runner?.run).toBe('node tests/auth-compatibility/run.mjs')
   expect(steps[0].with?.ref).toBe('${{ github.event.pull_request.head.sha }}')
   expect(steps[0].with?.['persist-credentials']).toBe(false)
@@ -196,7 +197,7 @@ it.each(['catalog-yaml', 'react19.3-catalog-fixed'])('invokes actual runner sour
   const candidate = { source: head, ui: fixed ? combinedReactUi(caseName, 'candidate', broad, catalogUi, { page: 0, console: 0 }) : catalogUi }
   const start = source.indexOf('async function main()'); const end = source.indexOf('\nmain().catch', start)
   const dependencies = {
-    sourceCase: selectedCase,
+    sourceCase: selectedCase, databaseCase,
     git: (...args: string[]) => args.join(' ') === 'rev-parse HEAD' ? head : args.join(' ') === 'status --porcelain' ? '' : args[0] === 'merge-base' ? selectedCase.baseline : args[0] === 'show' ? JSON.stringify(targetManifest) : args[0] === 'diff' ? 'identity-portal/tests/auth-compatibility/ui-plan.mjs\0' : (() => { throw Error('Unexpected real Git seam') })(),
     assert: nodeAssert, selectedCase, BASELINE: selectedCase.baseline, sourceRoot: '/inert/source', infraEnv: {},
     process: { argv: ['node', 'run.mjs'], version: 'v24.22.1', platform: 'linux', env: { AUTH_PROOF_HEAD: head, RUNNER_TEMP: '/inert', GITHUB_RUN_ID: '1', GITHUB_RUN_ATTEMPT: '1' } },

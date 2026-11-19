@@ -1,3 +1,8 @@
+---
+lastReviewedAt: 2026-11-19
+lastReviewedCommit: 65a4de21e933e5c97f00d1a625889ae5713313b7
+---
+
 # L0 依赖版本查证记录(2026-07-02)
 
 按 GOAL §5.1"先查证后实现"执行的版本调研结论与实际安装版本。后续各层引入新库时在 `docs/references/` 追加同类记录。
@@ -423,3 +428,47 @@ reports React/DOM19.3.1 and both types19.3.0. This records source composition on
 full build/unit and exact-head hosted proof remain pending Main phase review.
 The106 original29 provisional gaps need Main's exact per-record disposition;
 they are not blanket unadopted tooling or a whole-proposal completion claim.
+
+## 2026-11-19 database cohort source qualification — Identity #58
+
+Original PR40's four declared upgrades are retained, with unrelated regenerated
+lock fields restored to reviewed Main1ea85e1. Official fixed-version metadata
+([ORM](https://registry.npmjs.org/drizzle-orm/0.45.4),
+[Kit](https://registry.npmjs.org/drizzle-kit/0.31.11),
+[pg](https://registry.npmjs.org/pg/8.23.1),
+[types](https://registry.npmjs.org/%40types%2Fpg/8.23.1)) and complete seven-archive
+SHA512/name/version checks bind the selected graph. No source/metadata field
+outside the required pg closure is silently refreshed.
+
+Current-Main and candidate actual frozen installs produce identical 21-table
+schema snapshots,65 API-generated SQL statements, unchanged migration inputs,
+four compiled thin-adapter queries and pg parameter/type conversions. The same
+ordered namespace is passed to both Kit APIs; emitted SQL order and bytes remain
+intact. Actual CLI `generate` runs against owned explicit configurations also
+produce identical SQL. No migration is applied or database socket opened.
+The [official Kit distinction](https://orm.drizzle.team/docs/migrations) keeps
+SQL generation separate from migration execution; the
+[pg conversion contract](https://node-postgres.com/features/queries) covers the
+real serializer used here. The previous source cases/fixtures remain immutable.
+
+The `database-2026-11-19` workflow case retains historical security baseline68
+and the same complete native image, provider/DB/Redis, browser and security
+comparison. Its new parent and manifest/lock hashes are exact. Local offline
+and full unit proof cannot replace hosted acceptance. #49's vendor/obsolete
+loader remediation, #51's original89-record accounting, #52's remaining audit
+paths and production/publication authority stay separate. The current five
+unfiltered findings exactly match the accepted Main graph.
+
+The complete historical schema/migration/SQL oracle is required only by the
+explicit database dependency case's `database-consumer.mts --verify-case`
+entry in both archived variants. Ordinary quality uses an owned probe table and
+pg conversions, allowing independent business schema/migration changes without
+rewriting the historical oracle. All prior auth/image/behavior checks remain.
+
+## Hosted Ubuntu mirror transport
+
+The two retained EC2 package-download failures and narrowly applicable setup are
+recorded in the [dependency maintenance guide](../guides/dependency-maintenance.md#bounded-hosted-ubuntu-transport-prerequisite--identity-58).
+Only the exact observed EC2 profile changes; other image layouts record a fixed
+no-op reason. Context and actual IO failures remain errors, and the original
+complete qualification and budgets still decide acceptance.

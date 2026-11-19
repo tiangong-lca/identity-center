@@ -1,0 +1,66 @@
+{
+  "source": "1ea85e1a8a369e2f2a2c7271cfa0a05cc6742f98",
+  "scope": "Owned dependency_probe SQL table and actual pg conversions, independent of business schema and migration files.",
+  "proof": {
+    "driver": {
+      "bigint": "9223372036854775807",
+      "identifier": "\"fixture\"\"name\"",
+      "json": {
+        "locale": "中文",
+        "values": [
+          1,
+          null
+        ]
+      },
+      "literal": " E'fixture''\\\\value'",
+      "parameters": [
+        null,
+        null,
+        "{\"1\",NULL,\"a,b\",\"a\\\"b\"}",
+        "{\"locale\":\"中文\"}",
+        {
+          "type": "Buffer",
+          "hex": "00ff"
+        },
+        "{\"custom\",\"value\"}"
+      ]
+    },
+    "networkConnectCalls": 0,
+    "queries": {
+      "delete": {
+        "params": [
+          "11111111-1111-4111-8111-111111111111"
+        ],
+        "sql": "delete from \"dependency_probe\" where \"dependency_probe\".\"id\" = $1 returning \"id\""
+      },
+      "insert": {
+        "params": [
+          "11111111-1111-4111-8111-111111111111",
+          "fixture-sub",
+          "fixture@example.invalid",
+          "{\"locale\":\"中文\",\"values\":[null,3]}",
+          "2026-01-02T03:04:05.000Z",
+          "2026-01-02T03:04:05.000Z"
+        ],
+        "sql": "insert into \"dependency_probe\" (\"id\", \"keycloak_sub\", \"email\", \"display_name\", \"metadata\", \"created_at\", \"updated_at\") values ($1, $2, $3, default, $4, $5, $6) returning \"id\""
+      },
+      "select": {
+        "params": [
+          "fixture'key",
+          3,
+          2
+        ],
+        "sql": "select \"id\", \"keycloak_sub\" from \"dependency_probe\" where \"dependency_probe\".\"keycloak_sub\" = $1 order by \"dependency_probe\".\"id\" asc limit $2 offset $3"
+      },
+      "update": {
+        "params": [
+          "名字",
+          "{\"approved\":true}",
+          "2026-01-02T03:04:05.000Z",
+          "11111111-1111-4111-8111-111111111111"
+        ],
+        "sql": "update \"dependency_probe\" set \"display_name\" = $1, \"metadata\" = $2, \"updated_at\" = $3 where \"dependency_probe\".\"id\" = $4 returning \"id\""
+      }
+    }
+  }
+}

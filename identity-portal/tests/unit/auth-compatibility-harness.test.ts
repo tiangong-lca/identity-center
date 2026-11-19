@@ -106,7 +106,7 @@ it('keeps hosted auth proof secretless, PR-head bound and absent from unrelated 
   expect(workflow.permissions).toEqual({ contents: 'read' })
   const job = workflow.jobs['auth-compatibility']
   expect(job['runs-on']).toBe('ubuntu-24.04')
-  expect(job.steps.find(step => step.env?.AUTH_PROOF_CASE)?.env?.AUTH_PROOF_CASE).toBe('eslint-config-next-16.4.6')
+  expect(job.steps.find(step => step.env?.AUTH_PROOF_CASE)?.env?.AUTH_PROOF_CASE).toBe('database-2026-11-19')
   expect(job.steps.find(step => step.uses?.startsWith('actions/setup-node@'))?.with?.['node-version']).toBe('24.22.1')
   expect(job.steps[0].with?.ref).toBe('${{ github.event.pull_request.head.sha }}')
   expect(job.steps[0].with?.['persist-credentials']).toBe(false)
@@ -265,7 +265,7 @@ it('requires both broad and Catalog suites in both fixed variants, never the kno
 
 it('rejects the actual silent-merge duplicate YAML selector and selects exactly the owner case', () => {
   const source = fs.readFileSync(path.resolve(__dirname, '../../../.github/workflows/auth-compatibility.yml'), 'utf8')
-  const key = 'AUTH_PROOF_CASE: eslint-config-next-16.4.6'
+  const key = 'AUTH_PROOF_CASE: database-2026-11-19'
   expect(source.split(key).length - 1).toBe(1)
   expect(() => load(source.replace(key, key + '\n          AUTH_PROOF_CASE: catalog-yaml'))).toThrow(/duplicat/i)
 })

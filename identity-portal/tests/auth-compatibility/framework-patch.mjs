@@ -1,5 +1,6 @@
 import assert from 'node:assert/strict'
 import { createHash } from 'node:crypto'
+import { databaseCase, databaseSource } from './database-case.mjs'
 
 export const frameworkPatchCase = 'next-16.4.6'
 export const eslintConfigCase = 'eslint-config-next-16.4.6'
@@ -19,7 +20,7 @@ const sources = new Map([
 ])
 
 export function frameworkSource(name) {
-  return sources.get(name)
+  return sources.get(name) ?? (name === databaseCase ? databaseSource : undefined)
 }
 
 // Both framework cases inherit the seven original source inputs byte for byte.
