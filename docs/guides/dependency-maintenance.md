@@ -12,8 +12,8 @@ checkPaths:
   - identity-portal/pnpm-lock.yaml
   - docs/guides/dependency-maintenance.md
 lastReviewedAt: 2026-11-19
-lastReviewedCommit: b3821ff2212d7cf6707c5b5090d1912badf60fdd
-lastReviewedNote: "Identity #58 reviewed the four database declarations, strictly scoped lock, immutable source cases, actual offline SQL/client proof and unchanged complete hosted gates. Historical DB/design/security requirements and retained #49/#51/#52 scope remain unchanged."
+lastReviewedCommit: 969508cc2355f25b8852190918c3b13f81a81e21
+lastReviewedNote: "Identity #58 reviewed the scoped database graph and immutable dependency qualification, including the correction that confines whole schema/migration equality to its explicit case. Ordinary quality uses an owned probe; product/design/DB semantics, original auth/image gates and retained #49/#51/#52 scope stay unchanged."
 ---
 
 # Dependency maintenance

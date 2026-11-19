@@ -12,8 +12,8 @@ checkPaths:
   - docs/design/README.md
   - docs/implementation/README.md
 lastReviewedAt: 2026-11-19
-lastReviewedCommit: b3821ff2212d7cf6707c5b5090d1912badf60fdd
-lastReviewedNote: "Identity #58 reviewed the existing ownership/design/DB and delivery boundaries for the scoped database graph and immutable source qualification. No product, deployment, production authorization or retained #49/#51/#52 scope changes."
+lastReviewedCommit: 969508cc2355f25b8852190918c3b13f81a81e21
+lastReviewedNote: "Identity #58 reviewed the scoped database graph and immutable dependency qualification, including the correction that confines whole schema/migration equality to its explicit case. Ordinary quality uses an owned probe; product/design/DB semantics, original auth/image gates and retained #49/#51/#52 scope stay unchanged."
 ---
 
 # Identity Platform 文档
