@@ -15,6 +15,7 @@ on:
       - identity-portal/tests/unit/catalog-qualification.test.ts
       - identity-portal/tests/unit/security-qualification.test.ts
       - identity-portal/tests/unit/database-cohort.test.ts
+      - identity-portal/tests/unit/ubuntu-mirror.test.ts
       - identity-portal/tests/unit/security-behavior.test.ts
       - identity-portal/tests/unit/image-security-proof.test.ts
       - identity-portal/tests/unit/yaml-worker-adapter.test.ts
@@ -52,6 +53,9 @@ jobs:
       - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
         with:
           node-version: 24.22.1
+      - name: Prefer the existing canonical Ubuntu HTTPS mirror
+        shell: bash
+        run: node tests/auth-compatibility/ubuntu-mirror.mjs --apply --head '${{ github.event.pull_request.head.sha }}' > "$RUNNER_TEMP/identity58-apt-mirror.json"
       - name: Build and inspect isolated Node24 Portal and Worker images
         timeout-minutes: 28
         shell: bash
@@ -129,5 +133,6 @@ jobs:
           path: |
             ${{ runner.temp }}/identity34-evidence-*
             ${{ runner.temp }}/identity41-image-evidence-*
+            ${{ runner.temp }}/identity58-apt-mirror.json
           if-no-files-found: error
           retention-days: 7

@@ -88,6 +88,7 @@ const supportPaths = new Set([
   '.github/workflows/auth-compatibility.yml', 'identity-portal/tests/unit/auth-compatibility-harness.test.ts',
   'identity-portal/tests/unit/catalog-qualification.test.ts', 'identity-portal/tests/unit/security-qualification.test.ts', 'identity-portal/tests/unit/security-behavior.test.ts',
   'identity-portal/tests/unit/database-cohort.test.ts',
+  'identity-portal/tests/unit/ubuntu-mirror.test.ts',
 ])
 const docPaths = new Set(['docs/guides/dependency-maintenance.md', 'docs/references/2026-07-02-l0-dependency-versions.md', 'docs/references/2026-10-28-dependency-security.md'])
 const stripReview = value => value.replace(/^(?:lastReviewedAt|lastReviewedCommit|lastReviewedNote):[^\r\n]*(?:\r?\n|$)/gm, '')
