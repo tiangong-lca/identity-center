@@ -27,6 +27,13 @@ it('keeps the framework patch separate from the original security case and binds
   expect(() => assertQualificationManifest(frameworkPatchCase, immutableManifest.content, patched)).not.toThrow()
   expect(() => assertQualificationManifest('security-audit', immutableManifest.content, patched)).toThrow()
   expect(() => assertQualificationManifest(frameworkPatchCase, immutableManifest.content, candidateManifest())).toThrow()
+  const baselineVersions = versions('baseline')
+  const patchedVersions = { ...versions('candidate'), next: '16.4.6' }
+  expect(() => assertQualificationVersions(frameworkPatchCase, 'baseline', baselineVersions)).not.toThrow()
+  expect(() => assertQualificationVersions(frameworkPatchCase, 'candidate', patchedVersions)).not.toThrow()
+  expect(() => assertQualificationVersions(frameworkPatchCase, 'candidate', versions('candidate'))).toThrow()
+  expect(() => assertQualificationVersions('security-audit', 'candidate', patchedVersions)).toThrow()
+
 
   const historic = fs.readFileSync(path.resolve(__dirname, '../auth-compatibility/security-inputs.json'))
   const before = securityInputsForCase('security-audit', historic)
