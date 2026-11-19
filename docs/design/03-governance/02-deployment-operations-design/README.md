@@ -11,9 +11,9 @@ checkPaths:
   - docs/design/03-governance/02-deployment-operations-design/README.md
   - identity-portal/deploy/**
   - identity-portal/lib/config/**
-lastReviewedAt: 2026-10-28
-lastReviewedCommit: 10083691f0872cdc225cca950ca47c374138cf47
-lastReviewedNote: "Identity48 image-proof support: existing one-off native Node image check now uses immutable image ID, read-only/network-none filesystem inspection before unchanged cleanup. Worker observes exact source inputs, all three sanitizer hashes, selected packages and trusted canonical app-Zod entry/implementation hashes. Runner binds actual sanitizer/client-Zod/server-Zod output and discovered loadable/NFT associations, distinct host expectations and framework vendor tracked-open49. Focused filesystem/inert workflow controls and retained B Runner positive exercised; host virtual-store old orphan rejection preserved, not an image failure. No Docker/image build/browser/network/audit/publication in support preparation; actual hosted image proof pending."
+lastReviewedAt: 2026-11-19
+lastReviewedCommit: cbdcd2e42f42c884441879ca1ccf836b82ff7adb
+lastReviewedNote: "Identity #55. Reviewed the exact Next.js 16.4.6 framework patch and owner qualification while retaining the earlier source and image controls."
 ---
 
 # 10. 部署与运维设计

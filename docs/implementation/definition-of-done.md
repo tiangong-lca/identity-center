@@ -10,9 +10,9 @@ whenToUpdate: 完成定义条目、验收标准或核对证据发生变化时更
 checkPaths:
   - docs/implementation/definition-of-done.md
   - GOAL.md
-lastReviewedAt: 2026-10-28
-lastReviewedCommit: f0a0658568f07f5e3317817041acb4bd71676a72
-lastReviewedNote: "Identity48 cancellation proof closure: after unchanged TERM grace/KILL, require actual owned-group absence and direct-child reaping within a bounded one-second join; unknown observations fail closed. Host retains cancel metadata/no proof while preserving failed supervisor status. Existing immediate PID/deadline/trap checks remain, with actual descendant and unavailable-observation controls. Graph/product/patch/generator/formatter unchanged; fresh hosted qualification remains pending."
+lastReviewedAt: 2026-11-19
+lastReviewedCommit: cbdcd2e42f42c884441879ca1ccf836b82ff7adb
+lastReviewedNote: "Identity #55. Reviewed separate current framework source admission, the unchanged security behavior suite, and required hosted Runner/Worker qualification."
 ---
 
 # 完成定义(DoD)核对 — GOAL.md §7

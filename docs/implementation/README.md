@@ -11,9 +11,9 @@ checkPaths:
   - docs/implementation/README.md
   - GOAL.md
   - docs/design/README.md
-lastReviewedAt: 2026-10-28
-lastReviewedCommit: f0a0658568f07f5e3317817041acb4bd71676a72
-lastReviewedNote: "Identity48 cancellation proof closure: after unchanged TERM grace/KILL, require actual owned-group absence and direct-child reaping within a bounded one-second join; unknown observations fail closed. Host retains cancel metadata/no proof while preserving failed supervisor status. Existing immediate PID/deadline/trap checks remain, with actual descendant and unavailable-observation controls. Graph/product/patch/generator/formatter unchanged; fresh hosted qualification remains pending."
+lastReviewedAt: 2026-11-19
+lastReviewedCommit: cbdcd2e42f42c884441879ca1ccf836b82ff7adb
+lastReviewedNote: "Identity #55. Reviewed the exact Next.js 16.4.6 framework patch and owner qualification while retaining the earlier source and image controls."
 ---
 
 # 统一身份平台实施方案

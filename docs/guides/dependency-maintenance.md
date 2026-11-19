@@ -11,9 +11,9 @@ checkPaths:
   - .github/dependabot.yml
   - identity-portal/pnpm-lock.yaml
   - docs/guides/dependency-maintenance.md
-lastReviewedAt: 2026-10-27
-lastReviewedCommit: 2d9d0044bd5d0b6bc19a4c8d864331cf7fd9f851
-lastReviewedNote: "Identity #44 prepared bad-readiness correction: only intentional Keycloak false probe uses1retry/1s interval/1s timeout/zero start period; normal fixtures and20s deadline exact. Controlled failure requires owned full-ID running/unhealthy state plus exact startup rejection, retained health and cleanup, nonzero exit and no cancellation. Actual-function inert regressions reject unrelated1/125 and receipt/cleanup failures. Scoped33cases, lint/typecheck and independent re-review pass; draft cause gap resolved. No local Docker/product/Compose upgrade or page-error/auth relaxation; runtime and Main publication review pending."
+lastReviewedAt: 2026-11-19
+lastReviewedCommit: cbdcd2e42f42c884441879ca1ccf836b82ff7adb
+lastReviewedNote: "Identity #55. Reviewed the release-age diagnosis, exact Next.js 16.4.6 graph, source case, and independent residual ownership."
 ---
 
 # Dependency maintenance
