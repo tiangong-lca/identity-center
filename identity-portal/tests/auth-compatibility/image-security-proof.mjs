@@ -3,6 +3,7 @@ import path from 'node:path'
 import assert from 'node:assert/strict'
 import {createHash} from 'node:crypto'
 import {createRequire} from 'node:module'
+import { frameworkPatchCase, frameworkVersion, securityInputsForCase } from './framework-patch.mjs'
 import {spawn,execFileSync} from 'node:child_process'
 import {fileURLToPath} from 'node:url'
 const require=createRequire(import.meta.url)
@@ -24,7 +25,12 @@ export function inspectImageFilesystem(target,root,expected,{staticRoot}={}){
  const record=file=>{const data=read(file);return{path:relative(file),bytes:data.length,sha256:hash(data)}}
  const json=file=>JSON.parse(read(file).toString())
  function walk(dir,filter,depth=0){assert.ok(depth<=limits.depth,'Image directory depth exceeded');const list=[];for(const e of fs.readdirSync(dir,{withFileTypes:true})){const f=path.join(dir,e.name);assert.equal(e.isSymbolicLink(),false,'Refuse image inventory symlink');if(e.isDirectory())list.push(...walk(f,filter,depth+1));else if(e.isFile()&&filter(f))list.push(f);assert.ok(list.length<=limits.files,'Image file count exceeded')}return list}
- const frameworkPath=path.join(root,'node_modules/next/dist/compiled/zod/index.cjs'),framework=record(frameworkPath);assert.equal(framework.sha256,expected.frameworkVendor.sha256,'Known framework vendor bytes changed');assert.equal(framework.bytes,expected.frameworkVendor.bytes);const next=json(path.join(root,'node_modules/next/package.json'));assert.equal(next.version,'16.4.2')
+ const frameworkPath=path.join(root,'node_modules/next/dist/compiled/zod/index.cjs'),framework=record(frameworkPath);assert.equal(framework.sha256,expected.frameworkVendor.sha256,'Known framework vendor bytes changed');assert.equal(framework.bytes,expected.frameworkVendor.bytes);const next=json(path.join(root,'node_modules/next/package.json'));assert.ok(['16.4.2', '16.4.6'].includes(next.version), 'Unreviewed framework version');// This function also runs in the image; the host case and package inventory must agree.
+ const imageCase = expected.sourceCase ?? 'security-audit'
+ assert.ok(['security-audit', 'next-16.4.6'].includes(imageCase), 'Unknown image source case')
+ const expectedNext = imageCase === 'next-16.4.6' ? '16.4.6' : '16.4.2'
+ assert.equal(next.version, expectedNext, 'Require exact reviewed framework version')
+ assert.deepEqual(expected.packageVersions.next, [expectedNext], 'Host and image framework selections must agree')
  const frameworkVendor={...framework,namespace:'framework-vendored-zod',sourceNextVersion:next.version,vendorVersion:'not-asserted',status:'tracked-open-not-fixed',followup:expected.frameworkVendor.followup}
  let worker=null,runner=null
  if(target==='worker'){
@@ -64,10 +70,15 @@ export function inspectImageFilesystem(target,root,expected,{staticRoot}={}){
  return{schema:1,target,source:expected.source,hostExpectedInputHashes:expected.inputHashes,hostInputScope:'committed source expectations; only Worker reports observed raw lock/workspace/patch inputs',frameworkVendor,worker,runner,inventory:{files,bytes},scope:staticRoot?'offline-split-root-retained-B':'image-root-filesystem'}
 }
 
-export function buildExpected(root,source){
- assert.match(source,/^[a-f0-9]{40}$/);const app=path.join(root,'identity-portal'),inputs=JSON.parse(fs.readFileSync(path.join(app,'tests/auth-compatibility/security-inputs.json'),'utf8'))
- for(const[file,digest]of Object.entries(inputs.candidateHashes)){assert.match(digest,/^[a-f0-9]{64}$/);assert.equal(sha(fs.readFileSync(path.join(root,file))),digest,'Host expected source input mismatch')}
- return{source,inputHashes:inputs.candidateHashes,provenance:JSON.parse(fs.readFileSync(path.join(app,'patches/monaco-editor@0.55.1.provenance.json'),'utf8')),packageVersions:EXPECTED_PACKAGE_VERSIONS,zodSource:EXPECTED_ZOD_SOURCE,frameworkVendor:FRAMEWORK_VENDOR}
+export function buildExpected(root, source, sourceCase = 'security-audit') {
+ assert.match(source,/^[a-f0-9]{40}$/);const app=path.join(root,'identity-portal')
+ const inputs = securityInputsForCase(sourceCase, fs.readFileSync(path.join(app, 'tests/auth-compatibility/security-inputs.json')))
+ const inputHashes = inputs.candidateHashes
+ for(const[file,digest]of Object.entries(inputHashes)){assert.match(digest,/^[a-f0-9]{64}$/);assert.equal(sha(fs.readFileSync(path.join(root,file))),digest,'Host expected source input mismatch')}
+ const patched = sourceCase === frameworkPatchCase
+ const packageVersions = patched ? { ...EXPECTED_PACKAGE_VERSIONS, next: [frameworkVersion] } : EXPECTED_PACKAGE_VERSIONS
+ const zodSource = patched ? { ...EXPECTED_ZOD_SOURCE, sourceLockSha256: inputHashes['identity-portal/pnpm-lock.yaml'] } : EXPECTED_ZOD_SOURCE
+ return { source, sourceCase, inputHashes, provenance: JSON.parse(fs.readFileSync(path.join(app, 'patches/monaco-editor@0.55.1.provenance.json'), 'utf8')), packageVersions, zodSource, frameworkVendor: FRAMEWORK_VENDOR }
 }
 // Join the existing bounded supervisor on every path, including host-only
 // signals. The shell cannot report cleanup while its detached transport lives.
@@ -91,7 +102,7 @@ export function imageInspectionCommand(executable,args,{timeout,maxBuffer}) {
 }
 /** @param {(executable:string,args:string[],options:{timeout:number,maxBuffer:number})=>unknown} [transport] */
 export async function runImageInspection(options,transport=imageInspectionCommand){
- const{target,image,name,evidence,source,imageInfo,root}=options;assert.ok(['runner','worker'].includes(target));assert.match(image,/^identity41-node24-\d+-\d+:(runner|worker)$/);assert.match(name,/^identity41-node24-\d+-\d+-(runner|worker)$/);assert.ok(image.endsWith(':'+target)&&name.endsWith('-'+target));assert.ok(path.isAbsolute(evidence)&&path.isAbsolute(imageInfo));const expected=buildExpected(root,source)
+ const{target,image,name,evidence,source,imageInfo,root}=options;assert.ok(['runner','worker'].includes(target));assert.match(image,/^identity41-node24-\d+-\d+:(runner|worker)$/);assert.match(name,/^identity41-node24-\d+-\d+-(runner|worker)$/);assert.ok(image.endsWith(':'+target)&&name.endsWith('-'+target));assert.ok(path.isAbsolute(evidence)&&path.isAbsolute(imageInfo));const expected=buildExpected(root,source,options.sourceCase)
  const info=fs.readFileSync(imageInfo,'utf8').trim();assert.match(info,/^sha256:[a-f0-9]{64} linux\/amd64$/);const imageId=info.split(' ')[0]
  assert.equal(expected.zodSource.sourceLockSha256,expected.inputHashes['identity-portal/pnpm-lock.yaml']);
  const program=`try{const assert=require('node:assert/strict');assert.equal(process.version,'v24.22.1');assert.equal(process.platform,'linux');assert.equal(process.arch,'x64');const input=JSON.parse(process.argv[1]);const filesystem=(${inspectImageFilesystem.toString()})(input.target,'/app',input.expected);process.stdout.write(JSON.stringify({schema:1,target:input.target,source:input.expected.source,imageId:input.imageId,nodeVersion:process.version,platform:process.platform,arch:process.arch,filesystem}));}catch{process.stderr.write('Owned image security inspection failed\\n');process.exitCode=1}`
@@ -104,8 +115,9 @@ export async function runImageInspection(options,transport=imageInspectionComman
 }
 if(process.argv[1]&&path.resolve(process.argv[1])===fileURLToPath(import.meta.url)){
  try{
-  const args=process.argv.slice(2);assert.ok(args.length===12||args.length===14);const o={};for(let i=0;i<args.length;i+=2){assert.ok(['--target','--image','--name','--evidence','--source','--image-info','--root'].includes(args[i]));assert.ok(!Object.hasOwn(o,args[i]));o[args[i]]=args[i+1]}
+  const args=process.argv.slice(2);assert.ok([12,14,16].includes(args.length));const o={};for(let i=0;i<args.length;i+=2){assert.ok(['--target','--image','--name','--evidence','--source','--image-info','--root','--source-case'].includes(args[i]));assert.ok(!Object.hasOwn(o,args[i]));o[args[i]]=args[i+1]}
+  for (const key of ['--target','--image','--name','--evidence','--source','--image-info']) assert.ok(Object.hasOwn(o, key), 'Required image proof argument missing')
   const root=o['--root']??path.resolve(path.dirname(fileURLToPath(import.meta.url)),'../../..');assert.equal(execFileSync('git',['-C',root,'rev-parse','HEAD'],{encoding:'utf8'}).trim(),o['--source']);assert.equal(execFileSync('git',['-C',root,'status','--porcelain'],{encoding:'utf8'}),'')
-  await runImageInspection({target:o['--target'],image:o['--image'],name:o['--name'],evidence:o['--evidence'],source:o['--source'],imageInfo:o['--image-info'],root})
+  await runImageInspection({target:o['--target'],image:o['--image'],name:o['--name'],evidence:o['--evidence'],source:o['--source'],imageInfo:o['--image-info'],root,sourceCase:o['--source-case']})
  }catch(error){process.stderr.write('Owned image proof failed\n');process.exitCode=[130,143].includes(error?.exitCode)?error.exitCode:1}
 }
