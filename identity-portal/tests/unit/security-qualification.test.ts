@@ -5,6 +5,7 @@ import os from 'node:os'
 import { execFileSync } from 'node:child_process'
 import { createHash } from 'node:crypto'
 import { qualificationCase, assertQualificationManifest, assertQualificationVersions } from '../auth-compatibility/qualification-case.mjs'
+import { frameworkPatchCase, securityInputsForCase } from '../auth-compatibility/framework-patch.mjs'
 import { SECURITY_BASELINE, SECURITY_INPUTS, SECURITY_PATCH, securityChangedPathPolicy, assertSecurityArchive, SECURITY_CANDIDATE_PATHS, SECURITY_PROVENANCE, SECURITY_UPSTREAM, SECURITY_ORIGINAL_ASSETS, assertSecurityProvenance, securityInstalledAssets } from '../auth-compatibility/security-case.mjs'
 import { qualificationUiPlan, qualificationBrowserTimeout, combinedReactUi, assertSecurityUiReceipts } from '../auth-compatibility/ui-plan.mjs'
 
@@ -18,6 +19,37 @@ function candidateManifest() {
   return candidate
 }
 const versions = (variant: string) => ({ next: '16.4.2', react: '19.3.1', 'react-dom': '19.3.1', '@types/react': '19.3.0', '@types/react-dom': '19.3.0', jose: '6.2.12', '@keycloak/keycloak-admin-client': '26.8.1', 'monaco-editor': '0.55.1', 'monaco-yaml': '5.5.1', shadcn: variant === 'baseline' ? '4.21.0' : '4.23.0', zod: variant === 'baseline' ? '4.4.3' : '4.6.7', vitest: variant === 'baseline' ? '4.1.11' : '4.1.12', '@vitest/coverage-v8': variant === 'baseline' ? '4.1.11' : '4.1.12' })
+
+it('keeps the framework patch separate from the original security case and binds its exact input bytes', () => {
+  const patched = candidateManifest()
+  patched.dependencies.next = '16.4.6'
+  expect(qualificationCase(frameworkPatchCase)).toMatchObject({ name: frameworkPatchCase, behaviorCase: 'security-audit', baseline: SECURITY_BASELINE })
+  expect(() => assertQualificationManifest(frameworkPatchCase, immutableManifest.content, patched)).not.toThrow()
+  expect(() => assertQualificationManifest('security-audit', immutableManifest.content, patched)).toThrow()
+  expect(() => assertQualificationManifest(frameworkPatchCase, immutableManifest.content, candidateManifest())).toThrow()
+  const baselineVersions = versions('baseline')
+  const patchedVersions = { ...versions('candidate'), next: '16.4.6' }
+  expect(() => assertQualificationVersions(frameworkPatchCase, 'baseline', baselineVersions)).not.toThrow()
+  expect(() => assertQualificationVersions(frameworkPatchCase, 'candidate', patchedVersions)).not.toThrow()
+  expect(() => assertQualificationVersions(frameworkPatchCase, 'candidate', versions('candidate'))).toThrow()
+  expect(() => assertQualificationVersions('security-audit', 'candidate', patchedVersions)).toThrow()
+
+
+  const historic = fs.readFileSync(path.resolve(__dirname, '../auth-compatibility/security-inputs.json'))
+  const before = securityInputsForCase('security-audit', historic)
+  const after = securityInputsForCase(frameworkPatchCase, historic)
+  for (const file of Object.keys(before.candidateHashes)) {
+    if (file === 'identity-portal/package.json' || file === 'identity-portal/pnpm-lock.yaml') {
+      const actual = fs.readFileSync(path.resolve(__dirname, '../../..', file))
+      expect(after.candidateHashes[file]).toBe(createHash('sha256').update(actual).digest('hex'))
+      expect(after.candidateHashes[file]).not.toBe(before.candidateHashes[file])
+    } else {
+      expect(after.candidateHashes[file]).toBe(before.candidateHashes[file])
+    }
+  }
+  expect(() => securityInputsForCase(frameworkPatchCase, Buffer.concat([historic, Buffer.from(' ')]))).toThrow()
+  expect(() => securityInputsForCase('unreviewed', historic)).toThrow()
+})
 
 it('keeps security manifest, exact runtime/cohort versions and immutable history independent', () => {
   expect(immutableManifest.sourceCommit).toBe(SECURITY_BASELINE)

@@ -1,5 +1,29 @@
 # Auth dependency interoperability proof
 
+## Current Next.js source qualification
+
+The dependency workflow selects `next-16.4.6`. Its baseline is the historical
+security baseline `68e1fafce35e7e931ee0e7c65b5c6e0b4ccf8e8b`. The new
+candidate must also descend from accepted Main `742b6e1325f37dac2605bb1e482851258326b234`.
+The patch adds exactly one direct framework selector to the earlier reviewed
+manifest changes. The host binds the candidate manifest and lock to their
+reviewed hashes and checks the complete earlier input contract before using
+the remaining seven input hashes. Historical cases remain independently selectable.
+
+Image inspection uses the same explicit source case for both Runner and Worker.
+The installed Next package must be 16.4.6. The framework-vendored Zod file is
+still the previously measured 77,325-byte file tracked under #49. The application
+Zod identity is bound to the new lock and its separately qualified implementation
+bytes. The browser and transport jobs use the existing `security-audit` behavior.
+The outer receipt records both `qualificationCase` and `behaviorCase` for this run.
+
+From a clean checkout, use `AUTH_PROOF_CASE=next-16.4.6 AUTH_PROOF_HEAD="$(git rev-parse HEAD)" node tests/auth-compatibility/run.mjs --validate-sources`
+in `identity-portal/` to check Git identity and the complete allowed delta.
+The native image builds, restricted image inspections and behavioral comparison
+are verified by the existing hosted workflow.
+
+## Earlier qualification cases
+
 Historical Identity46 added an explicit `AUTH_PROOF_CASE=catalog-yaml` owner case.
 Its qualified repair workflow selected that case; the historical auth-client
 case remains available with its original baseline, graph and product assertions,

@@ -3,6 +3,7 @@ import { execFileSync } from 'node:child_process'
 import { createHash } from 'node:crypto'
 import { readFileSync, readdirSync, lstatSync, realpathSync } from 'node:fs'
 import path from 'node:path'
+import { frameworkParent, frameworkPatchCase, frameworkVersion, securityInputsForCase } from './framework-patch.mjs'
 
 export const SECURITY_BASELINE = '68e1fafce35e7e931ee0e7c65b5c6e0b4ccf8e8b'
 export const SECURITY_PATCH = 'identity-portal/patches/monaco-editor@0.55.1.patch'
@@ -30,22 +31,26 @@ const git = (args, options) => execFileSync('git', args, { ...options, env: { ..
 const show = (ref, file, options) => git(['show', `${ref}:${file}`], options)
 const keys = (value, expected, message) => assert.deepEqual(Object.keys(value ?? {}).sort(), [...expected].sort(), message)
 
-export function assertSecurityManifest(baselineContent, candidate) {
+export function assertSecurityManifest(baselineContent, candidate, sourceCase = 'security-audit') {
   assert.equal(hash(baselineContent), baselineHashes['identity-portal/package.json'], 'Security baseline manifest bytes must be immutable')
   const expected = JSON.parse(baselineContent)
   expected.dependencies.shadcn = '^4.23.0'
   expected.dependencies.zod = '^4.6.7'
   expected.devDependencies.vitest = '^4.1.12'
   expected.devDependencies['@vitest/coverage-v8'] = '^4.1.12'
-  assert.deepEqual(candidate, expected, 'Only the four reviewed security manifest changes are admitted')
+  if (sourceCase === frameworkPatchCase) expected.dependencies.next = frameworkVersion
+  else assert.equal(sourceCase, 'security-audit', 'Unknown security qualification source case')
+  assert.deepEqual(candidate, expected, 'Only the exact manifest changes for this source case are admitted')
 }
 
-export function assertSecurityVersions(variant, versions) {
+export function assertSecurityVersions(variant, versions, sourceCase = 'security-audit') {
   assert.ok(['baseline', 'candidate'].includes(variant))
   const fixed = { next: '16.4.2', react: '19.3.1', 'react-dom': '19.3.1', '@types/react': '19.3.0', '@types/react-dom': '19.3.0', jose: '6.2.12', '@keycloak/keycloak-admin-client': '26.8.1', 'monaco-editor': '0.55.1', 'monaco-yaml': '5.5.1' }
   const selected = variant === 'baseline'
     ? { shadcn: '4.21.0', zod: '4.4.3', vitest: '4.1.11', '@vitest/coverage-v8': '4.1.11' }
     : { shadcn: '4.23.0', zod: '4.6.7', vitest: '4.1.12', '@vitest/coverage-v8': '4.1.12' }
+  assert.ok(sourceCase === 'security-audit' || sourceCase === frameworkPatchCase)
+  if (sourceCase === frameworkPatchCase && variant === 'candidate') fixed.next = frameworkVersion
   for (const [name, value] of Object.entries({ ...fixed, ...selected })) assert.equal(versions[name], value, `Exact security ${variant} version required: ${name}`)
 }
 
@@ -77,14 +82,19 @@ export function securityChangedPathPolicy(file) {
   assert.fail(`Unreviewed security qualification path: ${file}`)
 }
 
-export function assertSecuritySources({ baseline, head, requestedHead, cwd, env }) {
+export function assertSecuritySources({ baseline, head, requestedHead, cwd, env, sourceCase = 'security-audit' }) {
   const options = { cwd, env }
   assert.equal(baseline, SECURITY_BASELINE, 'Use the immutable security baseline')
   assert.match(head, /^[a-f0-9]{40}$/)
   assert.equal(head, requestedHead, 'Candidate must be the requested exact head')
   assert.notEqual(head, baseline)
   assert.equal(git(['merge-base', baseline, head], options).toString().trim(), baseline, 'Candidate must descend from the security baseline')
-  const inputs = JSON.parse(show(head, SECURITY_INPUTS, options))
+  const retainedInputs = show(head, SECURITY_INPUTS, options)
+  if (sourceCase === frameworkPatchCase) {
+    assert.equal(git(['merge-base', frameworkParent, head], options).toString().trim(), frameworkParent, 'Framework patch must descend from the reviewed parent')
+    assert.deepEqual(retainedInputs, show(frameworkParent, SECURITY_INPUTS, options), 'Retain the original security input contract')
+  }
+  const inputs = securityInputsForCase(sourceCase, retainedInputs)
   keys(inputs, ['schema', 'baseline', 'baselineHashes', 'candidateHashes'], 'Unknown security input contract fields')
   assert.equal(inputs.schema, 1)
   assert.equal(inputs.baseline, baseline)
@@ -97,7 +107,7 @@ export function assertSecuritySources({ baseline, head, requestedHead, cwd, env 
   }
   assertSecurityProvenance(JSON.parse(show(head, SECURITY_PROVENANCE, options)), inputs)
   assert.equal(hash(show(head, 'identity-portal/patches/upstream/dompurify-3.4.17.purify.es.mjs', options)), SECURITY_UPSTREAM, 'Require trusted upstream sanitizer bytes')
-  assertSecurityManifest(show(baseline, 'identity-portal/package.json', options), JSON.parse(show(head, 'identity-portal/package.json', options)))
+  assertSecurityManifest(show(baseline, 'identity-portal/package.json', options), JSON.parse(show(head, 'identity-portal/package.json', options)), sourceCase)
   const dockerPath = 'identity-portal/deploy/docker/Dockerfile'
   const dockerBefore = show(baseline, dockerPath, options).toString()
   assert.equal(dockerBefore.split('COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./\n').length, 2, 'Require the single baseline manifest COPY anchor')

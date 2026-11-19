@@ -17,7 +17,9 @@ import { qualificationUiPlan, assertFixedReactUiReceipts, assertSecurityUiReceip
 import { emittedBrowserAssetPaths } from './browser-assets.mjs'
 import { emittedYamlWorker } from './catalog-worker-identity.mjs'
 import { badReadinessDocument, observeBadKeycloakHealth, classifyBadReadinessRejection, requireExpectedBadReadinessError, READINESS_CONTROL_WAIT_SECONDS } from './readiness-control.mjs'
-const selectedCase = qualificationCase(process.env.AUTH_PROOF_CASE)
+// Keep the selected source graph explicit while reusing the established behavioral suite.
+const sourceCase = qualificationCase(process.env.AUTH_PROOF_CASE)
+const selectedCase = sourceCase.behaviorCase ? qualificationCase(sourceCase.behaviorCase) : sourceCase
 const BASELINE = selectedCase.baseline
 
 const sourceRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../../..')
@@ -233,7 +235,7 @@ async function variant(variant, root, images, head, securityInputs) {
       if (selectedCase.name !== 'auth-client') {
         for (const name of ['@types/react', '@types/react-dom']) versions[name] = JSON.parse(fs.readFileSync(path.join(app, 'node_modules', name, 'package.json'))).version
         if (selectedCase.name === 'security-audit') for (const name of ['shadcn', 'zod', 'vitest', '@vitest/coverage-v8', 'monaco-editor', 'monaco-yaml']) versions[name] = JSON.parse(fs.readFileSync(path.join(app, 'node_modules', name, 'package.json'))).version
-        assertQualificationVersions(selectedCase.name, variant, versions)
+        assertQualificationVersions(sourceCase.name, variant, versions)
       }
       else {
         assert.equal(versions.next, '16.4.2'); assert.equal(versions.react, '19.2.4'); assert.equal(versions['react-dom'], '19.2.4')
@@ -366,13 +368,16 @@ async function readinessFailureControl(root, images) {
 }
 
 async function main() {
+  const sourceIdentity = sourceCase.behaviorCase
+    ? { qualificationCase: sourceCase.name, behaviorCase: selectedCase.name }
+    : { qualificationCase: sourceCase.name }
   const head = git('rev-parse', 'HEAD')
   let securityInputs
   assert.equal(git('status', '--porcelain'), '', 'Run proof from clean exact source')
   const validateOnly = process.argv.slice(2).length === 1 && process.argv[2] === '--validate-sources'
   assert.ok(process.argv.length === 2 || validateOnly, 'Unknown proof arguments')
   if (selectedCase.name === 'catalog-yaml') assertCatalogSources({ baseline: BASELINE, head, requestedHead: process.env.AUTH_PROOF_HEAD, cwd: sourceRoot, env: infraEnv })
-  else if (selectedCase.name === 'security-audit') securityInputs = assertSecuritySources({ baseline: BASELINE, head, requestedHead: process.env.AUTH_PROOF_HEAD, cwd: sourceRoot, env: infraEnv })
+  else if (selectedCase.name === 'security-audit') securityInputs = assertSecuritySources({ sourceCase: sourceCase.name, baseline: BASELINE, head, requestedHead: process.env.AUTH_PROOF_HEAD, cwd: sourceRoot, env: infraEnv })
   else if (selectedCase.name !== 'auth-client') {
     assertQualificationSources(selectedCase.name, { baseline: BASELINE, head, requestedHead: process.env.AUTH_PROOF_HEAD,
       ancestor: git('merge-base', BASELINE, head) === BASELINE })
@@ -383,7 +388,7 @@ async function main() {
   }
   if (validateOnly) {
     assert.notEqual(selectedCase.name, 'auth-client', 'Historical auth validation remains on its original full path')
-    console.log(JSON.stringify({ validationOnly: true, qualificationCase: selectedCase.name, baseline: BASELINE, head, dockerAccessed: false }))
+    console.log(JSON.stringify({ validationOnly: true, ...sourceIdentity, baseline: BASELINE, head, dockerAccessed: false }))
     return
   }
   assertHostedContext(process.env, process.platform, head)
@@ -407,7 +412,7 @@ async function main() {
   try {
     const pnpmVersion = await execute('pnpm', ['--version'], { name: 'pnpm-version' })
     assert.equal(pnpmVersion, '11.9.0')
-    fs.writeFileSync(path.join(output, 'source.json'), JSON.stringify({ qualificationCase: selectedCase.name, head, baseline: BASELINE, node: process.version, pnpm: pnpmVersion, ...(securityInputs ? { securityInputs } : {}) }, null, 2))
+    fs.writeFileSync(path.join(output, 'source.json'), JSON.stringify({ ...sourceIdentity, head, baseline: BASELINE, node: process.version, pnpm: pnpmVersion, ...(securityInputs ? { securityInputs } : {}) }, null, 2))
     await execute('docker', ['version', '--format', '{{.Server.Version}}'], { name: 'docker-preflight' })
     await execute('docker', ['compose', 'version'], { name: 'compose-preflight' })
     for (const [name, tag] of Object.entries(IMAGE_TAGS)) {
@@ -429,10 +434,10 @@ async function main() {
       assertSecurityBehaviorReceipts(baseline, candidate)
     }
     const comparison = compareReceipts(baseline, candidate)
-    fs.writeFileSync(path.join(output, 'qualification.json'), JSON.stringify({ qualificationCase: selectedCase.name, head, baseline: BASELINE, images, readinessControl, comparison, baselineReceipt: baseline, candidateReceipt: candidate, ...(securityInputs ? { securityInputs } : {}) }, null, 2))
-    console.log(JSON.stringify({ qualificationCase: selectedCase.name, head, baseline: BASELINE, comparison, evidence: output }))
+    fs.writeFileSync(path.join(output, 'qualification.json'), JSON.stringify({ ...sourceIdentity, head, baseline: BASELINE, images, readinessControl, comparison, baselineReceipt: baseline, candidateReceipt: candidate, ...(securityInputs ? { securityInputs } : {}) }, null, 2))
+    console.log(JSON.stringify({ ...sourceIdentity, head, baseline: BASELINE, comparison, evidence: output }))
   } catch (e) {
-    fs.writeFileSync(path.join(output, 'failure.json'), JSON.stringify({ qualificationCase: selectedCase.name, head, baseline: BASELINE, cancelled, message: redact(e instanceof Error ? e.message : e) }, null, 2))
+    fs.writeFileSync(path.join(output, 'failure.json'), JSON.stringify({ ...sourceIdentity, head, baseline: BASELINE, cancelled, message: redact(e instanceof Error ? e.message : e) }, null, 2))
     throw e
   } finally { fs.rmSync(root, { recursive: true, force: true }) }
 }
