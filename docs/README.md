@@ -12,8 +12,8 @@ checkPaths:
   - docs/design/README.md
   - docs/implementation/README.md
 lastReviewedAt: 2026-11-19
-lastReviewedCommit: 7f47619c54d31d640669d52400a5c62f351a982d
-lastReviewedNote: "Identity #57 reviewed the existing design and scope boundaries for the development lint graph and isolated image qualification."
+lastReviewedCommit: b3821ff2212d7cf6707c5b5090d1912badf60fdd
+lastReviewedNote: "Identity #58 reviewed the existing ownership/design/DB and delivery boundaries for the scoped database graph and immutable source qualification. No product, deployment, production authorization or retained #49/#51/#52 scope changes."
 ---
 
 # Identity Platform 文档

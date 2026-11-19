@@ -1,3 +1,8 @@
+---
+lastReviewedAt: 2026-11-19
+lastReviewedCommit: b3821ff2212d7cf6707c5b5090d1912badf60fdd
+---
+
 # L0 依赖版本查证记录(2026-07-02)
 
 按 GOAL §5.1"先查证后实现"执行的版本调研结论与实际安装版本。后续各层引入新库时在 `docs/references/` 追加同类记录。

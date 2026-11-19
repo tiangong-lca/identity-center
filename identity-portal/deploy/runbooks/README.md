@@ -12,8 +12,8 @@ checkPaths:
   - identity-portal/deploy/docker/**
   - identity-portal/deploy/runbooks/**
 lastReviewedAt: 2026-11-19
-lastReviewedCommit: 041691db7e94608c20804b901e1a976b32c9c97a
-lastReviewedNote: "Identity #57 reviewed the ESLint configuration and plugin against the accepted framework graph, frozen lock, image inputs and authentication behavior suite."
+lastReviewedCommit: b3821ff2212d7cf6707c5b5090d1912badf60fdd
+lastReviewedNote: "Identity #58 reviewed the four database declarations, strictly scoped lock, immutable source cases, actual offline SQL/client proof and unchanged complete hosted gates. Historical DB/design/security requirements and retained #49/#51/#52 scope remain unchanged."
 ---
 
 # 统一身份平台 · 部署/启动/运行 Runbook
