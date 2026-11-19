@@ -182,3 +182,20 @@ and any required follow-up. Original29 remains closed unmerged.
 The separate [security qualification](../references/2026-10-28-dependency-security.md) records the exact Main68 baseline, compatible graph, required all-copy sanitizer patch and pending full qualification. No zero-vulnerability claim or legacy-esbuild waiver is made.
 
 Identity48 correction restores only the independently reviewed satisfied-range graph drift and adds mandatory source-bound behavioral fixture receipts. Actual DOM/browser and application-format security proof remain gated; Both public CommonJS and rooted Node ESM controls are now required; actual Next application proof remains pending. See the security qualification record for current limitations.
+
+## Next.js 16.4.6 qualification for Identity #55
+
+The original Next.js 16.4.5 proposal stopped during the 24-hour frozen-install
+age check on two newly published transitive packages. The original lock
+installed successfully after the cutoff elapsed. The next unit stage then
+rejected its manifest against the prior image source hash. Keep both observations
+when evaluating the original PR.
+
+The focused 16.4.6 update is resolved from the accepted Main graph. Only Next,
+its environment package and eight native SWC packages move. The unchanged
+compatibility pins include React, next-auth, Keycloak, the ESLint configuration
+and the Monaco patch. The earlier `security-audit` case retains its immutable
+baseline and expectations. The current `next-16.4.6` case binds the new input
+bytes and uses that same behavioral suite. The former Next.js advisories clear
+on a fresh audit, while the separately recorded #49 and #52 residuals retain
+their existing owners. See the [source and image proof contract](../../identity-portal/tests/auth-compatibility/README.md).
