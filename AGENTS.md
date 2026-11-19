@@ -12,8 +12,8 @@ checkPaths:
   - docs/README.md
   - identity-portal/AGENTS.md
 lastReviewedAt: 2026-11-19
-lastReviewedCommit: 969508cc2355f25b8852190918c3b13f81a81e21
-lastReviewedNote: "Identity #58 reviewed the scoped database graph and immutable dependency qualification, including the correction that confines whole schema/migration equality to its explicit case. Ordinary quality uses an owned probe; product/design/DB semantics, original auth/image gates and retained #49/#51/#52 scope stay unchanged."
+lastReviewedCommit: 65a4de21e933e5c97f00d1a625889ae5713313b7
+lastReviewedNote: "Identity #58 reviewed the exact observed EC2-only hosted transport correction, zero-write non-applicable outcomes and hard context/IO failures. Existing dependency, signature, auth/image, timeout/retry, product/DB and retained #49/#51/#52 boundaries remain unchanged."
 ---
 
 # identity-center 代理入口

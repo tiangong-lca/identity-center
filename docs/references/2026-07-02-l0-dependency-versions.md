@@ -1,6 +1,6 @@
 ---
 lastReviewedAt: 2026-11-19
-lastReviewedCommit: 969508cc2355f25b8852190918c3b13f81a81e21
+lastReviewedCommit: 65a4de21e933e5c97f00d1a625889ae5713313b7
 ---
 
 # L0 依赖版本查证记录(2026-07-02)
