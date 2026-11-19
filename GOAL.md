@@ -11,9 +11,9 @@ checkPaths:
   - GOAL.md
   - docs/implementation/README.md
   - docs/implementation/definition-of-done.md
-lastReviewedAt: 2026-10-28
-lastReviewedCommit: f0a0658568f07f5e3317817041acb4bd71676a72
-lastReviewedNote: "Identity48 cancellation proof closure: after unchanged TERM grace/KILL, require actual owned-group absence and direct-child reaping within a bounded one-second join; unknown observations fail closed. Host retains cancel metadata/no proof while preserving failed supervisor status. Existing immediate PID/deadline/trap checks remain, with actual descendant and unavailable-observation controls. Graph/product/patch/generator/formatter unchanged; fresh hosted qualification remains pending."
+lastReviewedAt: 2026-11-19
+lastReviewedCommit: 0a9bfba88aea3050b1635fdc30c26758a259d9e4
+lastReviewedNote: "Identity #55. Reviewed the existing identity scope and documentation boundaries for isolated Next.js qualification and retained provider ownership."
 ---
 
 # GOAL — 统一身份平台一期全量交付
