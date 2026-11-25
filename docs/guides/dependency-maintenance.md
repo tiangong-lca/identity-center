@@ -11,8 +11,8 @@ checkPaths:
   - .github/dependabot.yml
   - identity-portal/pnpm-lock.yaml
   - docs/guides/dependency-maintenance.md
-lastReviewedAt: 2026-11-19
-lastReviewedCommit: 65a4de21e933e5c97f00d1a625889ae5713313b7
+lastReviewedAt: 2026-11-25
+lastReviewedCommit: fe8933b9b592fde21392ea8add13731c2827448e
 lastReviewedNote: "Identity #58 reviewed the exact observed EC2-only hosted transport correction, zero-write non-applicable outcomes and hard context/IO failures. Existing dependency, signature, auth/image, timeout/retry, product/DB and retained #49/#51/#52 boundaries remain unchanged."
 ---
 
@@ -32,6 +32,17 @@ workflows and Portal/Worker Docker stages select that runtime. Lifting the ceili
 needs explicit approval of another major runtime/types baseline and compatibility
 qualification. Other packages and Actions continue ordinary Dependabot proposals,
 including individually visible majors.
+
+The npm entry also ignores `monaco-editor` version proposals (Identity #61) while
+`identity-portal/pnpm-workspace.yaml` retains the exact `patchedDependencies` pin
+`"monaco-editor@0.55.1": patches/monaco-editor@0.55.1.patch` (and its
+`monaco-editor@0.55.1>dompurify` override) introduced for Identity #46. Without this
+exact-name exclusion, weekly hosted npm scans fail with
+`dependency_file_not_resolvable` because updating `monaco-editor` orphans the
+version-pinned pnpm patch. Revisit and remove or update this exclusion when
+`monaco-editor` is intentionally upgraded and its YAML worker initialization / patch
+requirement is re-verified, or when a security advisory requires upgrading
+`monaco-editor`; GitHub security alerts remain enabled.
 
 Preserve the exact pnpm11.9 package-manager declaration/integrity, frozen lockfile,
 workspace build approvals and Node24 track. The existing

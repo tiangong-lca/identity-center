@@ -13,6 +13,9 @@ updates:
     ignore:
       - dependency-name: "@types/node"
         versions: [">=25.0.0"]
+      # Pinned by pnpm patchedDependencies ("monaco-editor@0.55.1" in identity-portal/pnpm-workspace.yaml for #46);
+      # revisit when intentionally upgrading monaco-editor and re-verifying its patch/worker behavior, or on security advisory (#61).
+      - dependency-name: "monaco-editor"
     groups:
       react-next:
         applies-to: version-updates
