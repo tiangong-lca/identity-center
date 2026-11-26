@@ -11,8 +11,8 @@ checkPaths:
   - identity-portal/deploy/runbooks/README.md
   - identity-portal/deploy/docker/**
   - identity-portal/deploy/runbooks/**
-lastReviewedAt: 2026-11-19
-lastReviewedCommit: 65a4de21e933e5c97f00d1a625889ae5713313b7
+lastReviewedAt: 2026-11-26
+lastReviewedCommit: a29238562b2c84eb6501214f96dc2aa67eec52ac
 lastReviewedNote: "Identity #58 reviewed the exact observed EC2-only hosted transport correction, zero-write non-applicable outcomes and hard context/IO failures. Existing dependency, signature, auth/image, timeout/retry, product/DB and retained #49/#51/#52 boundaries remain unchanged."
 ---
 
