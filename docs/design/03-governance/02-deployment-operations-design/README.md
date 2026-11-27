@@ -11,8 +11,8 @@ checkPaths:
   - docs/design/03-governance/02-deployment-operations-design/README.md
   - identity-portal/deploy/**
   - identity-portal/lib/config/**
-lastReviewedAt: 2026-11-26
-lastReviewedCommit: a29238562b2c84eb6501214f96dc2aa67eec52ac
+lastReviewedAt: 2026-11-27
+lastReviewedCommit: 555abc45faff6179fe82934bf72031b3977d4687
 lastReviewedNote: "Identity #58 reviewed the exact observed EC2-only hosted transport correction, zero-write non-applicable outcomes and hard context/IO failures. Existing dependency, signature, auth/image, timeout/retry, product/DB and retained #49/#51/#52 boundaries remain unchanged."
 ---
 

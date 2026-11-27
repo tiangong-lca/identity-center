@@ -11,8 +11,8 @@ checkPaths:
   - docs/README.md
   - docs/design/README.md
   - docs/implementation/README.md
-lastReviewedAt: 2026-11-26
-lastReviewedCommit: 623e6b75b584ee05d94ea498ba2317cc46004082
+lastReviewedAt: 2026-11-27
+lastReviewedCommit: 555abc45faff6179fe82934bf72031b3977d4687
 lastReviewedNote: "Identity #58 reviewed the exact observed EC2-only hosted transport correction, zero-write non-applicable outcomes and hard context/IO failures. Existing dependency, signature, auth/image, timeout/retry, product/DB and retained #49/#51/#52 boundaries remain unchanged."
 ---
 
