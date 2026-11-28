@@ -24,7 +24,7 @@
     "@keycloak/keycloak-admin-client": "^26.8.1",
     "@monaco-editor/react": "^4.7.0",
     "@tanstack/react-query": "^5.101.2",
-    "amqplib": "^2.0.1",
+    "amqplib": "^2.4.0",
     "bullmq": "^5.79.2",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
